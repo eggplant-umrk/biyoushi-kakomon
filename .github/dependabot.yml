@@ -6,6 +6,9 @@ updates:
       interval: weekly
       timezone: Asia/Tokyo
     open-pull-requests-limit: 5
+    ignore:
+      # CI のコンテナイメージ（mcr.microsoft.com/playwright）と版をそろえる必要があるので手動で上げる
+      - dependency-name: '@playwright/test'
     groups:
       npm-minor-patch:
         update-types: [minor, patch]
