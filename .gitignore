@@ -1,0 +1,25 @@
+node_modules/
+dist/
+dev-dist/
+*.tsbuildinfo
+
+# 過去問の元データ（PDF・ページ画像）はコミットしない（SPEC §6.1）
+raw/
+
+# 秘密の値（SPEC §6.5 / §8.4）
+.env.local
+.env.*.local
+firestore.rules
+
+# テスト結果
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# Python
+__pycache__/
+*.pyc
+
+.DS_Store
+Thumbs.db
