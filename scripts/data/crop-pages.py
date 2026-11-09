@@ -40,7 +40,7 @@ for i, page in enumerate(doc, start=1):
         if sum(1 for v in col if v < 140) > 1:
             xs.append(x)
     ratio = dark / (w * h)
-    if ratio < 0.0009 or not xs or not ys:
+    if ratio < 0.0004 or not xs or not ys:
         print(f"{name}: skip (ink {ratio:.4f})")
         continue
     # 余白は固定で除く（文字が薄いページで本文を欠かさないよう、自動判定は使わない）

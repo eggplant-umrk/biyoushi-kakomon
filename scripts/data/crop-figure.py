@@ -25,15 +25,21 @@ def erase_answer_mark(img: Image.Image, threshold: int) -> int:
     for y in range(h):
         for x in range(w):
             r, g, b = px[x, y]
-            if max(r, g, b) - min(r, g, b) > threshold and (r + g + b) / 3 > 50:
-                mask.add((x, y))
-    # にじんだ縁も消すため 1px 広げる
+            if max(r, g, b) - min(r, g, b) > threshold:
+                if max(r, g, b) < 120:
+                    # 〇印と黒い線が重なった画素は、線として灰色に戻す（線が途切れないように）
+                    v = max(r, g, b) // 2
+                    px[x, y] = (v, v, v)
+                else:
+                    mask.add((x, y))
+    # にじんだ縁も消すため 1px 広げる（暗い画素＝線は広げた範囲に含めない）
     grown = set(mask)
     for x, y in mask:
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
-                if 0 <= x + dx < w and 0 <= y + dy < h:
-                    grown.add((x + dx, y + dy))
+                q = (x + dx, y + dy)
+                if 0 <= q[0] < w and 0 <= q[1] < h and sum(px[q]) / 3 > 110:
+                    grown.add(q)
     todo = grown
     filled = len(todo)
     while todo:
