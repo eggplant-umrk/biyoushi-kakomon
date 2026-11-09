@@ -1,0 +1,157 @@
+{
+  "examNo": 54,
+  "questions": [
+    {
+      "id": "54-01",
+      "examNo": 54,
+      "no": 1,
+      "fieldId": "law",
+      "stem": "【サンプル問題】このアプリの使い方に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "解答した後は、左にスワイプすると次の問題へ進める。",
+        "★をタップすると、あとで見直す問題としてチェックできる。",
+        "ログインせずに使った場合も、記録はクラウドに保存される。",
+        "正誤は色だけでなく、○×の記号と文字でも表示される。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": {
+        "summary": "ログインせずに使う（ゲストモード）場合、記録はこの端末の中だけに保存されるので、(3)が誤り。これはフェーズ1の動作確認用のダミー問題で、実際の試験問題ではない。",
+        "perChoice": [
+          "正しい。解答後は左スワイプか「次へ」ボタンで次の問題へ進める。",
+          "正しい。チェックした問題は、出題条件の「チェックした問題だけ」でまとめて解ける。",
+          "誤り。ゲストモードの記録は端末内だけに保存される。正しくは「端末の中だけ」。",
+          "正しい。色の見え方に関係なく分かるよう、○×と文字を併記している。"
+        ],
+        "traps": ["クラウドに保存される"],
+        "keyPoint": "ゲストモード＝端末内だけ／ログイン＝クラウドに保存",
+        "sources": [],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null
+      },
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "54-11",
+      "examNo": 54,
+      "no": 11,
+      "fieldId": "public_health",
+      "stem": "【サンプル問題】このアプリの問題データに関する次の記述のうち、[[u:正しいもの]]はどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "収録するのは第41回〜第54回の新制度の筆記試験である。",
+        "問題文は、毎回AIが新しく作っている。",
+        "検索エンジンで見つけやすいように公開している。",
+        "解説はすべて公式に発表されたものである。"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": {
+        "summary": "収録範囲は第41回〜第54回の新制度試験なので、(1)が正しい。これは動作確認用のダミー問題である。",
+        "perChoice": [
+          "正しい。14回×55問＝770問を収録する予定。",
+          "誤り。問題文は公式に公開された過去問のまま収録する。",
+          "誤り。URLを知っている人だけが使う前提で、検索エンジンにはインデックスさせない。",
+          "誤り。公式の解説はなく、解説は独自に作成している。"
+        ],
+        "traps": [],
+        "keyPoint": null,
+        "sources": [
+          { "title": "公益財団法人 理容師美容師試験研修センター", "url": "https://www.rbc.or.jp/", "type": "gov" }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null
+      },
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "54-16",
+      "examNo": 54,
+      "no": 16,
+      "fieldId": "infection",
+      "stem": "【サンプル問題】次のa〜dのうち、このアプリの出題画面にあるものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        { "label": "a", "text": "進捗バー" },
+        { "label": "b", "text": "広告" },
+        { "label": "c", "text": "「次へ」ボタン" },
+        { "label": "d", "text": "ほかの利用者の正答率" }
+      ],
+      "choices": ["a と b", "a と c", "b と d", "c と d"],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "54-36",
+      "examNo": 54,
+      "no": 36,
+      "fieldId": "cosmetics",
+      "stem": "【サンプル問題】濃度10%の溶液100mLに水を加えて濃度2%にするとき、全体の量を何mLにすればよいか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": ["200mL", "300mL", "500mL", "1000mL"],
+      "answer": 3,
+      "images": [],
+      "explanation": {
+        "summary": "水で薄めても溶けている成分の量は変わらないので、10%×100mL＝2%×全体量 となり、全体量は500mL。計算問題の解説表示の見本である。",
+        "perChoice": [
+          "誤り。200mLだと 10÷200×100＝5% になる。",
+          "誤り。300mLだと 10÷300×100≒3.3% になる。",
+          "正しい。成分の量は 100mL×0.10＝10mL。10mL÷0.02＝500mL。",
+          "誤り。1000mLだと 10÷1000×100＝1% になる。"
+        ],
+        "traps": [],
+        "keyPoint": "薄める計算：濃度×量 は薄める前後で同じ",
+        "sources": [],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null
+      },
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "54-41",
+      "examNo": 54,
+      "no": 41,
+      "fieldId": "theory",
+      "stem": "【サンプル問題】このアプリの設定で選べる文字サイズとして、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": ["標準", "大", "特大", "極小"],
+      "answer": 4,
+      "images": [],
+      "explanation": {
+        "summary": "文字サイズは「標準／大／特大」の3つから選ぶので、(4)の極小が誤り。この問題は「注意フラグ」と「確認中」表示の見本である。",
+        "perChoice": [
+          "正しい。本文は17px以上で表示する。",
+          "正しい。設定画面で選べる。",
+          "正しい。設定画面で選べる。",
+          "誤り。小さくする設定はない。"
+        ],
+        "traps": ["極小"],
+        "keyPoint": null,
+        "sources": [],
+        "crossChecked": 0,
+        "confidence": "low",
+        "status": "published",
+        "asOf": null
+      },
+      "caution": "【見本】法改正や統計の更新で内容が変わった問題には、ここに注記が表示されます。",
+      "ocrChecked": true
+    }
+  ]
+}
