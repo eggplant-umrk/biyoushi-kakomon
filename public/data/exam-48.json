@@ -1,0 +1,1231 @@
+{
+  "examNo": 48,
+  "questions": [
+    {
+      "id": "48-01",
+      "examNo": 48,
+      "no": 1,
+      "fieldId": "law",
+      "stem": "美容師の養成と免許に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "外国で美容を業としていた者であっても、日本で美容師となるためには、美容師養成施設において必要な知識及び技能を修得しなければならない。",
+        "理容師養成施設又は美容師養成施設のいずれか一方を卒業した者が、他方の養成施設で履修する場合には、履修課目の一部を免除する制度が設けられている。",
+        "美容師試験に合格しても、かつて無免許で美容の業を行った者には、免許が与えられないことがある。",
+        "美容師試験に合格しても、伝染性の疾病にかかっている者には、免許が与えられないことがある。"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-02",
+      "examNo": 48,
+      "no": 2,
+      "fieldId": "law",
+      "stem": "美容師に対する行政処分と罰則に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "美容師が伝染性の疾病にかかり、その就業が公衆衛生上不適当と認められるときは、業務停止処分となることがある。",
+        "美容師が業務停止処分に違反したときは、そのことにより罰金に処されることがある。",
+        "美容師が精神の機能の障害により業務を適正に行うことができないときは、免許を取り消されることがある。",
+        "美容師が免許の取消処分後においても、引き続き、美容の業務を行ったときは、罰金に処されることがある。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-03",
+      "examNo": 48,
+      "no": 3,
+      "fieldId": "law",
+      "stem": "美容所の開設に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "美容所の開設者は、美容師の免許を有する者でなければならない。",
+        "会社の福利厚生のための美容所については、業として行う場合であっても開設の届出は不要である。",
+        "美容所の開設の届出事項には、美容師の氏名は含まれるが、その他の従業者の氏名は含まれない。",
+        "美容所の開設届には、業務に従事する美容師について、指定された伝染性疾病の有無に関する医師の診断書を添えなければならない。"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-04",
+      "examNo": 48,
+      "no": 4,
+      "fieldId": "law",
+      "stem": "出張美容に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "美容師が出張美容において美容師法に基づく衛生上の措置を行わなかったときは、業務停止処分となることがある。",
+        "出張美容が認められる場合については、都道府県等の条例のみで定められている。",
+        "家族の育児や介護に従事している者に対する出張美容は、いかなる場合も認められない。",
+        "美容師が出張美容が認められない場所で美容の業務を行ったときは、美容所の閉鎖処分となることがある。"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-05",
+      "examNo": 48,
+      "no": 5,
+      "fieldId": "law",
+      "stem": "美容所の開設者に対する行政処分と罰則に関する次の記述のうち、正しいものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        {
+          "label": "a",
+          "text": "管理美容師を設置すべき美容所に管理美容師を設置しないときは、美容所の閉鎖処分となることがある。"
+        },
+        {
+          "label": "b",
+          "text": "美容所開設時における検査確認を受けずに美容所を使用したときは、罰金に処されることがある。"
+        },
+        {
+          "label": "c",
+          "text": "美容師法に基づく衛生措置を行わなかったときは、そのことにより罰金に処されることがある。"
+        },
+        {
+          "label": "d",
+          "text": "環境衛生監視員による立入検査を妨害したときは、美容所の閉鎖処分となることがある。"
+        }
+      ],
+      "choices": [
+        "aとb",
+        "bとc",
+        "cとd",
+        "aとd"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-06",
+      "examNo": 48,
+      "no": 6,
+      "fieldId": "law",
+      "stem": "生活衛生関係営業の運営の適正化及び振興に関する法律に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "生活衛生同業組合は、料金等を規制するための標準営業約款を定めることができる。",
+        "美容業については、1つの都道府県に複数の生活衛生同業組合を設立することができる。",
+        "生活衛生営業指導センターは、経営の健全化を通じて衛生水準の維持向上を図り、利用者又は消費者の利益を守るために設置されている。",
+        "都道府県知事は、生活衛生関係営業の振興を図るため、振興指針を定めることができる。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-07",
+      "examNo": 48,
+      "no": 7,
+      "fieldId": "law",
+      "stem": "美容業の衛生や運営に関連する法律に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "医薬品、医療機器等の品質、有効性及び安全性の確保等に関する法律は、化粧品を規制の対象としていない。",
+        "医師法に基づき、医師でない者が針先に色素を付け皮膚の表面に墨等の色素を入れる行為(アートメイク)を業として行うことは禁止されている。",
+        "廃棄物の処理及び清掃に関する法律に基づき、美容所から出される毛髪については産業廃棄物として処理される。",
+        "個人情報の保護に関する法律は、一定の数以上の個人情報を管理する事業者のみを規制の対象としている。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-08",
+      "examNo": 48,
+      "no": 8,
+      "fieldId": "law",
+      "stem": "国民年金制度に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "老齢基礎年金は、保険料納付済期間によって給付額が異なる。",
+        "遺族基礎年金は、被保険者が死亡した場合に、一定の要件に該当する遺族に支給される。",
+        "国民年金の第1号被保険者(自営業者等)の保険料は、所得が高いほど高額となる。",
+        "付加保険料を納付することで付加年金が支給される制度が設けられている。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-09",
+      "examNo": 48,
+      "no": 9,
+      "fieldId": "law",
+      "stem": "医療保険に関する次の記述のうち、正しいものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        {
+          "label": "a",
+          "text": "健康保険の保険者は、全国健康保険協会と健康保険組合である。"
+        },
+        {
+          "label": "b",
+          "text": "健康保険の保険料は、すべての保険者で一律に設定されている。"
+        },
+        {
+          "label": "c",
+          "text": "国民健康保険の保険者は、国と国民健康保険組合である。"
+        },
+        {
+          "label": "d",
+          "text": "国民健康保険の保険料は、保険者ごとに個々に設定されている。"
+        }
+      ],
+      "choices": [
+        "aとb",
+        "bとc",
+        "cとd",
+        "aとd"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-10",
+      "examNo": 48,
+      "no": 10,
+      "fieldId": "law",
+      "stem": "労働保険に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "雇用保険の基本手当は、一定の要件を満たせば自己都合で退職し失業した場合にも支給される。",
+        "雇用保険の給付には、育児休業給付は含まれない。",
+        "労働者災害補償保険の適用事業に雇用される者は、国籍や身分、年齢などにかかわらず適用労働者となる。",
+        "労働者災害補償保険では、通勤途上の事故により被った傷病に対しても保険給付を受けられることがある。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-11",
+      "examNo": 48,
+      "no": 11,
+      "fieldId": "public_health",
+      "stem": "保健所に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "地域における公衆衛生の第一線機関である。",
+        "感染症の予防や精神保健、難病に関する事業を実施している。",
+        "食品衛生関係施設の監視や指導を実施している。",
+        "介護認定審査会が設置されている。"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-12",
+      "examNo": 48,
+      "no": 12,
+      "fieldId": "public_health",
+      "stem": "わが国の平均寿命に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "2015年の平均寿命は、男女とも80年を超えている。",
+        "2015年の男女の平均寿命の差は、10年以下である。",
+        "平均寿命は、2015年がピークである。",
+        "戦後の平均寿命の延びの一因は、公衆衛生の向上である。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-13",
+      "examNo": 48,
+      "no": 13,
+      "fieldId": "public_health",
+      "stem": "喫煙と飲酒に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "わが国の女性の喫煙者率は、2005年以降上昇し続けている。",
+        "たばこの煙には、多種の発がん物質や発がん促進物質が含まれている。",
+        "受動喫煙の防止が、健康増進法に定められている。",
+        "飲酒に起因する健康障害には、アルコール依存症のみならず、脳卒中、がんなども含まれる。"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-14",
+      "examNo": 48,
+      "no": 14,
+      "fieldId": "public_health",
+      "stem": "日本の四季と疾病に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "春季には、スギやヒノキによる花粉症の患者が多くなる。",
+        "梅雨明け直後は、多くの人が十分に暑さに慣れていないため、熱中症リスクが高くなる。",
+        "夏季には、ウイルス性の食中毒の発生件数がピークとなる。",
+        "冬季には、季節性インフルエンザの患者が多くなる。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-15",
+      "examNo": 48,
+      "no": 15,
+      "fieldId": "public_health",
+      "stem": "一酸化炭素に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "不快な臭いがする。",
+        "赤血球のヘモグロビンとの結合力が酸素より強い。",
+        "人間の健康に対する影響はない。",
+        "空気中には窒素に次いで多く含まれる。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-16",
+      "examNo": 48,
+      "no": 16,
+      "fieldId": "infection",
+      "stem": "次の感染症のうち、細菌を病原体とするものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "後天性免疫不全症候群(エイズ)",
+        "アニサキス症",
+        "重症急性呼吸器症候群(SARS)",
+        "百日せき"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-17",
+      "examNo": 48,
+      "no": 17,
+      "fieldId": "infection",
+      "stem": "細菌とウイルスに関する次の記述のうち、正しいものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        {
+          "label": "a",
+          "text": "細菌は生きた細胞の中だけで発育するため、環境中に存在することはない。"
+        },
+        {
+          "label": "b",
+          "text": "本来は病原性の強くない常在細菌によっても、宿主の抵抗力低下により発病することがある。"
+        },
+        {
+          "label": "c",
+          "text": "細菌やウイルスが薬剤に対して抵抗性を持つようになることを、耐性を獲得したという。"
+        },
+        {
+          "label": "d",
+          "text": "ウイルスは変異によって弱毒となるが、強毒となることはない。"
+        }
+      ],
+      "choices": [
+        "aとb",
+        "bとc",
+        "cとd",
+        "aとd"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-18",
+      "examNo": 48,
+      "no": 18,
+      "fieldId": "infection",
+      "stem": "次の感染症のうち、空気感染するものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "破傷風",
+        "C型肝炎",
+        "麻しん",
+        "デング熱"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-19",
+      "examNo": 48,
+      "no": 19,
+      "fieldId": "infection",
+      "stem": "結核に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "2週間以上の長く続くせきは、結核の症状の1つである。",
+        "早期発見のために定期の健康診断が行われている。",
+        "美容師が罹患（りかん）した場合は、感染症法に基づく就業制限の対象となる。",
+        "年間の新規登録患者数は、近年1,000人程度で推移している。"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-20",
+      "examNo": 48,
+      "no": 20,
+      "fieldId": "infection",
+      "stem": "腸管出血性大腸菌感染症に関する次の記述のうち、正しいものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        {
+          "label": "a",
+          "text": "保菌者の便を通じて家族などに二次感染することがある。"
+        },
+        {
+          "label": "b",
+          "text": "病原体は、ベロ毒素を出すのが特徴である。"
+        },
+        {
+          "label": "c",
+          "text": "病原体は熱に強く、加熱によって死滅することはない。"
+        },
+        {
+          "label": "d",
+          "text": "潜伏期は、約20日である。"
+        }
+      ],
+      "choices": [
+        "aとb",
+        "bとc",
+        "cとd",
+        "aとd"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-21",
+      "examNo": 48,
+      "no": 21,
+      "fieldId": "hygiene",
+      "stem": "美容所で行うべき措置に関する次の文章の［　］内に入る語句の組合せのうち、正しいものはどれか。\n「美容師法では、皮ふに接する布片は客一人ごとに［A］、皮ふに接する器具は客一人ごとに［B］することと定められている。また、美容所には［C］設備を設けなければならない。」",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "A：取りかえ　B：消毒　C：消毒",
+        "A：消毒し　B：消毒　C：滅菌",
+        "A：取りかえ　B：洗浄　C：滅菌",
+        "A：消毒し　B：洗浄　C：消毒"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-22",
+      "examNo": 48,
+      "no": 22,
+      "fieldId": "hygiene",
+      "stem": "美容所で行う血液が付着している疑いのない器具類の消毒法に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "かみそりの表面を消毒用エタノールを含ませた綿で拭く。",
+        "くしを0.01%次亜塩素酸ナトリウム水溶液に10分間以上浸す。",
+        "はさみを沸騰後2分間以上煮沸する。",
+        "クリッパーの刃を0.1%逆性石けん水溶液に10分間以上浸す。"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-23",
+      "examNo": 48,
+      "no": 23,
+      "fieldId": "hygiene",
+      "stem": "理学的消毒法に関する次の記述のうち、正しいものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        {
+          "label": "a",
+          "text": "紫外線は固体表面の消毒に適するが、陰になる部分の消毒はできない。"
+        },
+        {
+          "label": "b",
+          "text": "紫外線の消毒効果は、汚れのついた表面でも減弱しない。"
+        },
+        {
+          "label": "c",
+          "text": "80〜100℃、10分間の蒸気消毒で細菌の芽胞は不活化する。"
+        },
+        {
+          "label": "d",
+          "text": "2〜3分間の煮沸消毒では、細菌の芽胞は不活化しない。"
+        }
+      ],
+      "choices": [
+        "aとb",
+        "bとc",
+        "cとd",
+        "aとd"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-24",
+      "examNo": 48,
+      "no": 24,
+      "fieldId": "hygiene",
+      "stem": "消毒用エタノールに関する次の記述のうち、正しいものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        {
+          "label": "a",
+          "text": "エタノールの濃度は40〜50%である。"
+        },
+        {
+          "label": "b",
+          "text": "消毒効果は逆性石けんと併用すると減弱する。"
+        },
+        {
+          "label": "c",
+          "text": "揮発性が強く、引火性がある。"
+        },
+        {
+          "label": "d",
+          "text": "手指や刃物類の消毒に適している。"
+        }
+      ],
+      "choices": [
+        "aとb",
+        "bとc",
+        "cとd",
+        "aとd"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-25",
+      "examNo": 48,
+      "no": 25,
+      "fieldId": "hygiene",
+      "stem": "次のうち、5%グルコン酸クロルヘキシジン10mLを水で希釈してグルコン酸クロルヘキシジン水溶液1,000mLを調製した場合の濃度はどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "0.01%",
+        "0.05%",
+        "0.1%",
+        "0.5%"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-26",
+      "examNo": 48,
+      "no": 26,
+      "fieldId": "anatomy",
+      "stem": "次のうち、鼻翼の付け根から口角の外側に向かう溝はどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "人中",
+        "鼻唇溝",
+        "オトガイ唇溝",
+        "赤唇縁"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-27",
+      "examNo": 48,
+      "no": 27,
+      "fieldId": "anatomy",
+      "stem": "次の骨の構造のうち、造血作用があるものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "黄色骨髄",
+        "赤色骨髄",
+        "海綿質",
+        "緻密質"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-28",
+      "examNo": 48,
+      "no": 28,
+      "fieldId": "anatomy",
+      "stem": "次の筋のうち、副交感神経の興奮により収縮するものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "心筋",
+        "皮膚血管の平滑筋",
+        "気管支の平滑筋",
+        "立毛筋"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-29",
+      "examNo": 48,
+      "no": 29,
+      "fieldId": "anatomy",
+      "stem": "次の眼の構造のうち、瞳孔に入る光の量を調節する絞りの働きをするものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "角膜",
+        "虹彩",
+        "硝子体",
+        "毛様体"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-30",
+      "examNo": 48,
+      "no": 30,
+      "fieldId": "anatomy",
+      "stem": "次のうち、リンパ管が合流する血管はどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "静脈",
+        "動脈",
+        "毛細血管",
+        "門脈"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-31",
+      "examNo": 48,
+      "no": 31,
+      "fieldId": "skin",
+      "stem": "皮膚の構造に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "表皮は、皮膚表面より順に基底層、有棘（ゆうきょく）層、顆粒（かりゅう）層、角質層の4つの細胞層からなる。",
+        "色素細胞(メラノサイト)は、表皮細胞の95%を占める。",
+        "真皮の外側には、多量の脂肪を含んだ皮下組織がある。",
+        "真皮は表皮の数倍の厚さの層で、膠原（こうげん）線維や弾性線維を含む。"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-32",
+      "examNo": 48,
+      "no": 32,
+      "fieldId": "skin",
+      "stem": "皮膚付属器官の構造に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "睫毛（しょうもう）(まつ毛)、耳毛、鼻毛以外の毛は、皮膚表面から垂直に生えている。",
+        "毛母の部分には色素細胞が多数存在し、毛に色素を与えている。",
+        "立毛筋は、毛包の一部がやや隆起した部分(毛隆起)に付着している。",
+        "毛は、ケラチンという硫黄を含むタンパク質の一種からなる。"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-33",
+      "examNo": 48,
+      "no": 33,
+      "fieldId": "skin",
+      "stem": "皮膚と皮膚付属器官の生理機能に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "皮膚の表面にある脂肪膜は弱酸性で、細菌などの発育を抑制する。",
+        "脂肪膜と角質層のケラチンは、化学的刺激に対する保護の働きをする。",
+        "男性ホルモンは、脂腺の発育を促進する。",
+        "エクリン腺の汗はアルカリ性で、アポクリン腺の汗は酸性である。"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-34",
+      "examNo": 48,
+      "no": 34,
+      "fieldId": "skin",
+      "stem": "皮膚と紫外線に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "紫外線のうち、UVCの波長が最も長い。",
+        "UVBは、UVAに比べて皮膚に対する刺激が強い。",
+        "メラニンが産生され、皮膚の色が濃くなることをサンバーンという。",
+        "紫外線により生じる紅斑のことをサンタンという。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-35",
+      "examNo": 48,
+      "no": 35,
+      "fieldId": "skin",
+      "stem": "次の感染性皮膚疾患のうち、ウイルスを病原体とするものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "伝染性膿痂疹（のうかしん）",
+        "疥癬（かいせん）",
+        "伝染性軟属腫(ミズイボ)",
+        "頭部白癬（はくせん）(シラクモ)"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-36",
+      "examNo": 48,
+      "no": 36,
+      "fieldId": "cosmetics",
+      "stem": "アルコールに関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "エタノール(エチルアルコール)は、水に溶けない化合物を化粧品に配合するための溶媒として用いられる。",
+        "メタノール(メチルアルコール)は、消毒・殺菌作用を持ち、化粧品に配合される。",
+        "セタノール(セチルアルコール)は、高級アルコールの一種で、乳化助剤として用いられる。",
+        "グリセリンは、天然の油脂を分解して得られるアルコールの一種である。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-37",
+      "examNo": 48,
+      "no": 37,
+      "fieldId": "cosmetics",
+      "stem": "界面活性剤に関する次の記述のうち、正しいものの組合せはどれか。",
+      "polarity": "other",
+      "statements": [
+        {
+          "label": "a",
+          "text": "界面活性剤は、クリームに用いられることはない。"
+        },
+        {
+          "label": "b",
+          "text": "界面活性剤は、水溶液中で必ずイオン化して作用を発揮する。"
+        },
+        {
+          "label": "c",
+          "text": "陽イオン界面活性剤は、毛髪への吸着性に優れている。"
+        },
+        {
+          "label": "d",
+          "text": "アルキル硫酸ナトリウムは、シャンプー剤に用いられる。"
+        }
+      ],
+      "choices": [
+        "aとb",
+        "bとc",
+        "cとd",
+        "aとd"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-38",
+      "examNo": 48,
+      "no": 38,
+      "fieldId": "cosmetics",
+      "stem": "香粧品原料に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "キトサンは、キチンから得られる高分子化合物である。",
+        "ラノリンは、羊の毛から得られるロウである。",
+        "じゃ香(ムスク)は、植物性香料である。",
+        "β-カロチンは、ニンジンに多く含まれる天然色素である。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-39",
+      "examNo": 48,
+      "no": 39,
+      "fieldId": "cosmetics",
+      "stem": "香粧品に用いられる成分とその配合目的に関する次の組合せのうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "パラオキシ安息香酸エステル(パラベン) ― 防腐剤",
+        "パラアミノ安息香酸エステル ― 金属イオン封鎖剤(キレート剤)",
+        "グリセリン ― 保湿剤",
+        "ジブチルヒドロキシトルエン(BHT) ― 酸化防止剤"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-40",
+      "examNo": 48,
+      "no": 40,
+      "fieldId": "cosmetics",
+      "stem": "パーマ剤やヘアカラーの成分とその配合目的に関する次の組合せのうち、正しいものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "アンモニア水 ― 調色剤(カップラー)",
+        "パラフェニレンジアミン ― 酸化剤",
+        "レゾルシン ― アルカリ剤",
+        "チオグリコール酸 ― 還元剤"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-41",
+      "examNo": 48,
+      "no": 41,
+      "fieldId": "theory",
+      "stem": "次の明治時代の女性の髪型のうち、束髪に該当するものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "桃割れ",
+        "結綿",
+        "二百三高地髷（まげ）",
+        "銀杏返し"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-42",
+      "examNo": 48,
+      "no": 42,
+      "fieldId": "theory",
+      "stem": "明治時代の服装に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "警官や鉄道員などの制服が洋装となった。",
+        "女性の車掌(バスガール)が登場し、洋装の制服が採用された。",
+        "海老茶袴（えびちゃばかま）が女学生の代名詞として流行した。",
+        "宮中における大礼服や通常礼服が洋装と規定された。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-43",
+      "examNo": 48,
+      "no": 43,
+      "fieldId": "theory",
+      "stem": "下図の男性の礼装のうち、夜の略式礼装であるタキシードはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "(1)の図",
+        "(2)の図",
+        "(3)の図",
+        "(4)の図"
+      ],
+      "answer": 1,
+      "images": [
+        "images/48/48-43.webp"
+      ],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": false
+    },
+    {
+      "id": "48-44",
+      "examNo": 48,
+      "no": 44,
+      "fieldId": "theory",
+      "stem": "コーム各部の名称とその働きに関する次の組合せのうち、正しいものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "歯元 ― コーム全体の支えとなり、バランスをとる。",
+        "胴 ― 毛髪を引き起こし垂直に立てて両側から支え、そろえる。",
+        "歯先 ― 頭皮に接して毛髪を引き起こす手引きをする。",
+        "歯 ― コームの目に入った毛髪を一線にそろえる。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-45",
+      "examNo": 48,
+      "no": 45,
+      "fieldId": "theory",
+      "stem": "シザーズの操作に関する次の文章の［　］内に入る語句の組合せのうち、正しいものはどれか。\n「［A］で操作する方の鋏身を安定させる。［B］で操作する方の刃が［C］となる。」",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "A：母指　B：薬指　C：静刃",
+        "A：薬指　B：薬指　C：動刃",
+        "A：母指　B：母指　C：静刃",
+        "A：薬指　B：母指　C：動刃"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-46",
+      "examNo": 48,
+      "no": 46,
+      "fieldId": "theory",
+      "stem": "次のうち、スキャルプマッサージの基本手技の揉捻（じゅうねん）法(ペトリサージュ)に該当するものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "皮膚を押さえつけながら強く擦る。",
+        "指先だけでなく腕全体で、皮膚や下部組織に振動を伝える。",
+        "圧迫することで充血を調節し、刺激する。",
+        "4指と母指を用いてもみほぐす。"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-47",
+      "examNo": 48,
+      "no": 47,
+      "fieldId": "theory",
+      "stem": "デザインに関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "ドンディスによる形の3つの基本形は、正方形・円・正三角形である。",
+        "ポンゾ錯視は、角度・方向錯視を代表するものである。",
+        "枠組み効果とは、枠組みによって対象の位置がずれて見える現象である。",
+        "主観的輪郭線とは、実際には輪郭線が存在しないのに、あたかも輪郭線がそこにあるように見える現象である。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-48",
+      "examNo": 48,
+      "no": 48,
+      "fieldId": "theory",
+      "stem": "刃物の材料に関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "鉄に炭素を加えると加工性が低下する。",
+        "ステンレス鋼は、炭素鋼に比べてさびに弱い。",
+        "コバルト鋼は、炭素鋼に比べて摩耗に強い。",
+        "ステンレス鋼には、クロムが約3〜6%含まれている。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-49",
+      "examNo": 48,
+      "no": 49,
+      "fieldId": "theory",
+      "stem": "レザーカット技法に関する次の記述のうち、[[u:誤っているもの]]はどれか。",
+      "polarity": "incorrect",
+      "statements": null,
+      "choices": [
+        "ディープテーパーカットは、根元近くからテーパーする技法である。",
+        "ボスサイドテーパーカットは、パネルの外側と内側の両面をテーパーする技法である。",
+        "ポインティングカットは、パネルの外側をテーパーする技法である。",
+        "ノーマルテーパーカットは、毛先から長さの1/3ほどをテーパーする技法である。"
+      ],
+      "answer": 3,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-50",
+      "examNo": 48,
+      "no": 50,
+      "fieldId": "theory",
+      "stem": "パーマネントウェービングに関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "つけ巻きは、毛髪をウェットの状態でワインディング後、第1剤を塗布する方法である。",
+        "トリートメント巻きは、薬剤の作用をセーブし、かかりすぎないようにするために行う。",
+        "フルウェーブには、使用するロッドの2回転分の毛髪の長さが必要である。",
+        "テストカールは、第2剤の塗布後に行う。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-51",
+      "examNo": 48,
+      "no": 51,
+      "fieldId": "theory",
+      "stem": "右図は、ピンカールのピンを取ったところを表したものである。\nこのカールウェーブをつくるためのピンカールは、次のうちどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "(1)の図",
+        "(2)の図",
+        "(3)の図",
+        "(4)の図"
+      ],
+      "answer": 1,
+      "images": [
+        "images/48/48-51.webp",
+        "images/48/48-51-2.webp"
+      ],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": false
+    },
+    {
+      "id": "48-52",
+      "examNo": 48,
+      "no": 52,
+      "fieldId": "theory",
+      "stem": "酸化染毛剤を用いたヘアカラーリングに関する次の文章の［　］内に入る語句の組合せのうち、正しいものはどれか。\n「太くて硬く、黒い毛髪の場合は、［A］が出やすく、明るさは［B］ので、希望色より明度の［C］染毛剤を選択するとよい。」",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "A：赤み系　B：出にくい　C：高い",
+        "A：黄み系　B：出やすい　C：低い",
+        "A：黄み系　B：出にくい　C：高い",
+        "A：赤み系　B：出やすい　C：低い"
+      ],
+      "answer": 1,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-53",
+      "examNo": 48,
+      "no": 53,
+      "fieldId": "theory",
+      "stem": "次のマニキュア技術の手順の［　］内に入る語句の組合せのうち、正しいものはどれか。\n手指消毒→エナメル除去→カウンセリング→［A］→キューティクル処理→マッサージ→［B］→［C］→保湿",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "A：ファイリング　B：カラーリング　C：バッフィング",
+        "A：バッフィング　B：ファイリング　C：カラーリング",
+        "A：バッフィング　B：カラーリング　C：ファイリング",
+        "A：ファイリング　B：バッフィング　C：カラーリング"
+      ],
+      "answer": 4,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-54",
+      "examNo": 48,
+      "no": 54,
+      "fieldId": "theory",
+      "stem": "まつ毛エクステンションに関する次の記述のうち、正しいものはどれか。",
+      "polarity": "correct",
+      "statements": null,
+      "choices": [
+        "まつ毛の毛周期は、頭髪の毛周期に比べて長い。",
+        "施術後すぐは、入浴やサウナなど高温・多湿の環境は避ける。",
+        "グルーやリムーバーによるアレルギー反応は、施術後数分で必ずあらわれる。",
+        "リペアは、個人差があるが通常6〜7週間で行う。"
+      ],
+      "answer": 2,
+      "images": [],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    },
+    {
+      "id": "48-55",
+      "examNo": 48,
+      "no": 55,
+      "fieldId": "theory",
+      "stem": "下図は、着物の各部を表したものである。A、B、C、Dに該当する名称の次の組合せのうち、正しいものはどれか。",
+      "polarity": "other",
+      "statements": null,
+      "choices": [
+        "A：裄（ゆき）　B：袖幅　C：身八つ口　D：身丈",
+        "A：袖付　B：袖幅　C：繰越し　D：着丈",
+        "A：裄　B：袖付　C：身八つ口　D：着丈",
+        "A：袖幅　B：袖付　C：繰越し　D：身丈"
+      ],
+      "answer": 1,
+      "images": [
+        "images/48/48-55.webp"
+      ],
+      "explanation": null,
+      "caution": null,
+      "ocrChecked": true
+    }
+  ]
+}
