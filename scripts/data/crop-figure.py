@@ -26,7 +26,7 @@ def erase_answer_mark(img: Image.Image, threshold: int) -> int:
         for x in range(w):
             r, g, b = px[x, y]
             if max(r, g, b) - min(r, g, b) > threshold:
-                if max(r, g, b) < 120:
+                if max(r, g, b) < 85:
                     # 〇印と黒い線が重なった画素は、線として灰色に戻す（線が途切れないように）
                     v = max(r, g, b) // 2
                     px[x, y] = (v, v, v)
