@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react';
 import { ErrorBox, Lightbox, Skeleton } from '../components/common';
 import { Explanation } from '../components/Explanation';
-import { loadExams, loadQuestionsByIds } from '../lib/data';
+import { isCorrectChoice, loadExams, loadQuestionsByIds } from '../lib/data';
 import {
   clearSession,
   getAllProgress,
@@ -75,7 +75,7 @@ export function QuizScreen() {
   const choose = useCallback(
     async (choice: number) => {
       if (!session || !q || answered) return;
-      const correct = choice === q.answer;
+      const correct = isCorrectChoice(q, choice);
       const next: QuizSession = {
         ...session,
         answers: session.answers.map((a, i) => (i === session.index ? choice : a)),
@@ -84,8 +84,10 @@ export function QuizScreen() {
       setLocked(true);
       window.clearTimeout(lockTimer.current);
       lockTimer.current = window.setTimeout(() => setLocked(false), NEXT_LOCK_MS);
-      vibrate(correct ? 30 : [40, 60, 40]);
+      if (!q.scoringExcluded) vibrate(correct ? 30 : [40, 60, 40]);
       await saveSession(next);
+      // 採点対象外の問題（公式に正解なし）は記録しない
+      if (q.scoringExcluded) return;
       const rec = await recordAnswer(q.id, correct);
       setProgress((m) => new Map(m).set(rec.id, rec));
     },
@@ -101,12 +103,14 @@ export function QuizScreen() {
       await saveSession(next);
       return;
     }
+    // 採点対象外の問題は結果に含めない
+    const scored = questions.map((qq, i) => ({ qq, i })).filter(({ qq }) => !qq.scoringExcluded);
     await saveLastResult({
       sessionId: session.id,
-      questionIds: session.questionIds,
-      answers: session.answers,
-      correctFlags: questions.map((qq, i) => session.answers[i] === qq.answer),
-      fieldIds: questions.map((qq) => qq.fieldId),
+      questionIds: scored.map(({ qq }) => qq.id),
+      answers: scored.map(({ i }) => session.answers[i] ?? null),
+      correctFlags: scored.map(({ qq, i }) => isCorrectChoice(qq, session.answers[i] ?? null)),
+      fieldIds: scored.map(({ qq }) => qq.fieldId),
       endedAt: Date.now(),
     });
     await clearSession();
@@ -160,7 +164,7 @@ export function QuizScreen() {
   const p = progress.get(q.id);
   const checked = p?.checked ?? false;
   const field = fieldById(q.fieldId);
-  const correct = chosen === q.answer;
+  const correct = isCorrectChoice(q, chosen);
 
   return (
     <div className="screen quiz has-bottom-bar" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -245,11 +249,13 @@ export function QuizScreen() {
       <ul className="choices" aria-label="選択肢">
         {q.choices.map((c, i) => {
           const n = i + 1;
-          const isAnswer = n === q.answer;
+          const isAnswer = n === q.answer || (q.altAnswers ?? []).includes(n);
           const isChosen = n === chosen;
           let state = '';
           let mark: string | null = null;
-          if (answered) {
+          if (answered && q.scoringExcluded) {
+            state = isChosen ? 'is-chosen' : 'is-dim';
+          } else if (answered) {
             if (isAnswer) {
               state = 'is-correct';
               mark = '○ 正答';
@@ -280,12 +286,20 @@ export function QuizScreen() {
 
       {answered && (
         <section className="answer-block" aria-live="polite">
+          {q.scoringExcluded ? (
+            <p className="verdict" data-testid="verdict">
+              採点対象外（公式に正解となる選択肢なし）
+            </p>
+          ) : (
           <p className={`verdict ${correct ? 'ok' : 'ng'}`} data-testid="verdict">
             <span className="verdict-icon" aria-hidden="true">
               {correct ? '○' : '×'}
             </span>
-            {correct ? '正解' : `不正解　正答は ${CHOICE_LABELS[q.answer - 1] ?? ''}`}
+            {correct
+              ? '正解'
+              : `不正解　正答は ${[q.answer, ...(q.altAnswers ?? [])].map((n) => CHOICE_LABELS[n - 1] ?? '').join('・')}`}
           </p>
+          )}
           <Explanation q={q} />
         </section>
       )}

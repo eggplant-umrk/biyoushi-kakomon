@@ -927,3 +927,6 @@ fieldset.card {
     min-height: auto;
   }
 }
+.choice.is-chosen {
+  border-color: var(--primary);
+}

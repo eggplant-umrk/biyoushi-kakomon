@@ -47,6 +47,8 @@ export function parseExam(text: string, file: string): Parsed {
     no: number;
     page: number;
     answer: number;
+    alt: number[];
+    excluded: boolean;
     stem: string[];
     statements: Statement[];
     choices: string[];
@@ -66,10 +68,12 @@ export function parseExam(text: string, file: string): Parsed {
       no: cur.no,
       fieldId: fieldOfNo(cur.no).id,
       stem,
-      polarity: cur.polarity ?? derivePolarity(stem, cur.statements.length > 0, cur.images.length > 0),
+      polarity: cur.excluded ? 'other' : (cur.polarity ?? derivePolarity(stem, cur.statements.length > 0, cur.images.length > 0)),
       statements: cur.statements.length ? cur.statements : null,
       choices: cur.choices,
       answer: cur.answer,
+      ...(cur.alt.length ? { altAnswers: cur.alt } : {}),
+      ...(cur.excluded ? { scoringExcluded: true } : {}),
       images: cur.images,
       explanation: null,
       caution: cur.caution,
@@ -91,12 +95,14 @@ export function parseExam(text: string, file: string): Parsed {
       month = Number(m[3]);
       return;
     }
-    if ((m = /^==\s*(\d+)\s+p(\d+)\s+ans=(\d)$/.exec(line))) {
+    if ((m = /^==\s*(\d+)\s+p(\d+)\s+ans=(\d)((?:,\d)*)$/.exec(line))) {
       flush();
       cur = {
         no: Number(m[1]),
         page: Number(m[2]),
         answer: Number(m[3]),
+        alt: (m[4] ?? '').split(',').filter(Boolean).map(Number),
+        excluded: false,
         stem: [],
         statements: [],
         choices: [],
@@ -114,6 +120,10 @@ export function parseExam(text: string, file: string): Parsed {
     }
     if ((m = /^!ocr\s+(.+)$/.exec(line))) {
       cur.ocr.push(m[1] ?? '');
+      return;
+    }
+    if (line === '!excluded') {
+      cur.excluded = true;
       return;
     }
     if ((m = /^!polarity\s+(correct|incorrect|other)$/.exec(line))) {
@@ -159,7 +169,7 @@ export function parseCheck(text: string): CheckRow[] {
     if (!line || line.startsWith('#') || line.startsWith('@')) continue;
     const m = /^(\d+)\s+(\d|\?)\s+(\d)(?:\s+(.*))?$/.exec(line);
     if (!m) throw new ParseError(`check の書式エラー: ${line}`);
-    rows.push({ no: Number(m[1]), answer: m[2] === '?' ? 0 : Number(m[2]), count: Number(m[3]), note: m[4] ?? '' });
+    rows.push({ no: Number(m[1]), answer: m[2] === '?' ? -1 : Number(m[2]), count: Number(m[3]), note: m[4] ?? '' });
   }
   return rows;
 }
@@ -183,7 +193,7 @@ function main() {
       const c = checkByNo.get(q.no);
       if (!c) reasons.push('二重チェックの記録がない');
       else {
-        if (c.answer === 0) reasons.push(`二重チェックで〇印を読み取れなかった${c.note ? `（${c.note}）` : ''}`);
+        if (c.answer === -1) reasons.push(`二重チェックで〇印を読み取れなかった${c.note ? `（${c.note}）` : ''}`);
         else if (c.answer !== q.answer)
           reasons.push(`正答の読み取りが食い違う（1回目: ${q.answer}、二重チェック: ${c.answer}）`);
         if (c.count !== q.choices.length)

@@ -71,7 +71,15 @@ for (const meta of metas) {
     }
     if (!Array.isArray(q.choices) || q.choices.length !== 4) err(`${at}: choices が4つではない`);
     else if (q.choices.some((c) => typeof c !== 'string' || !c.trim())) err(`${at}: 空の選択肢がある`);
-    if (!Number.isInteger(q.answer) || q.answer < 1 || q.answer > 4) err(`${at}: answer が1〜4ではない (${q.answer})`);
+    if (q.scoringExcluded) {
+      if (q.answer !== 0) err(`${at}: 採点対象外の問題は answer を 0 にする`);
+      if (!q.caution) err(`${at}: 採点対象外の問題には caution（公式の注記）が必要`);
+    } else if (!Number.isInteger(q.answer) || q.answer < 1 || q.answer > 4) err(`${at}: answer が1〜4ではない (${q.answer})`);
+    if (q.altAnswers !== undefined) {
+      if (!Array.isArray(q.altAnswers) || q.altAnswers.some((a) => !Number.isInteger(a) || a < 1 || a > 4 || a === q.answer))
+        err(`${at}: altAnswers が不正`);
+      if (!q.caution) err(`${at}: altAnswers がある問題には caution（公式の注記）が必要`);
+    }
     if (!q.stem.trim()) err(`${at}: 問題文が空`);
     if (!['correct', 'incorrect', 'other'].includes(q.polarity)) err(`${at}: polarity が不正`);
     if (q.statements !== null) {

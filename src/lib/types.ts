@@ -45,6 +45,10 @@ export interface Question {
   statements: Statement[] | null;
   choices: string[];
   answer: number; // 1〜4
+  /** 公式に「いずれも正解として採点」とされた、answer 以外の選択肢（通常は省略） */
+  altAnswers?: number[];
+  /** 公式に「正解となる選択肢がないため採点対象外」とされた問題（このとき answer は 0） */
+  scoringExcluded?: boolean;
   images: string[];
   explanation: Explanation | null;
   caution: string | null;
