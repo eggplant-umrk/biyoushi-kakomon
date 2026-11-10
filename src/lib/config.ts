@@ -22,7 +22,7 @@ export const firebaseConfig = USE_EMULATOR
 
 /**
  * ログイン（＝クラウドへの記録の保存）を使えるか。
- * 本番では Firebase の設定値と App Check（reCAPTCHA v3）のサイトキーが両方そろっているときだけ有効にする。
+ * 本番では Firebase の設定値と App Check（Fraud Defense＝reCAPTCHA Enterprise）のサイトキーが両方そろっているときだけ有効にする。
  * App Check なしで Firestore を使う状態を作らないため。
  */
 export const LOGIN_ENABLED =

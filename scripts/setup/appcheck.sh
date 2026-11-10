@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # App Check の強制（SPEC §8.2）。
-# 前提: コンソールで Web アプリを App Check（reCAPTCHA v3）に登録済み。gcloud auth login 済み。
+# 前提: コンソールで Web アプリを App Check（Fraud Defense＝reCAPTCHA Enterprise）に登録済み。gcloud auth login 済み。
 # 使い方:
 #   bash scripts/setup/appcheck.sh status            … いまの状態を表示
 #   bash scripts/setup/appcheck.sh enforce firestore … Firestore で強制（トークンのない通信を拒否）

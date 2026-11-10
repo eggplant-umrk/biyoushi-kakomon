@@ -13,7 +13,7 @@ const BASE = '/biyoushi-kakomon/';
  * 外部のドメインは、Firebase の設定値（VITE_FIREBASE_*）があるビルドにだけ、使うものだけを足す：
  * - Google ログイン（ポップアップ）: apis.google.com のスクリプトと、{authDomain} の iframe
  * - Firestore / Authentication / App Check の API
- * - reCAPTCHA v3（App Check）: www.google.com/recaptcha/ と www.gstatic.com/recaptcha/
+ * - reCAPTCHA Enterprise（App Check の Fraud Defense）: www.google.com/recaptcha/（enterprise.js を含む）と www.gstatic.com/recaptcha/
  * E2E 用ビルド（--mode e2e）は Firebase Emulator（localhost）だけを足す。
  */
 export function buildCsp(mode: string, env: Record<string, string>): string {

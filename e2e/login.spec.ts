@@ -37,6 +37,18 @@ async function newDevice(browser: Browser, info: TestInfo, user: FakeUser): Prom
   return { context, page };
 }
 
+/**
+ * ページを読み込み直したときに WebKit が出すエラーで、アプリの不具合ではないもの。
+ * 読み込み直しで Firestore の通信（WebChannel）が途中で切れると、WebKit は「access control checks」のエラーを出し、
+ * Firestore SDK は「バックエンドに接続できない」と出す（Chromium では出ない）
+ */
+function isReloadNoise(text: string): boolean {
+  return (
+    (/google\.firestore\.v1\.Firestore\/(Listen|Write)\/channel/.test(text) && /due to access control checks/.test(text)) ||
+    /Could not reach Cloud Firestore backend/.test(text)
+  );
+}
+
 async function login(page: Page): Promise<void> {
   await page.goto('./');
   await page.getByRole('button', { name: 'Googleでログイン' }).click();
@@ -72,7 +84,7 @@ test('ログインして解いた記録が、別の端末でログインして�
   const a = await newDevice(browser, info, user);
   const problems: string[] = [];
   a.page.on('console', (m) => {
-    if (m.type() === 'error') problems.push(m.text());
+    if (m.type() === 'error' && !isReloadNoise(m.text())) problems.push(m.text());
   });
   a.page.on('pageerror', (e) => problems.push(e.message));
 
@@ -95,7 +107,7 @@ test('ログインして解いた記録が、別の端末でログインして�
   await expect.poll(async () => answeredOf(await findUserDoc(user.name)), { timeout: 15_000 }).toBe(expected);
   const doc = await findUserDoc(user.name);
   // メールアドレスは Firestore に保存しない（SPEC §6.3）
-  expect(Object.keys(doc ?? {}).sort()).toEqual(['byField', 'createdAt', 'displayName', 'examBest', 'lastActiveAt', 'path', 'totals']);
+  expect(Object.keys(doc ?? {}).sort()).toEqual(['byField', 'createdAt', 'displayName', 'examBest', 'lastActiveAt', 'path', 'syncSeq', 'totals']);
   expect(JSON.stringify(doc)).not.toContain(user.email);
 
   // 別の端末
@@ -171,23 +183,30 @@ test('表示名の変更・ログアウト時のキャッシュ消去・アカ�
   await expect.poll(async () => (await findUserDoc(newName)) !== null, { timeout: 15_000 }).toBe(true);
 
   // ログアウトすると、端末内の記録の写しが消えてログイン画面に戻る
+  // ログアウトするとページを読み込み直す。読み込み直しが終わってから調べる
+  const reloaded = page.waitForEvent('load');
   await page.getByRole('button', { name: 'ログアウト', exact: true }).click();
+  await reloaded;
   await expect(page.getByRole('button', { name: 'Googleでログイン' })).toBeVisible();
-  const cached = await page.evaluate(
-    () =>
-      new Promise<number>((resolve, reject) => {
-        const open = indexedDB.open('kakomon-user');
-        open.onerror = () => reject(open.error);
-        open.onsuccess = () => {
-          const names = Array.from(open.result.objectStoreNames);
-          if (!names.includes('progress')) return resolve(0);
-          const req = open.result.transaction('progress').objectStore('progress').count();
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => reject(req.error);
-        };
-      }),
-  );
-  expect(cached).toBe(0);
+  // 念のため、読み込み中に調べて失敗したらやり直す
+  const countCached = () =>
+    page
+      .evaluate(
+        () =>
+          new Promise<number>((resolve, reject) => {
+            const open = indexedDB.open('kakomon-user');
+            open.onerror = () => reject(open.error);
+            open.onsuccess = () => {
+              const names = Array.from(open.result.objectStoreNames);
+              if (!names.includes('progress')) return resolve(0);
+              const req = open.result.transaction('progress').objectStore('progress').count();
+              req.onsuccess = () => resolve(req.result);
+              req.onerror = () => reject(req.error);
+            };
+          }),
+      )
+      .catch(() => -1);
+  await expect.poll(countCached, { timeout: 10_000 }).toBe(0);
   // クラウドの記録は残っている
   expect(answeredOf(await findUserDoc(newName))).toBeGreaterThan(0);
 

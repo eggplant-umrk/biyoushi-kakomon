@@ -22,7 +22,12 @@ import {
   Timestamp,
   updateDoc,
   where,
+  writeBatch,
+  type DocumentData,
+  type DocumentReference,
   type Firestore,
+  type SetOptions,
+  type WriteBatch,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
 import { renderRules, TEST_ADMIN_EMAIL as ADMIN_EMAIL } from '../scripts/setup/build-rules.ts';
@@ -77,6 +82,7 @@ const user = (o: Record<string, unknown> = {}) => ({
   totals: { answered: 0, correct: 0 },
   byField: {},
   examBest: {},
+  syncSeq: 0,
   ...o,
 });
 const progress = (o: Record<string, unknown> = {}) => ({
@@ -111,6 +117,24 @@ const report = (uid: string, o: Record<string, unknown> = {}) => ({
   createdAt: serverTimestamp(),
   ...o,
 });
+
+// ---- 記録の送信（アプリと同じく、users/{uid}.syncSeq を＋1 する writeBatch で書く）------------
+/** ops の書き込みと、users/{ALICE} の syncSeq＋1 を同じ writeBatch で送る */
+function sendBatch(db: Firestore, ops: (b: WriteBatch) => void, userUpdate: Record<string, unknown> = {}) {
+  const b = writeBatch(db);
+  ops(b);
+  b.update(doc(db, 'users', ALICE), { syncSeq: increment(1), lastActiveAt: serverTimestamp(), ...userUpdate });
+  return b.commit();
+}
+const sendSet = (ref: DocumentReference, data: DocumentData, opts?: SetOptions) =>
+  sendBatch(ref.firestore, (b) => (opts ? b.set(ref, data, opts) : b.set(ref, data)));
+const sendUpdate = (ref: DocumentReference, data: DocumentData) =>
+  sendBatch(ref.firestore, (b) => b.update(ref, data));
+/** 送信の前提になる users/{ALICE} を用意する */
+const seedAlice = (o: Record<string, unknown> = {}) =>
+  seed(async (db) => {
+    await setDoc(doc(db, 'users', ALICE), { ...user(), createdAt: past, lastActiveAt: past, ...o });
+  });
 
 beforeAll(async () => {
   const rules = renderRules(readFileSync('firestore.rules.template', 'utf8'), ADMIN_EMAIL);
@@ -209,6 +233,7 @@ describe('users/{uid}', () => {
     await assertSucceeds(setDoc(ref(db), user()));
     await assertSucceeds(
       updateDoc(ref(db), {
+        syncSeq: increment(1),
         lastActiveAt: serverTimestamp(),
         'totals.answered': increment(10),
         'totals.correct': increment(7),
@@ -248,6 +273,12 @@ describe('users/{uid}', () => {
     ['examBest が56点', { examBest: { '54': 56 } }],
     ['examBest が負の数', { examBest: { '54': -1 } }],
     ['examBest が文字列', { examBest: { '54': '40' } }],
+    ['syncSeq が 0 でない', { syncSeq: 1 }],
+    ['syncSeq が負の数', { syncSeq: -1 }],
+    ['syncSeq が文字列', { syncSeq: '0' }],
+    ['作成時の totals が 0 でない', { totals: { answered: 10, correct: 5 } }],
+    ['作成時の byField が空でない', { byField: { law: { answered: 1, correct: 0 } } }],
+    ['作成時の examBest が空でない', { examBest: { '54': 40 } }],
   ])('作成を拒否：%s', async (_name, override) => {
     await assertFails(setDoc(ref(userDb(ALICE)), user(override)));
   });
@@ -255,6 +286,8 @@ describe('users/{uid}', () => {
   test('キーが足りない作成を拒否', async () => {
     const { examBest: _e, ...rest } = user();
     await assertFails(setDoc(ref(userDb(ALICE)), rest));
+    const { syncSeq: _s, ...noSeq } = user();
+    await assertFails(setDoc(ref(userDb(ALICE)), noSeq));
   });
 
   test('更新では createdAt を変えられない・不正な値にできない', async () => {
@@ -273,14 +306,15 @@ describe('users/{uid}', () => {
 
 describe('users/{uid}/progress/{qid}', () => {
   const ref = (db: Firestore, qid = '54-01') => doc(db, 'users', ALICE, 'progress', qid);
+  beforeEach(() => seedAlice());
 
   test('本人は正しいデータで作成・更新・削除できる', async () => {
     const db = userDb(ALICE);
-    await assertSucceeds(setDoc(ref(db), progress()));
-    await assertSucceeds(setDoc(ref(db, '41-55'), progress({ attempts: 0, correctCount: 0, history: '', checked: true })));
-    await assertSucceeds(setDoc(ref(db, '49-10'), progress({ nextReviewAt: Timestamp.fromMillis(Date.now() + DAY) })));
+    await assertSucceeds(sendSet(ref(db), progress()));
+    await assertSucceeds(sendSet(ref(db, '41-55'), progress({ attempts: 0, correctCount: 0, history: '', checked: true })));
+    await assertSucceeds(sendSet(ref(db, '49-10'), progress({ nextReviewAt: Timestamp.fromMillis(Date.now() + DAY) })));
     await assertSucceeds(
-      setDoc(
+      sendSet(
         ref(db),
         { attempts: increment(1), correctCount: increment(1), history: '○×○○', lastAnsweredAt: serverTimestamp(), checked: true, nextReviewAt: null },
         { merge: true },
@@ -293,7 +327,7 @@ describe('users/{uid}/progress/{qid}', () => {
   test.each(['40-01', '55-01', '54-56', '54-00', '54-1', '54-001', 'abc', '54_01', '５４-01'])(
     '不正な問題IDを拒否：%s',
     async (qid) => {
-      await assertFails(setDoc(ref(userDb(ALICE), qid), progress()));
+      await assertFails(sendSet(ref(userDb(ALICE), qid), progress()));
     },
   );
 
@@ -312,12 +346,12 @@ describe('users/{uid}/progress/{qid}', () => {
     ['checked が bool でない', { checked: 'true' }],
     ['nextReviewAt が文字列', { nextReviewAt: '2026-12-01' }],
   ])('作成を拒否：%s', async (_name, override) => {
-    await assertFails(setDoc(ref(userDb(ALICE)), progress(override)));
+    await assertFails(sendSet(ref(userDb(ALICE)), progress(override)));
   });
 
   test('キーが足りない作成を拒否', async () => {
     const { nextReviewAt: _n, ...rest } = progress();
-    await assertFails(setDoc(ref(userDb(ALICE)), rest));
+    await assertFails(sendSet(ref(userDb(ALICE)), rest));
   });
 
   test('更新でも検査される', async () => {
@@ -325,36 +359,37 @@ describe('users/{uid}/progress/{qid}', () => {
       await setDoc(ref(db), { ...progress(), lastAnsweredAt: past });
     });
     const db = userDb(ALICE);
-    await assertFails(updateDoc(ref(db), { checked: true })); // lastAnsweredAt が古いまま
-    await assertFails(updateDoc(ref(db), { correctCount: increment(5), lastAnsweredAt: serverTimestamp() }));
-    await assertFails(updateDoc(ref(db), { extra: 1, lastAnsweredAt: serverTimestamp() }));
-    await assertSucceeds(updateDoc(ref(db), { checked: true, lastAnsweredAt: serverTimestamp() }));
+    await assertFails(sendUpdate(ref(db), { checked: true })); // lastAnsweredAt が古いまま
+    await assertFails(sendUpdate(ref(db), { correctCount: increment(5), lastAnsweredAt: serverTimestamp() }));
+    await assertFails(sendUpdate(ref(db), { extra: 1, lastAnsweredAt: serverTimestamp() }));
+    await assertSucceeds(sendUpdate(ref(db), { checked: true, lastAnsweredAt: serverTimestamp() }));
   });
 });
 
 describe('users/{uid}/days/{day}', () => {
   const ref = (db: Firestore, d: string) => doc(db, 'users', ALICE, 'days', d);
   const today = () => jstDate(Date.now());
+  beforeEach(() => seedAlice());
 
   test('今日と前日（日本時間）には書ける', async () => {
     const db = userDb(ALICE);
-    await assertSucceeds(setDoc(ref(db, today()), day()));
-    await assertSucceeds(setDoc(ref(db, jstDate(Date.now() - DAY)), day({ sessions: [] })));
+    await assertSucceeds(sendSet(ref(db, today()), day()));
+    await assertSucceeds(sendSet(ref(db, jstDate(Date.now() - DAY)), day({ sessions: [] })));
     await assertSucceeds(
-      setDoc(ref(db, today()), { answered: increment(5), correct: increment(5), sessions: [session(), session({ mode: 'exam', total: 55, correct: 40 })] }, { merge: true }),
+      sendSet(ref(db, today()), { answered: increment(5), correct: increment(5), sessions: [session(), session({ mode: 'exam', total: 55, correct: 40 })] }, { merge: true }),
     );
     await assertSucceeds(deleteDoc(ref(db, today())));
   });
 
   test('今日・前日以外の日付には書けない', async () => {
     const db = userDb(ALICE);
-    await assertFails(setDoc(ref(db, jstDate(Date.now() - 2 * DAY)), day()));
-    await assertFails(setDoc(ref(db, jstDate(Date.now() - 30 * DAY)), day()));
-    await assertFails(setDoc(ref(db, jstDate(Date.now() + DAY)), day()));
-    await assertFails(setDoc(ref(db, jstDate(Date.now() + 365 * DAY)), day()));
-    await assertFails(setDoc(ref(db, '2020-01-01'), day()));
-    await assertFails(setDoc(ref(db, 'today'), day()));
-    await assertFails(setDoc(ref(db, today().replaceAll('-', '')), day()));
+    await assertFails(sendSet(ref(db, jstDate(Date.now() - 2 * DAY)), day()));
+    await assertFails(sendSet(ref(db, jstDate(Date.now() - 30 * DAY)), day()));
+    await assertFails(sendSet(ref(db, jstDate(Date.now() + DAY)), day()));
+    await assertFails(sendSet(ref(db, jstDate(Date.now() + 365 * DAY)), day()));
+    await assertFails(sendSet(ref(db, '2020-01-01'), day()));
+    await assertFails(sendSet(ref(db, 'today'), day()));
+    await assertFails(sendSet(ref(db, today().replaceAll('-', '')), day()));
   });
 
   test('過去の日付のドキュメントは更新もできない', async () => {
@@ -362,7 +397,7 @@ describe('users/{uid}/days/{day}', () => {
     await seed(async (db) => {
       await setDoc(ref(db, old), day());
     });
-    await assertFails(updateDoc(ref(userDb(ALICE), old), { answered: increment(1) }));
+    await assertFails(sendUpdate(ref(userDb(ALICE), old), { answered: increment(1) }));
   });
 
   test.each<[string, Record<string, unknown>]>([
@@ -379,13 +414,142 @@ describe('users/{uid}/days/{day}', () => {
     ['末尾の session の endedAt が文字列', { sessions: [session({ endedAt: 'now' })] }],
     ['末尾の session が map でない', { sessions: ['x'] }],
   ])('作成を拒否：%s', async (_name, override) => {
-    await assertFails(setDoc(ref(userDb(ALICE), today()), day(override)));
+    await assertFails(sendSet(ref(userDb(ALICE), today()), day(override)));
   });
 
   test('sessions は50件まで書ける', async () => {
     await assertSucceeds(
-      setDoc(ref(userDb(ALICE), today()), day({ sessions: Array.from({ length: 50 }, () => session()) })),
+      sendSet(ref(userDb(ALICE), today()), day({ sessions: Array.from({ length: 50 }, () => session()) })),
     );
+  });
+});
+
+describe('記録の送信：二重加算の防止（syncSeq）と1回の上限', () => {
+  const userRef = (db: Firestore) => doc(db, 'users', ALICE);
+  const pRef = (db: Firestore, qid = '54-01') => doc(db, 'users', ALICE, 'progress', qid);
+  const dRef = (db: Firestore) => doc(db, 'users', ALICE, 'days', jstDate(Date.now()));
+  /** アプリと同じ形の送信：syncSeq を seq（絶対値）にし、progress・days・totals を increment で足す */
+  const sendLikeApp = (db: Firestore, seq: number, answered = 3, correct = 2) => {
+    const b = writeBatch(db);
+    b.set(pRef(db), { attempts: increment(answered), correctCount: increment(correct), history: '○×○', lastAnsweredAt: serverTimestamp(), checked: false, nextReviewAt: null }, { merge: true });
+    b.set(dRef(db), { answered: increment(answered), correct: increment(correct), sessions: [] }, { merge: true });
+    b.update(userRef(db), {
+      syncSeq: seq,
+      lastActiveAt: serverTimestamp(),
+      'totals.answered': increment(answered),
+      'totals.correct': increment(correct),
+      'byField.theory.answered': increment(answered),
+      'byField.theory.correct': increment(correct),
+    });
+    return b.commit();
+  };
+  beforeEach(() => seedAlice({ syncSeq: 7, totals: { answered: 100, correct: 50 }, byField: { theory: { answered: 100, correct: 50 } } }));
+
+  test('連番が「前回＋1」の送信は通り、同じ送信の再送は拒否される（二重に足されない）', async () => {
+    const db = userDb(ALICE);
+    await assertSucceeds(sendLikeApp(db, 8));
+    await assertFails(sendLikeApp(db, 8));
+    const u = (await getDoc(userRef(db))).data();
+    expect(u?.syncSeq).toBe(8);
+    expect(u?.totals).toEqual({ answered: 103, correct: 52 });
+    expect((await getDoc(pRef(db))).data()?.attempts).toBe(3);
+    expect((await getDoc(dRef(db))).data()?.answered).toBe(3);
+    // 次の送信は 9 で通る
+    await assertSucceeds(sendLikeApp(db, 9));
+  });
+
+  test('連番を飛ばす・戻す・据え置く送信は拒否される', async () => {
+    const db = userDb(ALICE);
+    await assertFails(sendLikeApp(db, 9));
+    await assertFails(sendLikeApp(db, 7));
+    await assertFails(sendLikeApp(db, 6));
+    await assertFails(sendLikeApp(db, 0));
+  });
+
+  test('progress・days は、syncSeq を進めない書き込みでは書けない', async () => {
+    const db = userDb(ALICE);
+    await assertFails(setDoc(pRef(db), progress()));
+    await assertFails(setDoc(dRef(db), day()));
+    // users を一緒に更新しても、syncSeq を進めていなければ拒否
+    const b = writeBatch(db);
+    b.set(pRef(db), progress());
+    b.update(userRef(db), { lastActiveAt: serverTimestamp() });
+    await assertFails(b.commit());
+  });
+
+  test('記録（totals・byField）は、syncSeq を進めない更新では変えられない', async () => {
+    const db = userDb(ALICE);
+    await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), 'totals.answered': increment(1) }));
+    await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), 'byField.law.answered': increment(1) }));
+    await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), 'examBest.54': 40 }));
+    await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), syncSeq: 100 }));
+    // 表示名の変更は syncSeq を変えずにできる
+    await assertSucceeds(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), displayName: '新しい名前' }));
+  });
+
+  test('1回の送信で増やせる解答数は55まで', async () => {
+    const db = userDb(ALICE);
+    await assertFails(sendLikeApp(db, 8, 56, 0));
+    await assertSucceeds(sendLikeApp(db, 8, 55, 55));
+  });
+
+  test('正解数の増加は解答数の増加以下', async () => {
+    const db = userDb(ALICE);
+    // 累計では correct ≤ answered のままでも、1回の増加で correct > answered なら拒否
+    await assertFails(sendLikeApp(db, 8, 1, 2));
+    await assertSucceeds(sendLikeApp(db, 8, 2, 2));
+  });
+
+  test('users の totals・byField の増加の上限と、減らす更新の拒否', async () => {
+    const db = userDb(ALICE);
+    const upd = (o: Record<string, unknown>) =>
+      updateDoc(userRef(db), { syncSeq: increment(1), lastActiveAt: serverTimestamp(), ...o });
+    await assertFails(upd({ 'totals.answered': increment(56) }));
+    await assertFails(upd({ 'totals.answered': increment(1), 'totals.correct': increment(2) }));
+    await assertFails(upd({ 'totals.answered': increment(-1) }));
+    await assertFails(upd({ 'totals.correct': increment(-1) }));
+    await assertFails(upd({ 'byField.law.answered': increment(56) }));
+    await assertFails(upd({ 'byField.theory.answered': increment(-10) }));
+    await assertFails(upd({ 'byField.theory.answered': increment(1), 'byField.theory.correct': increment(2) }));
+    await assertFails(upd({ byField: {} })); // 分野の記録を消す
+    await assertSucceeds(upd({ 'totals.answered': increment(55), 'byField.law.answered': increment(55) }));
+  });
+
+  test('progress・days の1回の増加の上限', async () => {
+    const db = userDb(ALICE);
+    const one = (ref: DocumentReference, data: DocumentData) => sendSet(ref, data, { merge: true });
+    await assertFails(one(pRef(db), progress({ attempts: 56, correctCount: 0, history: '' })));
+    await assertFails(one(dRef(db), day({ answered: 56, correct: 0, sessions: [] })));
+    await assertSucceeds(one(pRef(db), progress({ attempts: 10, correctCount: 0, history: '' })));
+    await assertSucceeds(one(dRef(db), day({ answered: 10, correct: 0, sessions: [] })));
+    // 正解数だけ増やす・解答数を超えて増やす・減らす
+    await assertFails(one(pRef(db), { correctCount: increment(1), lastAnsweredAt: serverTimestamp() }));
+    await assertFails(one(pRef(db), { attempts: increment(1), correctCount: increment(2), lastAnsweredAt: serverTimestamp() }));
+    await assertFails(one(pRef(db), { attempts: increment(-1), lastAnsweredAt: serverTimestamp() }));
+    await assertFails(one(dRef(db), { answered: increment(1), correct: increment(2) }));
+    await assertFails(one(dRef(db), { answered: increment(-1) }));
+    await assertFails(one(pRef(db), { attempts: increment(56), lastAnsweredAt: serverTimestamp() }));
+    await assertFails(one(dRef(db), { answered: increment(56) }));
+    await assertSucceeds(one(pRef(db), { attempts: increment(55), correctCount: increment(55), lastAnsweredAt: serverTimestamp() }));
+  });
+
+  test('アプリと同じ大きさの送信（55問を別々の問題で＋日別＋users）が通る', async () => {
+    const db = userDb(ALICE);
+    const b = writeBatch(db);
+    for (let i = 1; i <= 55; i++) {
+      const qid = `54-${String(i).padStart(2, '0')}`;
+      b.set(pRef(db, qid), { attempts: increment(1), correctCount: increment(1), history: '○', lastAnsweredAt: serverTimestamp(), checked: false, nextReviewAt: null }, { merge: true });
+    }
+    b.set(dRef(db), { answered: increment(55), correct: increment(55), sessions: [session({ total: 55, correct: 55 })] }, { merge: true });
+    b.update(userRef(db), {
+      syncSeq: 8,
+      lastActiveAt: serverTimestamp(),
+      'totals.answered': increment(55),
+      'totals.correct': increment(55),
+      'byField.theory.answered': increment(55),
+      'byField.theory.correct': increment(55),
+    });
+    await assertSucceeds(b.commit());
   });
 });
 

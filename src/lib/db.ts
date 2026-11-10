@@ -83,6 +83,7 @@ export type LocalDbKind = 'guest' | 'user';
 const DB_NAMES: Record<LocalDbKind, string> = { guest: 'kakomon-guest', user: 'kakomon-user' };
 const OUTBOX_KEY = 'outbox';
 const SYNC_KEY = 'syncState';
+const INFLIGHT_KEY = 'inflight';
 
 let active: LocalDbKind = 'guest';
 const opened = new Map<LocalDbKind, Promise<IDBPDatabase<KakomonDB>>>();
@@ -213,29 +214,71 @@ export function outboxSize(out: Outbox): number {
   return Object.keys(out.progress).length + Object.keys(out.days).length;
 }
 
-/** 送信できた分を outbox から引く。送信中に増えた分は残す */
-export async function settleOutbox(sent: Outbox): Promise<void> {
-  const d = await db('user');
-  const tx = d.transaction('kv', 'readwrite');
-  const out = ((await tx.store.get(OUTBOX_KEY)) as Outbox | undefined) ?? emptyOutbox();
+/**
+ * 送信できた分を outbox から引く。送信中に増えた分と、1回の送信で送りきれなかった分は残す。
+ * 問題ごとの分は、送ったあとに変わっていなければ（rev が同じ）、回数を送りきった時点で消す
+ */
+function subtractSent(out: Outbox, sent: Outbox): void {
   for (const [qid, s] of Object.entries(sent.progress)) {
     const cur = out.progress[qid];
     if (!cur) continue;
-    if (cur.rev === s.rev) delete out.progress[qid];
-    else {
-      cur.attempts -= s.attempts;
-      cur.correct -= s.correct;
-    }
+    cur.attempts = Math.max(0, cur.attempts - s.attempts);
+    cur.correct = Math.max(0, Math.min(cur.correct - s.correct, cur.attempts));
+    if (cur.rev === s.rev && cur.attempts === 0) delete out.progress[qid];
   }
   for (const [date, s] of Object.entries(sent.days)) {
     const cur = out.days[date];
     if (!cur) continue;
-    cur.answered -= s.answered;
-    cur.correct -= s.correct;
+    cur.answered = Math.max(0, cur.answered - s.answered);
+    cur.correct = Math.max(0, Math.min(cur.correct - s.correct, cur.answered));
     cur.sessions = cur.sessions.slice(s.sessions.length);
     if (cur.answered <= 0 && cur.sessions.length === 0) delete out.days[date];
   }
+}
+
+export async function settleOutbox(sent: Outbox): Promise<void> {
+  const d = await db('user');
+  const tx = d.transaction('kv', 'readwrite');
+  const out = ((await tx.store.get(OUTBOX_KEY)) as Outbox | undefined) ?? emptyOutbox();
+  subtractSent(out, sent);
   await tx.store.put(out, OUTBOX_KEY);
+  await tx.done;
+}
+
+/**
+ * 送信中の1回分（SPEC §14：二重加算の防止）。送る前に保存し、届いたと分かったら outbox から引いて消す。
+ * 再送するときは、中身と連番（seq）を変えずに同じものを送る。
+ * - seq：users/{uid}.syncSeq をこの値にする（ルールで「前回＋1」のときだけ許可される）
+ * - attempted：一度でも送信を試みたか（結果が分からないまま終わった可能性がある）
+ */
+export interface Inflight {
+  uid: string;
+  seq: number;
+  sent: Outbox;
+  attempted: boolean;
+}
+
+export async function getInflight(): Promise<Inflight | undefined> {
+  return (await (await db('user')).get('kv', INFLIGHT_KEY)) as Inflight | undefined;
+}
+export async function setInflight(f: Inflight): Promise<void> {
+  await (await db('user')).put('kv', f, INFLIGHT_KEY);
+}
+export async function clearInflight(): Promise<void> {
+  await (await db('user')).delete('kv', INFLIGHT_KEY);
+}
+
+/** 送信中の分が届いたので、outbox から引いて、送信中の記録を消す（同じトランザクションで行い、二重に引かない） */
+export async function settleInflight(): Promise<void> {
+  const d = await db('user');
+  const tx = d.transaction('kv', 'readwrite');
+  const f = (await tx.store.get(INFLIGHT_KEY)) as Inflight | undefined;
+  if (f) {
+    const out = ((await tx.store.get(OUTBOX_KEY)) as Outbox | undefined) ?? emptyOutbox();
+    subtractSent(out, f.sent);
+    await tx.store.put(out, OUTBOX_KEY);
+    await tx.store.delete(INFLIGHT_KEY);
+  }
   await tx.done;
 }
 

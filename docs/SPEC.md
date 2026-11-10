@@ -28,7 +28,7 @@
 | PWA | vite-plugin-pwa。ホーム画面に追加でき、問題データはオフラインでも解ける |
 | 認証 | Firebase Authentication（Googleログインのみ） |
 | DB | Cloud Firestore（東京リージョン `asia-northeast1`） |
-| 不正利用対策 | Firebase App Check（reCAPTCHA v3） |
+| 不正利用対策 | Firebase App Check（Fraud Defense＝reCAPTCHA Enterprise のスコアベースのキー。無料枠の範囲で使う。§14） |
 | 問題データ | リポジトリ内のJSON（`public/data/`）。図はWebP（`public/images/`） |
 | テスト | Vitest（ロジック）、Firebase Emulator＋@firebase/rules-unit-testing（セキュリティルール）、Playwright（スマホ表示のE2E） |
 
@@ -242,6 +242,7 @@ users/{uid}
   totals: { answered: int, correct: int }
   byField: { law: {answered, correct}, ... }   // 8分野のみ
   examBest: { "54": int, ... }                 // 回別の最高点
+  syncSeq: int                                 // 記録の送信の連番。送信ごとに＋1（二重加算の防止。§14）
 
 users/{uid}/progress/{questionId}     // 問題ごとに1件。最大770件
   attempts, correctCount: int
@@ -471,12 +472,14 @@ service cloud.firestore {
   - `days` は今日・前日以外の日付に書けない
   - 管理者がおすすめ復習を削除できる（v2のルールの不具合の再発防止）
   - 管理者でない人は `admin/ping` を読めない
+  - 記録の送信は `users/{uid}.syncSeq` が「前回＋1」のときだけ通り、同じ送信の再送は拒否される。`progress`・`days` は syncSeq を進める送信の中でしか書けない
+  - 1回の送信で増やせる解答数は55まで、正解数の増加は解答数の増加以下（`users` の totals・byField、`progress`、`days` のすべて）
 - テストが通らないとデプロイしない（CIで実行）。
 
 ### 8.2 Firebase 側の設定
 
 - **Sparkプラン（無料・課金なし）を維持**。
-- **App Check（reCAPTCHA v3）を有効化し、Firestoreで強制（Enforce）**。Authenticationでの強制は、無料プランで使えるか実装時に確認し、使えれば有効化する。他のサイトやスクリプトからAPIを叩かれるのを防ぐ。
+- **App Check（Fraud Defense＝reCAPTCHA Enterprise）を有効化し、Firestoreで強制（Enforce）**。スコアのしきい値は 0.3（Sparkプランで選べる 0.1 / 0.3 / 0.7 / 0.9 のうち。厳しすぎて本人がログインできなければ 0.1 に下げる）。Authenticationでの強制は、無料プランで使えるか実装時に確認し、使えれば有効化する。他のサイトやスクリプトからAPIを叩かれるのを防ぐ。
 - **無料枠を使い切られた場合**：Sparkプランなので請求は発生せず、その日は止まって翌日に戻る。管理画面に「本日の書き込みが多すぎる」警告を出せるよう、`users` の更新回数が異常な利用者を一覧で目立たせる。
 - **APIキーの制限**：ブラウザ用APIキーを、HTTPリファラー `https://eggplant-umrk.github.io/*` と `http://localhost:*` に限定し、使うAPI（Identity Toolkit、Secure Token、Firestore、App Check）だけ許可する。
 - **承認済みドメイン**：`eggplant-umrk.github.io` と `localhost` だけにする。
@@ -560,7 +563,7 @@ Claude Codeは以下をCLI（`firebase` / `gcloud` / `gh`）で実行する。
 |---|---|---|
 | 1 | `firebase login` / `gcloud auth login` / `gh auth login` で、ブラウザに出る画面でログインする | 本人のGoogle/GitHubアカウントの認証は本人しかできない |
 | 2 | Firebaseコンソールで「Authentication → Google」を有効にする（ボタン2回） | Googleログイン用のOAuth設定がコンソールでしか自動作成されない |
-| 3 | reCAPTCHA管理画面でサイトキーを作り、キーをClaude Codeに渡す | reCAPTCHAのキー作成は無料版ではCLIからできない |
+| 3 | Google Cloud コンソールの Fraud Defense（reCAPTCHA Enterprise）でスコアベースのWebサイト用キーを作り、App Check に登録して、サイトキーをClaude Codeに渡す | 本人の Google アカウントでのコンソール操作が必要（§14） |
 | 4 | 管理者として使うGoogleアカウントのメールアドレスをClaude Codeに伝える | `.env.local` に入れる |
 | 5 | （任意）`docs/ocr-review.md` に出た問題を原本と見比べる | 読み取り間違いの最終確認 |
 
@@ -606,3 +609,7 @@ Claude Codeは以下をCLI（`firebase` / `gcloud` / `gh`）で実行する。
 | 30 | CSP（§8.3） | `script-src` の `https://www.gstatic.com` は `https://www.gstatic.com/recaptcha/` に絞った。`connect-src` は Firestore・Identity Toolkit・Secure Token・App Check（`content-firebaseappcheck.googleapis.com`）・reCAPTCHA。`frame-src` は `{project}.firebaseapp.com` と reCAPTCHA。Firebase の設定値がないビルドでは `'self'` のまま | 使うものだけを許可する |
 | 31 | 表示名の入力欄（§8.3） | 表示名の変更は `<form>` を使わず、ボタンと Enter キーで保存する | CSP を `form-action 'none'` にしているため |
 | 32 | フェーズ3・4で作っていないもの | 回別の最高点（`examBest`）の記録と、解説への報告ボタン（`reports` への書き込み）は、ルールとテストだけ用意した | 本番模試モード（§3.1）と解説（フェーズ6）がまだないため。それぞれを作るときに画面を足す |
+| 33 | App Check のプロバイダ（§2 / §8.2） | reCAPTCHA v3（Classic）をやめ、Fraud Defense（旧称 reCAPTCHA Enterprise）のスコアベースのWebサイト用キー（表示名 `biyoushi-kakomon-appcheck`、ドメイン `eggplant-umrk.github.io`・`localhost`）を使う。アプリは `ReCaptchaEnterpriseProvider`。App Check のしきい値は 0.3。キーはサイトキーだけを使い、シークレットキーは扱わない。以前作った reCAPTCHA v3 のキーは使わない（App Check には登録していない） | App Check のコンソールで reCAPTCHA Classic が非推奨と表示された。Firebase のドキュメントでは Spark プランでも reCAPTCHA Enterprise を使え、スコアが 0.1 / 0.3 / 0.7 / 0.9 の4段階に限られるだけとされている。Google Cloud コンソールでのキー作成・App Check への登録で課金（Blaze）は求められなかった |
+| 34 | 記録の二重加算の防止（§6.4 / §8.1） | `users/{uid}` に送信の連番 `syncSeq`（作成時 0）を持たせる。記録の送信（writeBatch 1回）では `syncSeq` を「前回＋1」の値にし、ルールは「前回＋1」のときだけ許可する。`progress`・`days` の書き込みは、同じ writeBatch で `syncSeq` を進めている（`getAfter` と `get` の比較）ときだけ許可する。アプリは送る分と連番を端末内（`inflight`）に保存してから送り、再送では同じものを送る。再送が拒否され、Firestore の `syncSeq` がその連番以上になっていれば「届いていた」とみなして未送信分から消す。初めての送信が拒否されたとき（別の端末が先に同じ連番を使った等）は、作り直して送る | `increment()` で足す方式では、届いたのに応答が来なかった送信を再送すると二重に足される。連番なら2回目をルールで止められる。残るあいまいさ：送信の結果が分からないまま、別の端末が先に次の連番で送った場合は、届いていない送信を「届いた」とみなす可能性がある（1人で2台を同時に使う場合だけ。受け入れる） |
+| 35 | 1回の送信で増やせる量（§8.1） | 1回の送信で増やせる解答数は55まで、正解数の増加は解答数の増加以下（`users` の totals と8分野の byField、`progress` の attempts・correctCount、`days` の answered・correct）。減らす更新は拒否。アプリは未送信分を55問ずつに分けて送る（1問だけで55を超える場合はその問題を分けて送る）。`users/{uid}` の作成時は記録をすべて 0 にする。表示名の変更など `syncSeq` を進めない更新では、記録（totals・byField・examBest）を変えられない | ルールの検査をすり抜けて記録を一度に大きく書き換えられないようにする。55は1回分の試験の問題数 |
+| 36 | E2E の WebKit のエラー | ログインの E2E で、ページを読み込み直したときに WebKit が出す Firestore の通信の中断エラー（`access control checks`）と、その直後の「バックエンドに接続できない」は、アプリの不具合として数えない。ログアウト後の確認は、ページの読み込み直しが終わってから行う | iPhone（WebKit）でだけ、読み込み直しで切れた通信がコンソールのエラーとして出て、CI が失敗していた。記録の同期そのものはテストで確かめている |

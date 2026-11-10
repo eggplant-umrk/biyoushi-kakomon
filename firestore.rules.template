@@ -61,7 +61,8 @@ service cloud.firestore {
 
     // users/{uid}。lastActiveAt は必ず request.time（時刻の偽装を防ぐ）
     function validUser(d) {
-      return hasExactly(d, ['displayName', 'createdAt', 'lastActiveAt', 'totals', 'byField', 'examBest'])
+      return hasExactly(d, ['displayName', 'createdAt', 'lastActiveAt', 'totals', 'byField', 'examBest', 'syncSeq'])
+        && isNonNegInt(d.syncSeq, 100000000)
         && d.displayName is string
         && d.displayName.size() >= 1 && d.displayName.size() <= 30
         && d.displayName.matches('^[^\\x00-\\x1f\\x7f]+$')   // 制御文字を含まない
@@ -71,6 +72,41 @@ service cloud.firestore {
         && validByField(d.byField)
         && validExamBest(d.examBest);
     }
+
+    // ---- 1回の送信で増やせる量（SPEC §8.1 / §14）--------------------------
+    // 記録の送信（writeBatch 1回）では users/{uid}.syncSeq を「前回＋1」にする。同じ送信を2回送っても2回目は拒否され、
+    // 回数が二重に足されない。1回の送信で増やせる解答数は55まで、正解数の増加は解答数の増加以下。
+
+    // 増加分 { answered: 増えた数, correct: 増えた数 } が 0〜55 で、correct の増加 ≤ answered の増加
+    function validStep(da, dc) {
+      return da >= 0 && da <= 55 && dc >= 0 && dc <= da;
+    }
+    function countOf(m, key) { return key in m ? m[key] : { 'answered': 0, 'correct': 0 }; }
+    function validFieldStep(n, o, key) {
+      return validStep(countOf(n, key).answered - countOf(o, key).answered,
+                       countOf(n, key).correct - countOf(o, key).correct);
+    }
+    // 記録の送信による users/{uid} の更新
+    function validSyncStep(n, o) {
+      return n.syncSeq == o.syncSeq + 1
+        && validStep(n.totals.answered - o.totals.answered, n.totals.correct - o.totals.correct)
+        && validFieldStep(n.byField, o.byField, 'law') && validFieldStep(n.byField, o.byField, 'public_health')
+        && validFieldStep(n.byField, o.byField, 'infection') && validFieldStep(n.byField, o.byField, 'hygiene')
+        && validFieldStep(n.byField, o.byField, 'anatomy') && validFieldStep(n.byField, o.byField, 'skin')
+        && validFieldStep(n.byField, o.byField, 'cosmetics') && validFieldStep(n.byField, o.byField, 'theory');
+    }
+    // 表示名の変更など、記録を変えない更新
+    function unchangedRecords(n, o) {
+      return n.syncSeq == o.syncSeq
+        && n.totals == o.totals && n.byField == o.byField && n.examBest == o.examBest;
+    }
+    // progress / days を書く送信は、同じ writeBatch で users/{uid}.syncSeq を「前回＋1」にしていること
+    function syncBumped(uid) {
+      return getAfter(/databases/$(db)/documents/users/$(uid)).data.syncSeq
+        == get(/databases/$(db)/documents/users/$(uid)).data.syncSeq + 1;
+    }
+    // 書き込み前の値（新規作成なら 0）
+    function before(field) { return resource == null ? 0 : resource.data[field]; }
 
     // users/{uid}/progress/{qid}。lastAnsweredAt は必ず request.time
     function validProgress(d) {
@@ -121,17 +157,27 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
-      // createdAt は作成時だけ request.time と一致させ、更新では変更不可
+      // createdAt は作成時だけ request.time と一致させ、更新では変更不可。
+      // 作成時の記録はすべて 0（syncSeq も 0）。記録は送信（syncSeq を＋1）でだけ増やせる
       allow create: if isOwner(uid) && validUser(request.resource.data)
-                    && request.resource.data.createdAt == request.time;
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.syncSeq == 0
+                    && request.resource.data.totals == { 'answered': 0, 'correct': 0 }
+                    && request.resource.data.byField == {}
+                    && request.resource.data.examBest == {};
       allow update: if isOwner(uid) && validUser(request.resource.data)
-                    && request.resource.data.createdAt == resource.data.createdAt;
+                    && request.resource.data.createdAt == resource.data.createdAt
+                    && (unchangedRecords(request.resource.data, resource.data)
+                        || validSyncStep(request.resource.data, resource.data));
       allow delete: if isOwner(uid);
 
       match /progress/{qid} {
         allow read: if isOwner(uid) || isAdmin();
         allow create, update: if isOwner(uid) && isValidQid(qid)
-                              && validProgress(request.resource.data);
+                              && validProgress(request.resource.data)
+                              && validStep(request.resource.data.attempts - before('attempts'),
+                                           request.resource.data.correctCount - before('correctCount'))
+                              && syncBumped(uid);
         allow delete: if isOwner(uid);
       }
 
@@ -140,7 +186,10 @@ service cloud.firestore {
         // 今日か前日（日本時間）のドキュメントだけ書ける。過去・未来の日付を大量に作れないようにする
         allow create, update: if isOwner(uid)
                      && (day == jstDate(request.time) || day == jstDate(request.time - duration.value(1, 'd')))
-                     && validDay(request.resource.data);
+                     && validDay(request.resource.data)
+                     && validStep(request.resource.data.answered - before('answered'),
+                                  request.resource.data.correct - before('correct'))
+                     && syncBumped(uid);
         allow delete: if isOwner(uid);
       }
 
