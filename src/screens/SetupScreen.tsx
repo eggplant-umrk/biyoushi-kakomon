@@ -109,9 +109,7 @@ export function SetupScreen() {
                 checked={opt.exams.includes(e.examNo)}
                 onChange={() => set({ exams: toggle(opt.exams, e.examNo) })}
               />
-              <span>
-                第{e.examNo}回{e.sample ? '（サンプル）' : ''}
-              </span>
+              <span>第{e.examNo}回</span>
             </label>
           ))}
         </div>

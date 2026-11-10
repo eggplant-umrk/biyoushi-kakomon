@@ -16,7 +16,8 @@ export function checkQuestion(q: Question): string[] {
   const expectedId = `${q.examNo}-${String(q.no).padStart(2, '0')}`;
   if (q.id !== expectedId) errs.push(`id と回・番号が不一致: ${q.id} / ${expectedId}`);
   if (!Array.isArray(q.choices) || q.choices.length !== 4) errs.push(`${q.id}: choices が4つではない`);
-  if (!Number.isInteger(q.answer) || q.answer < 1 || q.answer > 4) errs.push(`${q.id}: answer が1〜4ではない`);
+  const answerOk = q.scoringExcluded ? q.answer === 0 : Number.isInteger(q.answer) && q.answer >= 1 && q.answer <= 4;
+  if (!answerOk) errs.push(`${q.id}: answer が1〜4ではない`);
   try {
     if (fieldOfNo(q.no).id !== q.fieldId) errs.push(`${q.id}: fieldId が番号と不一致`);
   } catch {
@@ -24,6 +25,11 @@ export function checkQuestion(q: Question): string[] {
   }
   if (q.explanation && q.explanation.perChoice.length !== 4) errs.push(`${q.id}: perChoice が4つではない`);
   return errs;
+}
+
+/** 選んだ選択肢が正解か（公式に複数正解とされた問題にも対応） */
+export function isCorrectChoice(q: Question, choice: number | null): boolean {
+  return choice !== null && (choice === q.answer || (q.altAnswers ?? []).includes(choice));
 }
 
 let examsCache: Promise<ExamMeta[]> | null = null;

@@ -622,6 +622,7 @@ fieldset.card {
   margin-bottom: 16px;
 }
 .stem {
+  white-space: pre-line;
   margin: 8px 0;
   font-size: 1.04rem;
 }
@@ -925,4 +926,7 @@ fieldset.card {
   .login {
     min-height: auto;
   }
+}
+.choice.is-chosen {
+  border-color: var(--primary);
 }
