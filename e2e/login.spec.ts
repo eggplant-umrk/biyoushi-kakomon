@@ -40,12 +40,14 @@ async function newDevice(browser: Browser, info: TestInfo, user: FakeUser): Prom
 /**
  * ページを読み込み直したときに WebKit が出すエラーで、アプリの不具合ではないもの。
  * 読み込み直しで Firestore の通信（WebChannel）が途中で切れると、WebKit は「access control checks」のエラーを出し、
- * Firestore SDK は「バックエンドに接続できない」と出す（Chromium では出ない）
+ * Firestore SDK は「バックエンドに接続できない」と出す。WebChannel は切れたときに www.google.com/images/cleardot.gif で
+ * 通信の確認をしようとし、CSP（img-src）で止められる（Chromium では出ない）
  */
 function isReloadNoise(text: string): boolean {
   return (
-    (/google\.firestore\.v1\.Firestore\/(Listen|Write)\/channel/.test(text) && /due to access control checks/.test(text)) ||
-    /Could not reach Cloud Firestore backend/.test(text)
+    (/google\.firestore\.v1\.Firestore\/(Listen|Write)\/channel/.test(text) && /access control checks/.test(text)) ||
+    /Could not reach Cloud Firestore backend/.test(text) ||
+    (/www\.google\.com\/images\/cleardot\.gif/.test(text) && /img-src/.test(text))
   );
 }
 
@@ -86,7 +88,9 @@ test('ログインして解いた記録が、別の端末でログインして�
   a.page.on('console', (m) => {
     if (m.type() === 'error' && !isReloadNoise(m.text())) problems.push(m.text());
   });
-  a.page.on('pageerror', (e) => problems.push(e.message));
+  a.page.on('pageerror', (e) => {
+    if (!isReloadNoise(e.message)) problems.push(e.message);
+  });
 
   await login(a.page);
   await expect(a.page.getByTestId('total-count')).toHaveText('0問');
