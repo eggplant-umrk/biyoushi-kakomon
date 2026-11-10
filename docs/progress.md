@@ -2,38 +2,55 @@
 
 作業を引き継ぐときに最初に読むファイルです。仕様は `docs/SPEC.md`、仕様と違う判断は SPEC.md §14。
 
-## フェーズ3（ログイン・記録）・フェーズ4（セキュリティ）
-
 最終更新: 2026-11-10
 
-### 済んだこと
+## いまの状態
 
-- `docs/ocr-review.html`（OCR確認用の比較ページ。`scripts/build-data.ts` が作る）
-- Firebase プロジェクト `biyoushi-kakomon`（Spark プラン）：Web アプリ、Firestore（asia-northeast1）、API キー制限、`.env.local` と GitHub Secrets（`scripts/setup/firebase.sh`）
-- セキュリティルール（`firestore.rules.template`）とルールのテスト（`rules-tests/`、`npm run test:rules`）
-- Google ログイン、アプリ内ブラウザの案内、ゲスト記録の引き継ぎ、Firestore への記録、設定画面（表示名・ログアウト・アカウント削除）、管理タブ（準備中）
-- E2E（`npm run test:e2e`。Auth・Firestore Emulator を使う）
-- CSP、CI（ルールのテスト、ビルド結果に管理者メールが入っていないことの検査）
+フェーズ1〜4はマージ済みで、本番（https://eggplant-umrk.github.io/biyoushi-kakomon/）にデプロイされています。次はフェーズ5（管理画面）です。
 
-### 2026-11-10 の追加分
+| フェーズ | 状態 |
+|---|---|
+| 1. 骨組み | 済み（PR #1） |
+| 2. データ | 済み（PR #3）。OCR確認待ち18問は `docs/ocr-review.html` で確認できる |
+| 3. ログイン・記録 | 済み（PR #4） |
+| 4. セキュリティ | 済み（PR #4・#5） |
+| 5. 管理画面 | 未着手。管理タブは「準備中」を出すだけ |
+| 6. 解説 | 未着手 |
 
-- App Check を Fraud Defense（reCAPTCHA Enterprise）に切り替え（SPEC §14-33）。キー `biyoushi-kakomon-appcheck`（サイトキー `6Lf-DRkuAAAAAHYUjdfiymk5uG7PsaehHjOqr18J`）を作り、App Check に登録（しきい値 0.3）。GitHub Secrets の `VITE_RECAPTCHA_SITE_KEY` に登録済み
-- 記録の二重加算の防止（`syncSeq`・`syncAt`）と、1回の送信の上限（55問・問題10件）をルールとアプリに追加（SPEC §14-34・35）。ルールのテストは CI で通過
-- Authentication：Google ログインを有効化、承認済みドメインに `eggplant-umrk.github.io` を追加。メール列挙保護は有効
+## Firebase（プロジェクト `biyoushi-kakomon`、Spark プラン）
 
-### 残り
+- Firestore（asia-northeast1）。ルールは `firestore.rules.template` から作り、`bash scripts/setup/deploy-rules.sh`（テスト → 生成 → デプロイ）で公開する。コンソールのルール画面からは公開しない
+- Authentication：Google ログインだけ有効。メール列挙保護は有効。承認済みドメインは `eggplant-umrk.github.io`・`localhost`・`biyoushi-kakomon.firebaseapp.com`
+- App Check：Fraud Defense（reCAPTCHA Enterprise）のキー `biyoushi-kakomon-appcheck`。**Firestore・Authentication の両方で強制済み**（SPEC §14-37）。状態の確認と切り替えは `bash scripts/setup/appcheck.sh status|enforce|unenforce`
+- API キーは、使う4つの API とリファラー3つに制限（`scripts/setup/firebase.sh`）
+- 設定値は `.env.local`（コミットしない）と GitHub Secrets。管理者メール（`ADMIN_EMAIL`）はこの2か所だけに置く
 
-1. 新しいルールを本番に公開する（コンソールのルール画面に入れてあり、「公開」を押すだけ。または手元で `bash scripts/setup/deploy-rules.sh`）
-2. PR #4 をマージ（CI は通過済み）→ GitHub Pages に自動デプロイ
-3. 本番で App Check のトークンが届くのを確認 → Firestore の App Check を強制（`bash scripts/setup/appcheck.sh enforce firestore` かコンソール）
-4. Authentication での App Check 強制が無料プランで使えるか確認し、結果を SPEC.md §14 に書く
-5. 承認済みドメインから `biyoushi-kakomon.web.app`・`biyoushi-kakomon.firebaseapp.com` を外す（`firebase.sh` と同じ状態にする）
-6. 本番URLで、ログイン → 数問解く → 別の端末でログインして記録が見える、を確認
-7. 以前作った reCAPTCHA v3 のキー（ラベル biyoushi-kakomon）を削除
-8. `.env.local` の `VITE_RECAPTCHA_SITE_KEY` を新しいサイトキーにする（手元のPC）
+## 本番で確認したこと（2026-11-10）
 
-### 手元で動かすときの注意
+- Google でログイン → 第54回の10問を解く → Firestore に累計10問・問題ごとの記録10件・日別の記録1件が保存された
+- `users` のドキュメントにメールアドレスは入っていない。配信中の JS に管理者メールと E2E 用のコードは入っていない
+- App Check：トークンなしのリクエストは、Firestore で 403、Authentication で 401 になる。トークンありは通る
+- App Check の強制後も、ログイン済みのブラウザは読み込み直して同期できる
 
-- Firestore Emulator に Java が必要。このPCでは `.tools/` に Temurin JRE 21 を置いてある（コミットしない）。
+## まだ確認していないこと
+
+- 別のブラウザ・端末で同じアカウントにログインして、記録が見えること（Emulator の E2E では確認済み。本番では未確認）
+- App Check を Authentication で強制した後の、新規のログイン（ポップアップ）とアカウント削除（再ログイン）
+- iPhone の Safari・Android の Chrome の実機での表示とログイン
+- 新しい画面（ゲスト記録の引き継ぎ確認、アプリ内ブラウザの案内、設定のアカウント欄）の見た目
+
+ログインできない場合は、まず `bash scripts/setup/appcheck.sh unenforce auth` で Authentication の強制を外して切り分ける。
+
+## 作っていないもの
+
+- 回別の最高点（`examBest`）の記録（本番模試モードがまだない）
+- 解説への報告ボタン（解説がまだない）。ルールとテストは用意済み
+
+## 手元で動かすときの注意
+
+- Firestore Emulator に Java が必要。作業用の Windows PC では `.tools/` に Temurin JRE 21 を置いてある（コミットしない）。
   `export JAVA_HOME="$PWD/.tools/jdk-21.0.13+9-jre"; export PATH="$JAVA_HOME/bin:$PATH"`
-- ルールのデプロイは `bash scripts/setup/deploy-rules.sh`（テスト → 生成 → デプロイ）
+- E2E は PC の負荷が高いと時間切れで落ちることがある。そのときは並列数を下げる：
+  `firebase emulators:exec --config firebase.emulator.json --project demo-kakomon --only auth,firestore "npx playwright test --workers=2"`
+- Windows では iPhone（WebKit）のログイン E2E を飛ばしている。CI（Linux）で実行される
+- デプロイ後に古い版が出る場合は、ページをもう一度読み込む（PR #5 より前の版を開いていたブラウザだけ。以後は自動で切り替わる）
