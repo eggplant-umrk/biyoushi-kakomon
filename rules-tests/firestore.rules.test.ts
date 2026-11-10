@@ -83,6 +83,7 @@ const user = (o: Record<string, unknown> = {}) => ({
   byField: {},
   examBest: {},
   syncSeq: 0,
+  syncAt: null,
   ...o,
 });
 const progress = (o: Record<string, unknown> = {}) => ({
@@ -123,7 +124,7 @@ const report = (uid: string, o: Record<string, unknown> = {}) => ({
 function sendBatch(db: Firestore, ops: (b: WriteBatch) => void, userUpdate: Record<string, unknown> = {}) {
   const b = writeBatch(db);
   ops(b);
-  b.update(doc(db, 'users', ALICE), { syncSeq: increment(1), lastActiveAt: serverTimestamp(), ...userUpdate });
+  b.update(doc(db, 'users', ALICE), { syncSeq: increment(1), syncAt: serverTimestamp(), lastActiveAt: serverTimestamp(), ...userUpdate });
   return b.commit();
 }
 const sendSet = (ref: DocumentReference, data: DocumentData, opts?: SetOptions) =>
@@ -234,6 +235,7 @@ describe('users/{uid}', () => {
     await assertSucceeds(
       updateDoc(ref(db), {
         syncSeq: increment(1),
+        syncAt: serverTimestamp(),
         lastActiveAt: serverTimestamp(),
         'totals.answered': increment(10),
         'totals.correct': increment(7),
@@ -279,6 +281,8 @@ describe('users/{uid}', () => {
     ['作成時の totals が 0 でない', { totals: { answered: 10, correct: 5 } }],
     ['作成時の byField が空でない', { byField: { law: { answered: 1, correct: 0 } } }],
     ['作成時の examBest が空でない', { examBest: { '54': 40 } }],
+    ['作成時の syncAt が null でない', { syncAt: serverTimestamp() }],
+    ['syncAt が文字列', { syncAt: 'now' }],
   ])('作成を拒否：%s', async (_name, override) => {
     await assertFails(setDoc(ref(userDb(ALICE)), user(override)));
   });
@@ -431,10 +435,12 @@ describe('記録の送信：二重加算の防止（syncSeq）と1回の上限',
   /** アプリと同じ形の送信：syncSeq を seq（絶対値）にし、progress・days・totals を increment で足す */
   const sendLikeApp = (db: Firestore, seq: number, answered = 3, correct = 2) => {
     const b = writeBatch(db);
-    b.set(pRef(db), { attempts: increment(answered), correctCount: increment(correct), history: '○×○', lastAnsweredAt: serverTimestamp(), checked: false, nextReviewAt: null }, { merge: true });
+    const history = '○'.repeat(Math.min(Math.max(answered, 0), 3));
+    b.set(pRef(db), { attempts: increment(answered), correctCount: increment(correct), history, lastAnsweredAt: serverTimestamp(), checked: false, nextReviewAt: null }, { merge: true });
     b.set(dRef(db), { answered: increment(answered), correct: increment(correct), sessions: [] }, { merge: true });
     b.update(userRef(db), {
       syncSeq: seq,
+      syncAt: serverTimestamp(),
       lastActiveAt: serverTimestamp(),
       'totals.answered': increment(answered),
       'totals.correct': increment(correct),
@@ -470,11 +476,15 @@ describe('記録の送信：二重加算の防止（syncSeq）と1回の上限',
     const db = userDb(ALICE);
     await assertFails(setDoc(pRef(db), progress()));
     await assertFails(setDoc(dRef(db), day()));
-    // users を一緒に更新しても、syncSeq を進めていなければ拒否
+    // users を一緒に更新しても（表示名の変更など）、記録の送信でなければ拒否
     const b = writeBatch(db);
     b.set(pRef(db), progress());
-    b.update(userRef(db), { lastActiveAt: serverTimestamp() });
+    b.update(userRef(db), { lastActiveAt: serverTimestamp(), displayName: '別の名前' });
     await assertFails(b.commit());
+    const b2 = writeBatch(db);
+    b2.set(dRef(db), day());
+    b2.update(userRef(db), { lastActiveAt: serverTimestamp() });
+    await assertFails(b2.commit());
   });
 
   test('記録（totals・byField）は、syncSeq を進めない更新では変えられない', async () => {
@@ -483,6 +493,10 @@ describe('記録の送信：二重加算の防止（syncSeq）と1回の上限',
     await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), 'byField.law.answered': increment(1) }));
     await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), 'examBest.54': 40 }));
     await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), syncSeq: 100 }));
+    await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), syncAt: serverTimestamp() }));
+    // syncSeq を進めても、syncAt を現在時刻にしなければ拒否
+    await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), syncSeq: increment(1) }));
+    await assertFails(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), syncSeq: increment(1), syncAt: past }));
     // 表示名の変更は syncSeq を変えずにできる
     await assertSucceeds(updateDoc(userRef(db), { lastActiveAt: serverTimestamp(), displayName: '新しい名前' }));
   });
@@ -500,19 +514,18 @@ describe('記録の送信：二重加算の防止（syncSeq）と1回の上限',
     await assertSucceeds(sendLikeApp(db, 8, 2, 2));
   });
 
-  test('users の totals・byField の増加の上限と、減らす更新の拒否', async () => {
+  test('users の totals の増加の上限と、減らす更新の拒否', async () => {
     const db = userDb(ALICE);
     const upd = (o: Record<string, unknown>) =>
-      updateDoc(userRef(db), { syncSeq: increment(1), lastActiveAt: serverTimestamp(), ...o });
+      updateDoc(userRef(db), { syncSeq: increment(1), syncAt: serverTimestamp(), lastActiveAt: serverTimestamp(), ...o });
     await assertFails(upd({ 'totals.answered': increment(56) }));
     await assertFails(upd({ 'totals.answered': increment(1), 'totals.correct': increment(2) }));
     await assertFails(upd({ 'totals.answered': increment(-1) }));
     await assertFails(upd({ 'totals.correct': increment(-1) }));
-    await assertFails(upd({ 'byField.law.answered': increment(56) }));
-    await assertFails(upd({ 'byField.theory.answered': increment(-10) }));
-    await assertFails(upd({ 'byField.theory.answered': increment(1), 'byField.theory.correct': increment(2) }));
-    await assertFails(upd({ byField: {} })); // 分野の記録を消す
-    await assertSucceeds(upd({ 'totals.answered': increment(55), 'byField.law.answered': increment(55) }));
+    // byField も型・範囲は検査される
+    await assertFails(upd({ 'byField.math': { answered: 1, correct: 0 } }));
+    await assertFails(upd({ 'byField.law': { answered: 1, correct: 2 } }));
+    await assertSucceeds(upd({ 'totals.answered': increment(55), 'byField.law': { answered: 55, correct: 0 } }));
   });
 
   test('progress・days の1回の増加の上限', async () => {
@@ -533,22 +546,32 @@ describe('記録の送信：二重加算の防止（syncSeq）と1回の上限',
     await assertSucceeds(one(pRef(db), { attempts: increment(55), correctCount: increment(55), lastAnsweredAt: serverTimestamp() }));
   });
 
-  test('アプリと同じ大きさの送信（55問を別々の問題で＋日別＋users）が通る', async () => {
+  test('アプリが送る最大の大きさ（問題10件＋今日・前日の日別＋users）が通る', async () => {
+    // users の byField（8分野）・examBest（14回）がすべて埋まっている、いちばん検査の多い状態
+    const fields = ['law', 'public_health', 'infection', 'hygiene', 'anatomy', 'skin', 'cosmetics', 'theory'];
+    const byField = Object.fromEntries(fields.map((f) => [f, { answered: 100, correct: 50 }]));
+    const examBest = Object.fromEntries(Array.from({ length: 14 }, (_, i) => [String(41 + i), 30]));
+    await seedAlice({ syncSeq: 7, totals: { answered: 800, correct: 400 }, byField, examBest });
     const db = userDb(ALICE);
     const b = writeBatch(db);
-    for (let i = 1; i <= 55; i++) {
+    for (let i = 1; i <= 10; i++) {
       const qid = `54-${String(i).padStart(2, '0')}`;
-      b.set(pRef(db, qid), { attempts: increment(1), correctCount: increment(1), history: '○', lastAnsweredAt: serverTimestamp(), checked: false, nextReviewAt: null }, { merge: true });
+      b.set(pRef(db, qid), { attempts: increment(5), correctCount: increment(5), history: '○○○○○', lastAnsweredAt: serverTimestamp(), checked: true, nextReviewAt: null }, { merge: true });
     }
-    b.set(dRef(db), { answered: increment(55), correct: increment(55), sessions: [session({ total: 55, correct: 55 })] }, { merge: true });
-    b.update(userRef(db), {
+    b.set(dRef(db), { answered: increment(50), correct: increment(50), sessions: [session({ total: 50, correct: 50 })] }, { merge: true });
+    b.set(doc(db, 'users', ALICE, 'days', jstDate(Date.now() - DAY)), { answered: increment(5), correct: increment(5), sessions: [] }, { merge: true });
+    const upd: Record<string, unknown> = {
       syncSeq: 8,
+      syncAt: serverTimestamp(),
       lastActiveAt: serverTimestamp(),
-      'totals.answered': increment(55),
-      'totals.correct': increment(55),
-      'byField.theory.answered': increment(55),
-      'byField.theory.correct': increment(55),
-    });
+      'totals.answered': increment(50),
+      'totals.correct': increment(50),
+    };
+    for (const f of fields) {
+      upd[`byField.${f}.answered`] = increment(5);
+      upd[`byField.${f}.correct`] = increment(5);
+    }
+    b.update(userRef(db), upd);
     await assertSucceeds(b.commit());
   });
 });

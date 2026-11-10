@@ -10,7 +10,7 @@ import {
   settleInflight,
   type Outbox,
 } from './db';
-import { chunkTotals, MAX_ANSWERS_PER_SEND, takeChunk } from './sendplan';
+import { chunkTotals, MAX_ANSWERS_PER_SEND, MAX_DOCS_PER_SEND, takeChunk } from './sendplan';
 
 const prog = (attempts: number, correct: number, rev = 1) => ({ attempts, correct, rev });
 
@@ -27,11 +27,19 @@ describe('takeChunk（1回の送信で送る分）', () => {
 
   it('解答数の合計が55を超える分は次の送信に回す（問題は途中で分けない）', () => {
     const progress: Outbox['progress'] = {};
-    for (let i = 1; i <= 30; i++) progress[`54-${String(i).padStart(2, '0')}`] = prog(2, 1);
+    for (let i = 1; i <= 5; i++) progress[`54-${String(i).padStart(2, '0')}`] = prog(12, 6);
     const c = takeChunk({ progress, days: {} });
-    expect(chunkTotals(c).answered).toBe(54); // 2問ずつ27問まで。28問目は入らない
-    expect(Object.keys(c.progress)).toHaveLength(27);
-    expect(Object.values(c.progress).every((p) => p.attempts === 2)).toBe(true);
+    expect(chunkTotals(c).answered).toBe(48); // 12問ずつ4問まで。5問目は入らない
+    expect(Object.keys(c.progress)).toHaveLength(4);
+    expect(Object.values(c.progress).every((p) => p.attempts === 12)).toBe(true);
+  });
+
+  it('問題は1回に10件まで', () => {
+    const progress: Outbox['progress'] = {};
+    for (let i = 1; i <= 30; i++) progress[`54-${String(i).padStart(2, '0')}`] = prog(1, 1);
+    const c = takeChunk({ progress, days: {} });
+    expect(Object.keys(c.progress)).toHaveLength(MAX_DOCS_PER_SEND);
+    expect(chunkTotals(c).answered).toBe(MAX_DOCS_PER_SEND);
   });
 
   it('1問だけで55を超える場合は、送信の先頭で55まで分けて送る', () => {

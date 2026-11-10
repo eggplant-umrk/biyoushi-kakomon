@@ -5,8 +5,12 @@ import type { Outbox } from './db';
  * セキュリティルールでも、1回の送信で増やせる解答数を 55 まで（1回分の試験の問題数）に制限している。
  */
 export const MAX_ANSWERS_PER_SEND = 55;
-/** 1回の送信で書く progress の件数の上限（writeBatch の上限は500件。余裕を持たせる） */
-export const MAX_DOCS_PER_SEND = 400;
+/**
+ * 1回の送信で書く progress の件数の上限。
+ * ルールは progress・days の1件ごとに getAfter を1回使い、1回の書き込み要求あたり20回までしか使えない。
+ * また1回の要求で評価できる式は1000個まで。日別の記録（最大2件）と users の更新を合わせて収まる数にする
+ */
+export const MAX_DOCS_PER_SEND = 10;
 
 /**
  * 未送信分（outbox）から、1回の送信で送る分を取り出す。

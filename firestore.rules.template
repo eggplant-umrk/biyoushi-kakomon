@@ -60,50 +60,46 @@ service cloud.firestore {
     }
 
     // users/{uid}。lastActiveAt は必ず request.time（時刻の偽装を防ぐ）
+    // 更新で byField・examBest が変わっていなければ、中身の検査を省く（ルールの評価回数の上限 1000 に収めるため）
     function validUser(d) {
-      return hasExactly(d, ['displayName', 'createdAt', 'lastActiveAt', 'totals', 'byField', 'examBest', 'syncSeq'])
+      return hasExactly(d, ['displayName', 'createdAt', 'lastActiveAt', 'totals', 'byField', 'examBest', 'syncSeq', 'syncAt'])
         && isNonNegInt(d.syncSeq, 100000000)
+        && (d.syncAt == null || d.syncAt is timestamp)
         && d.displayName is string
         && d.displayName.size() >= 1 && d.displayName.size() <= 30
         && d.displayName.matches('^[^\\x00-\\x1f\\x7f]+$')   // 制御文字を含まない
         && d.createdAt is timestamp
         && d.lastActiveAt == request.time
         && validCount(d.totals, 1000000)
-        && validByField(d.byField)
-        && validExamBest(d.examBest);
+        && ((resource != null && d.byField == resource.data.byField) || validByField(d.byField))
+        && ((resource != null && d.examBest == resource.data.examBest) || validExamBest(d.examBest));
     }
 
-    // ---- 1回の送信で増やせる量（SPEC §8.1 / §14）--------------------------
-    // 記録の送信（writeBatch 1回）では users/{uid}.syncSeq を「前回＋1」にする。同じ送信を2回送っても2回目は拒否され、
-    // 回数が二重に足されない。1回の送信で増やせる解答数は55まで、正解数の増加は解答数の増加以下。
+    // ---- 記録の送信（SPEC §8.1 / §14）---------------------------------------
+    // 記録の送信（writeBatch 1回）では、users/{uid} の syncSeq を「前回＋1」に、syncAt を request.time にする。
+    // 同じ送信を2回送っても2回目は拒否され、回数が二重に足されない。
+    // 1回の送信で増やせる解答数は55まで、正解数の増加は解答数の増加以下。
 
-    // 増加分 { answered: 増えた数, correct: 増えた数 } が 0〜55 で、correct の増加 ≤ answered の増加
+    // 増加分が 0〜55 で、正解数の増加 ≤ 解答数の増加
     function validStep(da, dc) {
       return da >= 0 && da <= 55 && dc >= 0 && dc <= da;
-    }
-    function countOf(m, key) { return key in m ? m[key] : { 'answered': 0, 'correct': 0 }; }
-    function validFieldStep(n, o, key) {
-      return validStep(countOf(n, key).answered - countOf(o, key).answered,
-                       countOf(n, key).correct - countOf(o, key).correct);
     }
     // 記録の送信による users/{uid} の更新
     function validSyncStep(n, o) {
       return n.syncSeq == o.syncSeq + 1
-        && validStep(n.totals.answered - o.totals.answered, n.totals.correct - o.totals.correct)
-        && validFieldStep(n.byField, o.byField, 'law') && validFieldStep(n.byField, o.byField, 'public_health')
-        && validFieldStep(n.byField, o.byField, 'infection') && validFieldStep(n.byField, o.byField, 'hygiene')
-        && validFieldStep(n.byField, o.byField, 'anatomy') && validFieldStep(n.byField, o.byField, 'skin')
-        && validFieldStep(n.byField, o.byField, 'cosmetics') && validFieldStep(n.byField, o.byField, 'theory');
+        && n.syncAt == request.time
+        && validStep(n.totals.answered - o.totals.answered, n.totals.correct - o.totals.correct);
     }
     // 表示名の変更など、記録を変えない更新
     function unchangedRecords(n, o) {
-      return n.syncSeq == o.syncSeq
+      return n.syncSeq == o.syncSeq && n.syncAt == o.syncAt
         && n.totals == o.totals && n.byField == o.byField && n.examBest == o.examBest;
     }
-    // progress / days を書く送信は、同じ writeBatch で users/{uid}.syncSeq を「前回＋1」にしていること
-    function syncBumped(uid) {
-      return getAfter(/databases/$(db)/documents/users/$(uid)).data.syncSeq
-        == get(/databases/$(db)/documents/users/$(uid)).data.syncSeq + 1;
+    // progress / days は、同じ writeBatch で記録の送信（users/{uid}.syncAt を request.time にする更新）を
+    // しているときだけ書ける。syncAt を request.time にできるのは validSyncStep を通る更新だけ。
+    // getAfter は1回だけ（1回の書き込み要求あたり20回の上限があるため）
+    function inSyncBatch(uid) {
+      return getAfter(/databases/$(db)/documents/users/$(uid)).data.syncAt == request.time;
     }
     // 書き込み前の値（新規作成なら 0）
     function before(field) { return resource == null ? 0 : resource.data[field]; }
@@ -158,10 +154,11 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
       // createdAt は作成時だけ request.time と一致させ、更新では変更不可。
-      // 作成時の記録はすべて 0（syncSeq も 0）。記録は送信（syncSeq を＋1）でだけ増やせる
+      // 作成時の記録はすべて 0（syncSeq は 0、syncAt は null）。記録は送信（syncSeq を＋1）でだけ増やせる
       allow create: if isOwner(uid) && validUser(request.resource.data)
                     && request.resource.data.createdAt == request.time
                     && request.resource.data.syncSeq == 0
+                    && request.resource.data.syncAt == null
                     && request.resource.data.totals == { 'answered': 0, 'correct': 0 }
                     && request.resource.data.byField == {}
                     && request.resource.data.examBest == {};
@@ -177,7 +174,7 @@ service cloud.firestore {
                               && validProgress(request.resource.data)
                               && validStep(request.resource.data.attempts - before('attempts'),
                                            request.resource.data.correctCount - before('correctCount'))
-                              && syncBumped(uid);
+                              && inSyncBatch(uid);
         allow delete: if isOwner(uid);
       }
 
@@ -189,7 +186,7 @@ service cloud.firestore {
                      && validDay(request.resource.data)
                      && validStep(request.resource.data.answered - before('answered'),
                                   request.resource.data.correct - before('correct'))
-                     && syncBumped(uid);
+                     && inSyncBatch(uid);
         allow delete: if isOwner(uid);
       }
 

@@ -107,7 +107,7 @@ test('ログインして解いた記録が、別の端末でログインして�
   await expect.poll(async () => answeredOf(await findUserDoc(user.name)), { timeout: 15_000 }).toBe(expected);
   const doc = await findUserDoc(user.name);
   // メールアドレスは Firestore に保存しない（SPEC §6.3）
-  expect(Object.keys(doc ?? {}).sort()).toEqual(['byField', 'createdAt', 'displayName', 'examBest', 'lastActiveAt', 'path', 'syncSeq', 'totals']);
+  expect(Object.keys(doc ?? {}).sort()).toEqual(['byField', 'createdAt', 'displayName', 'examBest', 'lastActiveAt', 'path', 'syncAt', 'syncSeq', 'totals']);
   expect(JSON.stringify(doc)).not.toContain(user.email);
 
   // 別の端末

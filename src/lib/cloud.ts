@@ -191,6 +191,7 @@ export async function loadProfile(googleName: string | null): Promise<Profile> {
         byField: {},
         examBest: {},
         syncSeq: 0,
+        syncAt: null,
       });
     } catch (e) {
       // 別の端末が同時に作った場合は、上書き（createdAt の変更）になるのでルールで拒否される。できていればそれを使う
@@ -220,11 +221,11 @@ let flushing: Promise<boolean> | null = null;
  * 未送信分（outbox）を writeBatch で Firestore に送る。全部送れたら true。
  * 回数は increment() で足すので、別の端末で増えた分を上書きしない。
  *
- * 二重加算の防止（SPEC §14）：1回の送信ごとに users/{uid}.syncSeq を「前回＋1」にする。ルールは「前回＋1」の
+ * 二重加算の防止（SPEC §14）：1回の送信ごとに users/{uid}.syncSeq を「前回＋1」に、syncAt をサーバー時刻にする。ルールは「前回＋1」の
  * 書き込みだけを許可するので、同じ送信を2回送っても2回目は拒否される（届いていたのに応答が来なかった場合など）。
  * 送る分と連番は送る前に端末内（inflight）に保存し、再送では同じものを送る。再送が拒否され、Firestore の syncSeq が
  * その連番以上になっていれば「前回の送信は届いていた」とみなして、outbox から消す。
- * 1回に送る解答数は55まで（ルールの上限）。多いときは何回かに分けて送る。
+ * 1回に送る解答数は55まで、問題は10件まで（ルールの上限）。多いときは何回かに分けて送る。
  */
 export function flush(): Promise<boolean> {
   flushing ??= doFlush().finally(() => {
@@ -295,7 +296,7 @@ async function doFlush(): Promise<boolean> {
   return outboxSize(await getOutbox()) === 0;
 }
 
-/** 1回分を writeBatch で送る。users/{uid}.syncSeq を seq にする */
+/** 1回分を writeBatch で送る。users/{uid}.syncSeq を seq に、syncAt をサーバー時刻にする */
 async function commitChunk(uid: string, seq: number, sent: Outbox): Promise<void> {
   const { fs } = init();
   const qids = Object.keys(sent.progress);
@@ -351,6 +352,7 @@ async function commitChunk(uid: string, seq: number, sent: Outbox): Promise<void
   const totals = chunkTotals(sent);
   const upd: Record<string, FieldValue | number> = {
     syncSeq: seq,
+    syncAt: serverTimestamp(),
     lastActiveAt: serverTimestamp(),
     'totals.answered': increment(totals.answered),
     'totals.correct': increment(totals.correct),
