@@ -70,5 +70,11 @@
     "year": "令和2年度",
     "month": 3,
     "questionCount": 55
+  },
+  {
+    "examNo": 42,
+    "year": "令和2年度",
+    "month": 9,
+    "questionCount": 55
   }
 ]
