@@ -1,14 +1,23 @@
+import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
+import type { ExamFile, ExamMeta } from '../src/lib/types';
 
-// サンプル5問の正答（public/data/exam-54.json）。すべて (1) を選ぶと正解は問11の1問だけになる
-const TOTAL = 5;
+// 初期の出題条件は「最新の回・全分野・10問・番号順」。すべて (1) を選んだときの正解数を実データから求める
+const exams = JSON.parse(readFileSync('public/data/exams.json', 'utf8')) as ExamMeta[];
+const latest = Math.max(...exams.map((e) => e.examNo));
+const latestFile = JSON.parse(readFileSync(`public/data/exam-${latest}.json`, 'utf8')) as ExamFile;
+const picked = [...latestFile.questions].sort((a, b) => a.no - b.no).slice(0, 10);
+const TOTAL = picked.length;
+const scored = picked.filter((q) => !q.scoringExcluded);
+const CORRECT = scored.filter((q) => q.answer === 1 || (q.altAnswers ?? []).includes(1)).length;
+const WRONG = scored.length - CORRECT;
 
 async function expectNoHorizontalScroll(page: Page) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 }
 
-test('ゲストで5問解いて、結果と記録が残る', async ({ page }) => {
+test('ゲストで10問解いて、結果と記録が残る', async ({ page }) => {
   const problems: string[] = [];
   page.on('console', (m) => {
     if (m.type() === 'error') problems.push(m.text());
@@ -49,12 +58,15 @@ test('ゲストで5問解いて、結果と記録が残る', async ({ page }) =>
       await expect(page.getByRole('button', { name: 'あとで見直すチェックを外す' })).toHaveAttribute('aria-pressed', 'true');
     }
 
+    await expect(page.locator('.quiz-meta')).toContainText(`第${latest}回 問${picked[i - 1]?.no}`);
     await choices.first().click();
     // 正誤は色だけでなく記号と文字で表示する
-    await expect(page.getByTestId('verdict')).toContainText(/正解|不正解/);
-    await expect(page.getByText('○ 正答')).toBeVisible();
-    // 端末内への記録が終わると過去の正誤マークが出る
-    await expect(page.getByLabel(/^過去の正誤/)).toBeVisible();
+    await expect(page.getByTestId('verdict')).toContainText(/正解|不正解|採点対象外/);
+    if (!picked[i - 1]?.scoringExcluded) {
+      await expect(page.getByText('○ 正答').first()).toBeVisible();
+      // 端末内への記録が終わると過去の正誤マークが出る
+      await expect(page.getByLabel(/^過去の正誤/)).toBeVisible();
+    }
 
     if (i === 2) {
       // 途中で閉じても「続きから」で再開できる
@@ -70,13 +82,13 @@ test('ゲストで5問解いて、結果と記録が残る', async ({ page }) =>
 
   // 結果
   await expect(page).toHaveURL(/#\/result$/);
-  await expect(page.getByTestId('score')).toContainText(`1 / ${TOTAL} 問正解`);
-  await expect(page.getByRole('heading', { name: '間違えた問題（4問）' })).toBeVisible();
+  await expect(page.getByTestId('score')).toContainText(`${CORRECT} / ${scored.length} 問正解`);
+  await expect(page.getByRole('heading', { name: `間違えた問題（${WRONG}問）` })).toBeVisible();
 
   // ホームの成績に反映される
   await page.getByRole('button', { name: 'ホームへ' }).click();
-  await expect(page.getByTestId('today-count')).toHaveText(`${TOTAL}問`);
-  await expect(page.getByTestId('total-count')).toHaveText(`${TOTAL}問`);
+  await expect(page.getByTestId('today-count')).toHaveText(`${scored.length}問`);
+  await expect(page.getByTestId('total-count')).toHaveText(`${scored.length}問`);
   await expect(page.getByRole('button', { name: /続きから/ })).toHaveCount(0);
 
   // CSP 違反やスクリプトエラーが出ていない

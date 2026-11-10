@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react';
 import { ErrorBox, Lightbox, Skeleton } from '../components/common';
 import { Explanation } from '../components/Explanation';
-import { isCorrectChoice, loadExams, loadQuestionsByIds } from '../lib/data';
+import { isCorrectChoice, loadQuestionsByIds } from '../lib/data';
 import {
   clearSession,
   getAllProgress,
@@ -26,7 +26,6 @@ export function QuizScreen() {
   const [session, setSession] = useState<QuizSession | null>(null);
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [progress, setProgress] = useState<Map<string, ProgressRec>>(new Map());
-  const [sampleExams, setSampleExams] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
@@ -42,7 +41,7 @@ export function QuizScreen() {
           navigate('/home', { replace: true });
           return;
         }
-        const [qs, p, exams] = await Promise.all([loadQuestionsByIds(s.questionIds), getAllProgress(), loadExams()]);
+        const [qs, p] = await Promise.all([loadQuestionsByIds(s.questionIds), getAllProgress()]);
         if (!alive) return;
         if (qs.length !== s.questionIds.length) {
           // 問題データが更新されて見つからない問題があれば、その問題を除いて続ける
@@ -53,7 +52,6 @@ export function QuizScreen() {
           s.index = Math.min(s.index, Math.max(0, s.questionIds.length - 1));
           await saveSession(s);
         }
-        setSampleExams(new Set(exams.filter((e) => e.sample).map((e) => e.examNo)));
         setProgress(p);
         setQuestions(qs);
         setSession(s);
@@ -199,7 +197,6 @@ export function QuizScreen() {
         <div className="quiz-meta">
           <span>
             第{q.examNo}回 問{q.no}
-            {sampleExams.has(q.examNo) && <span className="badge">サンプル</span>}
           </span>
           <span className="sep" aria-hidden="true">
             ｜

@@ -60,8 +60,6 @@ export interface ExamMeta {
   year: string;
   month: number;
   questionCount: number;
-  /** フェーズ1のダミーデータであることを示す（フェーズ2で削除） */
-  sample?: boolean;
 }
 
 export interface ExamFile {
