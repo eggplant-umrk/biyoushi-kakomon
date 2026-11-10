@@ -76,8 +76,10 @@ export default defineConfig(({ mode }) => ({
     cspMeta(buildCsp(mode, loadEnv(mode, process.cwd(), 'VITE_'))),
     VitePWA({
       registerType: 'autoUpdate',
-      // インラインスクリプトを出さないよう、登録コードを外部ファイル（registerSW.js）にする
-      injectRegister: 'script',
+      // 登録は src/main.tsx の virtual:pwa-register で行う（バンドルされた外部ファイルになるので、インラインスクリプトは出ない）。
+      // 新しい版の Service Worker はすぐに有効になり、開いているページは自動で読み込み直される。
+      // 以前の registerSW.js だけの登録では、新しい版が「待機中」のまま、アプリを完全に閉じるまで切り替わらなかった
+      injectRegister: false,
       includeAssets: ['icons/apple-touch-icon.png', 'icons/favicon.svg'],
       manifest: {
         name: '美容師国家試験 過去問トレーナー',
@@ -101,6 +103,9 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,svg,png,webp,json,webmanifest}'],
         navigateFallback: `${BASE}index.html`,
         cleanupOutdatedCaches: true,
+        // 新しい版をすぐ有効にする（待機させない）。開いているページの読み込み直しは virtual:pwa-register が行う
+        skipWaiting: true,
+        clientsClaim: true,
       },
     }),
   ],

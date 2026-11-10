@@ -53,10 +53,11 @@ if ! api GET "$IDP/admin/v2/projects/$PROJECT/config" >/dev/null 2>&1; then
   echo "!! Authentication がまだ初期化されていません。コンソールで Google ログインを有効にしてから、もう一度実行してください。"
   echo "   （承認済みドメイン・メール列挙保護の設定を飛ばして続けます）"
 else
-# 承認済みドメインは GitHub Pages と localhost だけ（既定の firebaseapp.com / web.app は外す）。
+# 承認済みドメインは GitHub Pages・localhost と、Google ログインのポップアップが使う {project}.firebaseapp.com。
+# 既定で入っている {project}.web.app は使わないので外す。
 # メール列挙保護を有効にし、メール／パスワード・匿名ログインは無効のままにする
 api PATCH "$IDP/admin/v2/projects/$PROJECT/config?updateMask=authorizedDomains,emailPrivacyConfig.enableImprovedEmailPrivacy,signIn.email.enabled,signIn.anonymous.enabled" \
-  "{\"authorizedDomains\":[\"$PAGES_HOST\",\"localhost\"],\"emailPrivacyConfig\":{\"enableImprovedEmailPrivacy\":true},\"signIn\":{\"email\":{\"enabled\":false},\"anonymous\":{\"enabled\":false}}}" \
+  "{\"authorizedDomains\":[\"$PAGES_HOST\",\"localhost\",\"$PROJECT.firebaseapp.com\"],\"emailPrivacyConfig\":{\"enableImprovedEmailPrivacy\":true},\"signIn\":{\"email\":{\"enabled\":false},\"anonymous\":{\"enabled\":false}}}" \
   | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const c=JSON.parse(s);console.log("== auth:",JSON.stringify({authorizedDomains:c.authorizedDomains,emailPrivacy:c.emailPrivacyConfig,signIn:c.signIn}))})'
 fi
 
