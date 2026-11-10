@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { initAuth } from './lib/auth';
 import { applyToDocument, getSettings } from './lib/settings';
 import './styles.css';
 
@@ -9,6 +10,7 @@ if (window.top !== window.self) {
   document.body.replaceChildren();
 } else {
   applyToDocument(getSettings());
+  initAuth();
   const root = document.getElementById('root');
   if (root) {
     createRoot(root).render(

@@ -18,7 +18,7 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     # ランナーの apt が遅く playwright install --with-deps が終わらないため、ブラウザ入りの公式イメージで実行する。
     # タグは package.json の @playwright/test と同じ版にそろえる（ダイジェストで固定）
     container:
@@ -32,11 +32,35 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      # Firebase Emulator（セキュリティルールのテストと E2E）に Java が必要
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: '21'
       - run: npm ci
       - run: npm audit --audit-level=high
+      - name: Install firebase-tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/firebase-tools" --no-audit --no-fund firebase-tools@15.35.0
+          echo "$RUNNER_TEMP/firebase-tools/node_modules/.bin" >> "$GITHUB_PATH"
       - run: npm run typecheck
       - run: npm run validate -- --expect 41-54
       - run: npm test
+      # セキュリティルールのテスト（SPEC §8.1）。通らなければマージもデプロイもしない
+      - run: npm run test:rules
+      # 本番と同じ設定でビルドし、管理者メールやテスト用のコードが入っていないか調べる（SPEC §6.5）
+      - name: Production build check
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        run: |
+          npm run build
+          bash scripts/check-dist.sh dist
+      # E2E（Auth・Firestore Emulator に対して、iPhone・Pixel のエミュレーションで実行）
       - run: npm run test:e2e
       - if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -70,7 +94,20 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - name: Build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
+        run: npm run build
+      # 公開する前に、管理者メールやテスト用のコードが入っていないことを確かめる（入っていたらデプロイしない）
+      - name: Check build output
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          REQUIRE_ADMIN_EMAIL: '1'
+        run: bash scripts/check-dist.sh dist
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

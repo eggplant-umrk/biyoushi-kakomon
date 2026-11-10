@@ -7,10 +7,14 @@ const TABS: { to: Route; label: string; icon: string }[] = [
   { to: '/settings', label: '設定', icon: '⚙' },
 ];
 
-export function TabBar({ route }: { route: Route }) {
+// 管理者だけに出すタブ（SPEC §4.1）。出し分けは見た目だけで、データを守るのはセキュリティルール
+const ADMIN_TAB = { to: '/admin', label: '管理', icon: '☰' } as const;
+
+export function TabBar({ route, admin = false }: { route: Route; admin?: boolean }) {
+  const tabs = admin ? [...TABS, ADMIN_TAB] : TABS;
   return (
     <nav className="tabbar" aria-label="メインメニュー">
-      {TABS.map((t) => {
+      {tabs.map((t) => {
         const active = route === t.to || (t.to === '/setup' && route === '/result');
         return (
           <button

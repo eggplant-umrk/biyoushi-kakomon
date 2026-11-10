@@ -1,5 +1,5 @@
 /// <reference types="vitest/config" />
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -9,25 +9,51 @@ const BASE = '/biyoushi-kakomon/';
 /**
  * CSP（SPEC §8.3）。GitHub Pages はレスポンスヘッダーを設定できないので <meta> で入れる。
  * 開発サーバーは React Fast Refresh のインラインスクリプトを使うため、本番ビルドにだけ入れる。
- * フェーズ1は Firebase を使わないので 'self' のみ。Firebase を入れるフェーズ3で
- * Google / Firebase / reCAPTCHA のドメインを追加する。
+ *
+ * 外部のドメインは、Firebase の設定値（VITE_FIREBASE_*）があるビルドにだけ、使うものだけを足す：
+ * - Google ログイン（ポップアップ）: apis.google.com のスクリプトと、{authDomain} の iframe
+ * - Firestore / Authentication / App Check の API
+ * - reCAPTCHA v3（App Check）: www.google.com/recaptcha/ と www.gstatic.com/recaptcha/
+ * E2E 用ビルド（--mode e2e）は Firebase Emulator（localhost）だけを足す。
  */
-const CSP = [
-  "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self'",
-  "img-src 'self' data:",
-  "font-src 'self'",
-  "connect-src 'self'",
-  "manifest-src 'self'",
-  "worker-src 'self'",
-  "frame-src 'none'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'none'",
-].join('; ');
+export function buildCsp(mode: string, env: Record<string, string>): string {
+  const script = ["'self'"];
+  const connect = ["'self'"];
+  const frame: string[] = [];
+  if (mode === 'e2e') {
+    connect.push('http://localhost:9099', 'http://localhost:8080');
+  } else if (env.VITE_FIREBASE_API_KEY && env.VITE_FIREBASE_AUTH_DOMAIN) {
+    script.push('https://apis.google.com', 'https://www.google.com/recaptcha/', 'https://www.gstatic.com/recaptcha/');
+    connect.push(
+      'https://firestore.googleapis.com',
+      'https://identitytoolkit.googleapis.com',
+      'https://securetoken.googleapis.com',
+      'https://content-firebaseappcheck.googleapis.com',
+      'https://www.google.com/recaptcha/',
+    );
+    frame.push(
+      `https://${env.VITE_FIREBASE_AUTH_DOMAIN}`,
+      'https://www.google.com/recaptcha/',
+      'https://recaptcha.google.com/recaptcha/',
+    );
+  }
+  return [
+    "default-src 'self'",
+    `script-src ${script.join(' ')}`,
+    "style-src 'self'",
+    "img-src 'self' data:",
+    "font-src 'self'",
+    `connect-src ${connect.join(' ')}`,
+    "manifest-src 'self'",
+    "worker-src 'self'",
+    `frame-src ${frame.length ? frame.join(' ') : "'none'"}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'none'",
+  ].join('; ');
+}
 
-function cspMeta(): Plugin {
+function cspMeta(csp: string): Plugin {
   return {
     name: 'inject-csp-meta',
     apply: 'build',
@@ -37,17 +63,17 @@ function cspMeta(): Plugin {
       handler: (html) =>
         html.replace(
           '<meta charset="UTF-8" />',
-          `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${CSP}" />`,
+          `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />`,
         ),
     },
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: BASE,
   plugins: [
     react(),
-    cspMeta(),
+    cspMeta(buildCsp(mode, loadEnv(mode, process.cwd(), 'VITE_'))),
     VitePWA({
       registerType: 'autoUpdate',
       // インラインスクリプトを出さないよう、登録コードを外部ファイル（registerSW.js）にする
@@ -86,4 +112,4 @@ export default defineConfig({
     environment: 'node',
     setupFiles: ['src/test-setup.ts'],
   },
-});
+}));

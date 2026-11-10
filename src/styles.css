@@ -930,3 +930,26 @@ fieldset.card {
 .choice.is-chosen {
   border-color: var(--primary);
 }
+
+/* ---- ログイン・設定（フェーズ3） ---- */
+.text-input,
+.url-box {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+}
+.url-box {
+  margin-top: 8px;
+  font-size: max(16px, 0.82rem);
+}
+.inapp {
+  text-align: left;
+}
+.error-text {
+  color: var(--ng);
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Footer, Skeleton } from '../components/common';
+import { declineImport, importGuestRecords, useAuth } from '../lib/auth';
 import { getAllDays, getAllProgress, getSession, jstDate, type QuizSession } from '../lib/db';
 import { fieldById } from '../lib/fields';
 import { navigate } from '../lib/router';
@@ -8,6 +9,10 @@ import { pct, summarize, type Summary } from '../lib/stats';
 export function HomeScreen() {
   const [session, setSession] = useState<QuizSession | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [importing, setImporting] = useState(false);
+  // ログイン中は、Firestore から記録を取り込むたびに読み直す
+  const auth = useAuth();
+  const { dataVersion } = auth;
 
   useEffect(() => {
     let alive = true;
@@ -20,11 +25,39 @@ export function HomeScreen() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [dataVersion]);
 
   return (
     <div className="screen">
       <h1 className="screen-title">ホーム</h1>
+
+      {auth.status === 'signedIn' && auth.importCount > 0 && (
+        // ゲストの記録をログイン後に引き継ぐか確認する（SPEC §6.2）
+        <section className="card" aria-labelledby="import-title">
+          <h2 id="import-title" className="card-title">
+            ログイン前の記録を引き継ぎますか？
+          </h2>
+          <p className="small">
+            この端末に、ログインせずに解いた記録が {auth.importCount} 問分あります。引き継ぐと、アカウントの記録に足してクラウドに保存します。
+          </p>
+          <div className="stack">
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={importing}
+              onClick={() => {
+                setImporting(true);
+                void importGuestRecords().finally(() => setImporting(false));
+              }}
+            >
+              {importing ? '引き継ぎ中…' : '引き継ぐ'}
+            </button>
+            <button type="button" className="btn btn-ghost" disabled={importing} onClick={declineImport}>
+              引き継がない
+            </button>
+          </div>
+        </section>
+      )}
 
       {session && (
         <button type="button" className="card card-action resume" onClick={() => navigate('/quiz')}>
