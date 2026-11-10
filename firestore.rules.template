@@ -1,0 +1,233 @@
+// セキュリティルールのテンプレート（SPEC §8.1）。
+// __ADMIN_EMAIL__ は、デプロイ時に .env.local の ADMIN_EMAIL で置き換える（scripts/setup/build-rules.ts）。
+// 管理者のメールアドレスをこのファイルに直接書かないこと。
+//
+// 方針：明示的に許可したもの以外はすべて拒否。書き込みは型・キー・値の範囲・サイズを全部検査する。
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    // ---- 共通の関数 -------------------------------------------------------
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email == '__ADMIN_EMAIL__'
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function isValidQid(q) {
+      return q is string && q.matches('^(4[1-9]|5[0-4])-(0[1-9]|[1-4][0-9]|5[0-5])$');
+    }
+    function isNonNegInt(v, max) { return v is int && v >= 0 && v <= max; }
+    function hasExactly(d, keys) { return d.keys().hasOnly(keys) && d.keys().hasAll(keys); }
+
+    // request.time などの timestamp を、日本時間の "YYYY-MM-DD" にする
+    function pad2(n) { return n < 10 ? '0' + string(n) : string(n); }
+    function jstDate(t) {
+      let j = t + duration.value(9, 'h');
+      return string(j.year()) + '-' + pad2(j.month()) + '-' + pad2(j.day());
+    }
+
+    // ---- 検査関数 ---------------------------------------------------------
+
+    // { answered, correct }：どちらも 0 以上の整数で、correct ≤ answered
+    function validCount(m, max) {
+      return m is map
+        && hasExactly(m, ['answered', 'correct'])
+        && isNonNegInt(m.answered, max)
+        && isNonNegInt(m.correct, max)
+        && m.correct <= m.answered;
+    }
+    function validFieldCount(m, key) { return !(key in m) || validCount(m[key], 1000000); }
+    function validByField(m) {
+      return m is map
+        && m.keys().hasOnly(['law', 'public_health', 'infection', 'hygiene', 'anatomy', 'skin', 'cosmetics', 'theory'])
+        && validFieldCount(m, 'law') && validFieldCount(m, 'public_health')
+        && validFieldCount(m, 'infection') && validFieldCount(m, 'hygiene')
+        && validFieldCount(m, 'anatomy') && validFieldCount(m, 'skin')
+        && validFieldCount(m, 'cosmetics') && validFieldCount(m, 'theory');
+    }
+    function validBest(m, key) { return !(key in m) || isNonNegInt(m[key], 55); }
+    function validExamBest(m) {
+      return m is map
+        && m.keys().hasOnly(['41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54'])
+        && validBest(m, '41') && validBest(m, '42') && validBest(m, '43') && validBest(m, '44')
+        && validBest(m, '45') && validBest(m, '46') && validBest(m, '47') && validBest(m, '48')
+        && validBest(m, '49') && validBest(m, '50') && validBest(m, '51') && validBest(m, '52')
+        && validBest(m, '53') && validBest(m, '54');
+    }
+
+    // users/{uid}。lastActiveAt は必ず request.time（時刻の偽装を防ぐ）
+    // 更新で byField・examBest が変わっていなければ、中身の検査を省く（ルールの評価回数の上限 1000 に収めるため）
+    function validUser(d) {
+      return hasExactly(d, ['displayName', 'createdAt', 'lastActiveAt', 'totals', 'byField', 'examBest', 'syncSeq', 'syncAt'])
+        && isNonNegInt(d.syncSeq, 100000000)
+        && (d.syncAt == null || d.syncAt is timestamp)
+        && d.displayName is string
+        && d.displayName.size() >= 1 && d.displayName.size() <= 30
+        && d.displayName.matches('^[^\\x00-\\x1f\\x7f]+$')   // 制御文字を含まない
+        && d.createdAt is timestamp
+        && d.lastActiveAt == request.time
+        && validCount(d.totals, 1000000)
+        && ((resource != null && d.byField == resource.data.byField) || validByField(d.byField))
+        && ((resource != null && d.examBest == resource.data.examBest) || validExamBest(d.examBest));
+    }
+
+    // ---- 記録の送信（SPEC §8.1 / §14）---------------------------------------
+    // 記録の送信（writeBatch 1回）では、users/{uid} の syncSeq を「前回＋1」に、syncAt を request.time にする。
+    // 同じ送信を2回送っても2回目は拒否され、回数が二重に足されない。
+    // 1回の送信で増やせる解答数は55まで、正解数の増加は解答数の増加以下。
+
+    // 増加分が 0〜55 で、正解数の増加 ≤ 解答数の増加
+    function validStep(da, dc) {
+      return da >= 0 && da <= 55 && dc >= 0 && dc <= da;
+    }
+    // 記録の送信による users/{uid} の更新
+    function validSyncStep(n, o) {
+      return n.syncSeq == o.syncSeq + 1
+        && n.syncAt == request.time
+        && validStep(n.totals.answered - o.totals.answered, n.totals.correct - o.totals.correct);
+    }
+    // 表示名の変更など、記録を変えない更新
+    function unchangedRecords(n, o) {
+      return n.syncSeq == o.syncSeq && n.syncAt == o.syncAt
+        && n.totals == o.totals && n.byField == o.byField && n.examBest == o.examBest;
+    }
+    // progress / days は、同じ writeBatch で記録の送信（users/{uid}.syncAt を request.time にする更新）を
+    // しているときだけ書ける。syncAt を request.time にできるのは validSyncStep を通る更新だけ。
+    // getAfter は1回だけ（1回の書き込み要求あたり20回の上限があるため）
+    function inSyncBatch(uid) {
+      return getAfter(/databases/$(db)/documents/users/$(uid)).data.syncAt == request.time;
+    }
+    // 書き込み前の値（新規作成なら 0）
+    function before(field) { return resource == null ? 0 : resource.data[field]; }
+
+    // users/{uid}/progress/{qid}。lastAnsweredAt は必ず request.time
+    function validProgress(d) {
+      return hasExactly(d, ['attempts', 'correctCount', 'history', 'lastAnsweredAt', 'checked', 'nextReviewAt'])
+        && isNonNegInt(d.attempts, 100000)
+        && isNonNegInt(d.correctCount, 100000)
+        && d.correctCount <= d.attempts
+        && d.history is string
+        && d.history.matches('^[○×]{0,10}$')
+        && d.history.size() <= d.attempts
+        && d.lastAnsweredAt == request.time
+        && d.checked is bool
+        && (d.nextReviewAt == null || d.nextReviewAt is timestamp);
+    }
+
+    // users/{uid}/days/{YYYY-MM-DD}。sessions は最大50件。
+    // ルールでは配列を1件ずつ調べられないので、末尾（いま追加した1件）の中身を検査する
+    function validSession(s) {
+      return s is map
+        && hasExactly(s, ['mode', 'total', 'correct', 'endedAt'])
+        && s.mode in ['practice', 'exam', 'review']
+        && s.total is int && s.total >= 1 && s.total <= 770
+        && isNonNegInt(s.correct, 770) && s.correct <= s.total
+        && s.endedAt is timestamp;
+    }
+    function validDay(d) {
+      return hasExactly(d, ['answered', 'correct', 'sessions'])
+        && isNonNegInt(d.answered, 100000)
+        && isNonNegInt(d.correct, 100000)
+        && d.correct <= d.answered
+        && d.sessions is list
+        && d.sessions.size() <= 50
+        && (d.sessions.size() == 0 || validSession(d.sessions[d.sessions.size() - 1]));
+    }
+
+    // users/{uid}/assignments/{aid}（おすすめ復習。作るのは管理者だけ）
+    function validAssignment(d) {
+      return hasExactly(d, ['title', 'questionIds', 'createdAt', 'doneAt'])
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 50
+        && d.questionIds is list
+        && d.questionIds.size() >= 1 && d.questionIds.size() <= 55
+        && isValidQid(d.questionIds[0])
+        && d.createdAt == request.time
+        && d.doneAt == null;
+    }
+
+    // ---- 利用者の記録 -----------------------------------------------------
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      // createdAt は作成時だけ request.time と一致させ、更新では変更不可。
+      // 作成時の記録はすべて 0（syncSeq は 0、syncAt は null）。記録は送信（syncSeq を＋1）でだけ増やせる
+      allow create: if isOwner(uid) && validUser(request.resource.data)
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.syncSeq == 0
+                    && request.resource.data.syncAt == null
+                    && request.resource.data.totals == { 'answered': 0, 'correct': 0 }
+                    && request.resource.data.byField == {}
+                    && request.resource.data.examBest == {};
+      allow update: if isOwner(uid) && validUser(request.resource.data)
+                    && request.resource.data.createdAt == resource.data.createdAt
+                    && (unchangedRecords(request.resource.data, resource.data)
+                        || validSyncStep(request.resource.data, resource.data));
+      allow delete: if isOwner(uid);
+
+      match /progress/{qid} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create, update: if isOwner(uid) && isValidQid(qid)
+                              && validProgress(request.resource.data)
+                              && validStep(request.resource.data.attempts - before('attempts'),
+                                           request.resource.data.correctCount - before('correctCount'))
+                              && inSyncBatch(uid);
+        allow delete: if isOwner(uid);
+      }
+
+      match /days/{day} {
+        allow read: if isOwner(uid) || isAdmin();
+        // 今日か前日（日本時間）のドキュメントだけ書ける。過去・未来の日付を大量に作れないようにする
+        allow create, update: if isOwner(uid)
+                     && (day == jstDate(request.time) || day == jstDate(request.time - duration.value(1, 'd')))
+                     && validDay(request.resource.data)
+                     && validStep(request.resource.data.answered - before('answered'),
+                                  request.resource.data.correct - before('correct'))
+                     && inSyncBatch(uid);
+        allow delete: if isOwner(uid);
+      }
+
+      match /assignments/{aid} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isAdmin() && validAssignment(request.resource.data);
+        // 管理者と、本人（アカウント削除のとき。SPEC §8.4）が削除できる
+        allow delete: if isAdmin() || isOwner(uid);
+        // 利用者は doneAt だけ、現在時刻にだけ更新できる
+        allow update: if isOwner(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['doneAt'])
+          && request.resource.data.doneAt == request.time;
+      }
+    }
+
+    // ---- 解説への報告 -----------------------------------------------------
+
+    match /reports/{rid} {
+      // ドキュメントIDは "{uid}_{questionId}" に固定。1人1問1件まで。作成のみ
+      allow create: if signedIn()
+        && hasExactly(request.resource.data, ['questionId', 'kind', 'comment', 'uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && isValidQid(request.resource.data.questionId)
+        && rid == request.auth.uid + '_' + request.resource.data.questionId
+        && request.resource.data.kind in ['unclear', 'wrong', 'other']
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() <= 300
+        && request.resource.data.createdAt == request.time;
+      // 読めるのは管理者と、報告した本人（アカウント削除のときに自分の報告を探すため）
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow update: if false;
+    }
+
+    // ---- 管理者判定 -------------------------------------------------------
+
+    match /admin/ping {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // ここに書いていないパスはすべて拒否（Firestore の既定動作）
+  }
+}

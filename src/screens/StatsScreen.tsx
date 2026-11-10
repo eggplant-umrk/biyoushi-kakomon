@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Skeleton } from '../components/common';
+import { useAuth } from '../lib/auth';
 import { getAllDays, getAllProgress, jstDate, type DayRec } from '../lib/db';
 import { fieldById } from '../lib/fields';
 import { pct, summarize, type Summary } from '../lib/stats';
@@ -7,6 +8,8 @@ import { pct, summarize, type Summary } from '../lib/stats';
 export function StatsScreen() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [days, setDays] = useState<DayRec[]>([]);
+  // ログイン中は、Firestore から記録を取り込むたびに読み直す
+  const { dataVersion } = useAuth();
 
   useEffect(() => {
     void (async () => {
@@ -14,7 +17,7 @@ export function StatsScreen() {
       setSummary(summarize(p.values(), d, jstDate(Date.now())));
       setDays([...d].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 14));
     })();
-  }, []);
+  }, [dataVersion]);
 
   return (
     <div className="screen">

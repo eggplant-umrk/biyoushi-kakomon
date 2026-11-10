@@ -13,6 +13,7 @@ import {
   type ProgressRec,
   type QuizSession,
 } from '../lib/db';
+import { noteAnswered, noteSetFinished, requestFlush } from '../lib/auth';
 import { fieldById } from '../lib/fields';
 import { RichText } from '../lib/markup';
 import { navigate } from '../lib/router';
@@ -62,6 +63,7 @@ export function QuizScreen() {
     return () => {
       alive = false;
       window.clearTimeout(lockTimer.current);
+      requestFlush(); // 途中で出題画面を離れたときも、ログイン中はそこまでの記録を送る
     };
   }, []);
 
@@ -88,6 +90,7 @@ export function QuizScreen() {
       if (q.scoringExcluded) return;
       const rec = await recordAnswer(q.id, correct);
       setProgress((m) => new Map(m).set(rec.id, rec));
+      noteAnswered(); // ログイン中は10問ごとに Firestore へ送る
     },
     [session, q, answered],
   );
@@ -112,6 +115,13 @@ export function QuizScreen() {
       endedAt: Date.now(),
     });
     await clearSession();
+    // ログイン中はセットの結果を記録して Firestore へ送る
+    await noteSetFinished({
+      mode: 'practice',
+      total: scored.length,
+      correct: scored.filter(({ qq, i }) => isCorrectChoice(qq, session.answers[i] ?? null)).length,
+      endedAt: Date.now(),
+    });
     navigate('/result');
   }, [session, questions, answered, locked, isLast]);
 

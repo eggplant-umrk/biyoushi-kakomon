@@ -1,9 +1,9 @@
 import { useSyncExternalStore } from 'react';
 
 /** ハッシュルーティング（/#/quiz）。GitHub Pages でリロードしても 404 にならない（SPEC §4.1） */
-export type Route = '/' | '/home' | '/setup' | '/quiz' | '/result' | '/stats' | '/settings';
+export type Route = '/' | '/home' | '/setup' | '/quiz' | '/result' | '/stats' | '/settings' | '/admin';
 
-const ROUTES: readonly Route[] = ['/', '/home', '/setup', '/quiz', '/result', '/stats', '/settings'];
+const ROUTES: readonly Route[] = ['/', '/home', '/setup', '/quiz', '/result', '/stats', '/settings', '/admin'];
 
 function current(): Route {
   const h = window.location.hash.replace(/^#/, '').split('?')[0] || '/';

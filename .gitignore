@@ -23,3 +23,10 @@ __pycache__/
 
 .DS_Store
 Thumbs.db
+
+# ローカルの道具（Firestore Emulator 用の Java など）
+.tools/
+
+# Emulator
+firestore.test.rules
+*-debug.log
