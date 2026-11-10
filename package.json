@@ -13,16 +13,20 @@
     "preview": "vite preview --port 4173 --strictPort",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/setup/build-rules.ts --test && firebase emulators:exec --config firebase.emulator.json --project demo-kakomon --only auth,firestore \"playwright test\"",
     "data:build": "node scripts/build-data.ts",
-    "validate": "node scripts/validate.ts"
+    "validate": "node scripts/validate.ts",
+    "rules:build": "node scripts/setup/build-rules.ts",
+    "test:rules": "node scripts/setup/build-rules.ts --test && firebase emulators:exec --config firebase.emulator.json --project demo-kakomon --only firestore \"vitest run --config vitest.rules.config.ts\""
   },
   "dependencies": {
+    "firebase": "^13.2.0",
     "idb": "^8.0.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@playwright/test": "1.65.0",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
@@ -34,5 +38,8 @@
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.1.0",
     "workbox-window": "^7.4.1"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.7"
   }
 }
