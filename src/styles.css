@@ -814,12 +814,74 @@ fieldset.card {
 .per-choice li.is-answer .pc-no {
   color: var(--ok);
 }
-.sources summary {
+.ex-summary {
+  margin: 0 0 10px;
+}
+.ex-chosen {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-left: 4px solid var(--ng);
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 0.94rem;
+}
+.ex-chosen-label,
+.ex-caution-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.ex-chosen-label {
+  color: var(--ng);
+}
+.ex-caution {
+  margin: 10px 0 0;
+}
+.textbook-refs {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+.textbook-refs li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+.textbook-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+.textbook-title {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.explanation-pending .textbook-refs {
+  margin: 8px 4px 0;
+}
+.ex-fold {
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.ex-fold summary {
   min-height: 48px;
   display: flex;
   align-items: center;
   cursor: pointer;
   color: var(--primary);
+  font-weight: 700;
+}
+.ex-fold[open] summary {
+  margin-bottom: 4px;
+}
+.ex-fold .per-choice {
+  margin: 0 0 12px;
 }
 .sources ul {
   padding-left: 0;

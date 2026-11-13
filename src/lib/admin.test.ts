@@ -6,14 +6,15 @@ import type { ProgressRec } from './db';
 const NOW = Date.UTC(2026, 10, 13, 3, 0, 0);
 const DAY = 86_400_000;
 
-const prog = (id: string, attempts: number, correctCount: number, lastAnsweredAt = 0): ProgressRec => ({
+/** history は古い順の正誤（例: '○×'）。解いた回数・正解数・直近の正誤は history から決める */
+const prog = (id: string, history: string, lastAnsweredAt = 0): ProgressRec => ({
   id,
-  attempts,
-  correctCount,
-  history: '',
+  attempts: history.length,
+  correctCount: [...history].filter((c) => c === '○').length,
+  history,
   lastAnsweredAt,
   checked: false,
-  lastCorrect: null,
+  lastCorrect: history ? history.endsWith('○') : null,
 });
 
 describe('lastDates / recentAnswered / dailySeries', () => {
@@ -77,23 +78,34 @@ describe('fieldRates', () => {
 });
 
 describe('weakQuestions', () => {
-  it('2回以上解いて間違いのある問題を、正答率の低い順に並べる', () => {
+  it('直近の解答が不正解の問題を、正答率の低い順に並べる', () => {
     const list = weakQuestions(
       [
-        prog('54-01', 1, 0), // 1回だけ → 対象外
-        prog('54-02', 2, 2), // 全問正解 → 対象外
-        prog('54-03', 4, 2), // 50%
-        prog('54-04', 2, 0), // 0%
-        prog('54-05', 5, 0), // 0%・回数が多い → 先
-        prog('54-06', 3, 1), // 33%
+        prog('54-01', '×'), // 1回だけ解いて不正解 → 対象（0%）
+        prog('54-02', '○○'), // 間違えたことがない → 対象外
+        prog('54-03', '○○××'), // 50%
+        prog('54-04', '××'), // 0%
+        prog('54-05', '×××××'), // 0%・回数が多い → 先
+        prog('54-06', '○××'), // 33%
+        prog('54-07', '××○'), // 間違えたことはあるが、直近は正解 → 対象外
+        prog('54-08', '○'), // 1回だけ解いて正解 → 対象外
+        prog('54-09', ''), // 解いていない（チェックだけ付けた） → 対象外
       ],
       10,
     );
-    expect(list.map((p) => p.id)).toEqual(['54-05', '54-04', '54-06', '54-03']);
+    expect(list.map((p) => p.id)).toEqual(['54-05', '54-04', '54-01', '54-06', '54-03']);
+  });
+
+  it('同じ正答率・回数なら、最近解いた順に並べる', () => {
+    expect(weakQuestions([prog('54-01', '×', 100), prog('54-02', '×', 300), prog('54-03', '×', 200)], 10).map((p) => p.id)).toEqual([
+      '54-02',
+      '54-03',
+      '54-01',
+    ]);
   });
 
   it('上限の数で切る', () => {
-    const many = Array.from({ length: 30 }, (_, i) => prog(`54-${String(i + 1).padStart(2, '0')}`, 2, 0));
+    const many = Array.from({ length: 30 }, (_, i) => prog(`54-${String(i + 1).padStart(2, '0')}`, '××'));
     expect(weakQuestions(many, 20)).toHaveLength(20);
     expect(weakQuestions([], 20)).toEqual([]);
   });

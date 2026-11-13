@@ -42,7 +42,7 @@ test('管理者は利用者の一覧と詳細を見られ、苦手問題を自�
   test.setTimeout(120_000);
   expect(WRONG).toBeGreaterThan(0);
 
-  // 利用者：同じ10問を2回解く（2回以上解いて間違えた問題が「苦手問題」になる）
+  // 利用者：同じ10問を2回解く（直近の解答が不正解の問題が「苦手問題」になる。2回とも同じ選択肢を選ぶ）
   const user = fakeUser(info);
   const u = await newDevice(browser, info, user);
   await login(u.page);

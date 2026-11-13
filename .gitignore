@@ -30,3 +30,6 @@ Thumbs.db
 # Emulator
 firestore.test.rules
 *-debug.log
+
+# 教科書の写真（表紙・奥付・目次・索引など）。私的使用以外のデジタル化が認められていないので、コミットしない（SPEC §14）
+textbook-src/

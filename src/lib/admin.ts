@@ -17,8 +17,6 @@ export type { AdminUserData } from './cloud';
 const DAY_MS = 86_400_000;
 export const SERIES_DAYS = 14;
 export const RECENT_DAYS = 7;
-/** 苦手問題とみなす最低の解答回数（SPEC §7：2回以上解いて正答率の低い順） */
-export const WEAK_MIN_ATTEMPTS = 2;
 /** 詳細画面に出す苦手問題の数 */
 export const WEAK_SHOWN = 10;
 /** 「この人の苦手問題で出題」で出す最大の問題数 */
@@ -74,11 +72,13 @@ export function fieldRates(byField: AdminUserData['byField']): FieldRate[] {
 }
 
 /**
- * 苦手問題：2回以上解いて、1回でも間違えている問題。正答率の低い順、同じなら解いた回数の多い順、最近解いた順。
+ * 苦手問題：直近の解答が不正解の問題（1回だけ解いて間違えた問題も含む。SPEC §14）。
+ * 間違えたことがあっても、直近で正解できた問題は含めない（もう解けるようになったとみなす）。
+ * 正答率の低い順、同じなら解いた回数の多い順、最近解いた順。
  */
 export function weakQuestions(progress: readonly ProgressRec[], limit: number): ProgressRec[] {
   return progress
-    .filter((p) => p.attempts >= WEAK_MIN_ATTEMPTS && p.correctCount < p.attempts)
+    .filter((p) => p.attempts > 0 && p.lastCorrect === false)
     .sort(
       (a, b) =>
         a.correctCount / a.attempts - b.correctCount / b.attempts ||
