@@ -5,13 +5,26 @@
 # 使い方: ADMIN_EMAIL=... bash scripts/check-dist.sh [dist]
 #   REQUIRE_ADMIN_EMAIL=1 のときは、ADMIN_EMAIL が空なら失敗にする（デプロイ前の検査用）
 set -euo pipefail
+# ロケールによっては grep -i が日本語を含むファイルで異常終了し、「含まれていない」と見分けがつかなくなる（Windows の Git Bash で確認）
+export LC_ALL=C.UTF-8
+
+# grep の終了コード：0＝見つかった／1＝見つからない／それ以外＝検査そのものの失敗（見逃しにしない）
+search() {
+  local rc=0
+  hits="$(grep "$@")" || rc=$?
+  if [ "$rc" -gt 1 ]; then
+    echo "::error::grep が失敗しました（終了コード $rc）。検査できていません"
+    exit 1
+  fi
+  return "$rc"
+}
 DIST="${1:-dist}"
 [ -d "$DIST" ] || { echo "::error::$DIST がありません（先にビルドしてください）"; exit 1; }
 fail=0
 
 if [ -n "${ADMIN_EMAIL:-}" ]; then
   # -F: 文字列そのまま / -i: 大文字小文字を区別しない / -l: ファイル名だけ表示（メールアドレスは表示しない）
-  if hits="$(grep -rIilF -- "$ADMIN_EMAIL" "$DIST")"; then
+  if search -rIilF -- "$ADMIN_EMAIL" "$DIST"; then
     echo "::error::ビルド結果に管理者のメールアドレスが含まれています:"
     echo "$hits"
     fail=1
@@ -26,7 +39,7 @@ else
 fi
 
 for marker in 'localhost:9099' 'e2e-user' '__ADMIN_EMAIL__'; do
-  if hits="$(grep -rIlF -- "$marker" "$DIST")"; then
+  if search -rIlF -- "$marker" "$DIST"; then
     echo "::error::ビルド結果にテスト用・テンプレート用の文字列（$marker）が含まれています:"
     echo "$hits"
     fail=1
