@@ -82,7 +82,7 @@ export function Explanation({ q, chosen = null }: { q: Question; chosen?: number
       )}
       {ex.caution && (
         <p className="caution ex-caution" role="note" data-testid="ex-caution">
-          <span className="ex-caution-label">いまの制度・統計との違い{ex.asOf ? `（${asOfLabel(ex.asOf)}に確認）` : ''}</span>
+          <span className="ex-caution-label">注意{ex.asOf ? `（${asOfLabel(ex.asOf)}に確認）` : ''}</span>
           {ex.caution}
         </p>
       )}

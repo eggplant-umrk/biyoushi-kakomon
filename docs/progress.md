@@ -2,7 +2,7 @@
 
 作業を引き継ぐときに最初に読むファイルです。仕様は `docs/SPEC.md`、仕様と違う判断は SPEC.md §14。
 
-最終更新: 2026-11-13
+最終更新: 2026-11-14
 
 ## いまの状態
 
@@ -15,13 +15,36 @@
 | 3. ログイン・記録 | 済み（PR #4） |
 | 4. セキュリティ | 済み（PR #4・#5） |
 | 5. 管理画面 | 利用者一覧・利用者の詳細・「この人の苦手問題で出題」まで実装。残りは下の「フェーズ5の残り」 |
-| 6. 解説 | 未着手 |
+| 6. 解説 | 6a（第54回の55問の試作）まで。残り715問は、品質の確認後に展開する。下の「フェーズ6a」 |
+
+## フェーズ6a（解説の試作：第54回）
+
+- 解説の元データは `data-src/explanations/exam-54.json`（書式は `data-src/README.md`）。`node scripts/build-data.ts` で `public/data/exam-54.json` に入り、`docs/explanation-review.md`（確認待ちの一覧）も作られる
+- 第54回の55問すべてに解説を付けた：確信度 高29・中22・低4。確認待ちは26問（`docs/explanation-review.md`）
+- 表示は `src/components/Explanation.tsx`。要点（なぜその答えか・自分が選んだ選択肢の誤り・ここだけ覚える・注意）を先に出し、選択肢ごとの説明と根拠の資料は折りたたみ（SPEC §14-51）
+- 形の検証は `src/lib/explanationCheck.ts`（`validate` と `build-data` の両方から使う）。E2E は `e2e/explanation.spec.ts`
+- 根拠のURL（107件）は、2026-11-14 にすべて開けることを確認した
+
+### 解説の作り方（残りの回に広げるとき）
+
+1. 分野ごと（問1〜10／11〜20／21〜30／31〜40／41〜55）に分けて調べる。法令は e-Gov、制度・統計は厚生労働省などの現在の内容を必ず検索して確認する
+2. 書き終えたら全問を読み直し、`traps`（1文字の語句・説明文の中でも光ってしまう語句）、`caution`（時点の注記以外を入れていないか）、出典の種別を直す
+3. 一次情報がなく、照合も解説サイト1件だけの問題は `low` にする
+4. `node scripts/build-data.ts && node scripts/validate.ts --expect 41-54`
+- 第54回は解説サイトにまだ掲載がなく、問1〜40 は結論の照合ができていない（`crossChecked: 0`。SPEC §14-53）。文化論・美容技術理論（問41〜55）は教科書にしか根拠がないものが多く、`high` は0問
+
+### 教科書の参照（運営管理）— 未着手
+
+- 仕組み（`textbookRefs`、`data-src/textbook-refs.json`、`src/lib/textbooks.ts`、解説画面の1行表示、検証）は実装済み。**参照のデータは0件**
+- 理由：このPCに `textbook-src/unei/`（教科書の写真）がなかった。写真をリポジトリ直下の `textbook-src/unei/` に置いてから、索引・目次を読んで `data-src/textbook-refs.json` に書く（`textbook-src/` は `.gitignore` 済み）
+- 第54回で運営管理にあたりそうなのは問8〜10（国民年金・介護保険・雇用保険）。問1〜7 は関係法規・制度の側
 
 ## フェーズ5（管理画面）
 
 - 画面は `src/screens/AdminScreen.tsx`、取得・集計・キャッシュは `src/lib/admin.ts`、Firestore の読み取りは `src/lib/cloud.ts` の `adminLoadUsers` / `adminLoadProgress`
 - セキュリティルールは変えていない（管理者は他人の `users`・`progress`・`days` を読むだけ）。ルールのデプロイも不要
 - 管理者以外に管理タブが出ないこと・データを読めないことは、ルールのテスト（`rules-tests/`）と E2E（`e2e/admin.spec.ts`）で確認している
+- 苦手問題は「直近の解答が不正解の問題」（1回だけ解いて間違えた問題も含む。SPEC §14-47）
 - 「この人の苦手問題で出題」は、出題モード `study`。管理者の記録にも利用者の記録にも残さない（SPEC §14-45）
 
 ### フェーズ5の残り（次回以降）

@@ -72,6 +72,7 @@ describe('checkExplanation', () => {
     expect(checkExplanation(question({ explanation: ex({ traps: ['厚生労働大臣'] }) }))).toEqual([
       'traps の語句が選択肢・記述にない: 厚生労働大臣',
     ]);
+    expect(checkExplanation(question({ choices: ['国である。', 'B', 'C', 'D'], explanation: ex({ traps: ['国'] }) }))).not.toEqual([]);
   });
 
   it('根拠は https の URL。解説サイトは根拠にしない', () => {

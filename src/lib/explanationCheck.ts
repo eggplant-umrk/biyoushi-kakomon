@@ -36,6 +36,8 @@ export function checkExplanation(q: Question): string[] {
     // 強調する語句は、問題の選択肢・記述にそのまま出てくる語句にする（出てこない語句は強調されない）
     const body = [...q.choices, ...(q.statements ?? []).map((s) => s.text)].join('\n');
     for (const t of ex.traps) if (!body.includes(t)) errs.push(`traps の語句が選択肢・記述にない: ${t}`);
+    // 1文字の語句（「国」など）は、関係のない所まで強調されてしまう
+    for (const t of ex.traps) if ([...t].length < 2) errs.push(`traps の語句が短すぎる（2文字以上にする）: ${t}`);
   }
 
   if (ex.keyPoint !== null) {
