@@ -1,7 +1,19 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import type { ExamFile, ExamMeta } from '../src/lib/types';
-import { ADMIN_USER, answeredOf, answerQuestions, fakeUser, findUserDoc, login, newDevice, startDefaultSet, type FakeUser } from './helpers';
+import {
+  ADMIN_USER,
+  answeredOf,
+  answerQuestions,
+  fakeUser,
+  findUserDoc,
+  isConnectionNoise,
+  isReloadNoise,
+  login,
+  newDevice,
+  startDefaultSet,
+  type FakeUser,
+} from './helpers';
 
 /**
  * 管理画面の E2E（SPEC §7 / §10 フェーズ5）。iPhone 15 / Pixel 7 のエミュレーションで、Firebase Emulator に対して動かす。
@@ -65,7 +77,7 @@ test('管理者は利用者の一覧と詳細を見られ、苦手問題を自�
   const a = await newDevice(browser, info, ADMIN_USER);
   const problems: string[] = [];
   a.page.on('console', (m) => {
-    if (m.type() === 'error') problems.push(m.text());
+    if (m.type() === 'error' && !isReloadNoise(m.text()) && !isConnectionNoise(m.text())) problems.push(m.text());
   });
   a.page.on('pageerror', (e) => problems.push(e.message));
   await login(a.page);

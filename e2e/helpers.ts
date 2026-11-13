@@ -46,6 +46,14 @@ export function isReloadNoise(text: string): boolean {
   );
 }
 
+/**
+ * WebKit が、Firestore Emulator との通信（ロングポーリング）が途中で切れたときに出すエラー。
+ * 通信路の切断で、SDK がつなぎ直す。アプリの不具合ではない（CI の iPhone で、まれに出る）
+ */
+export function isConnectionNoise(text: string): boolean {
+  return text === 'Failed to load resource: Connection terminated unexpectedly';
+}
+
 export async function login(page: Page): Promise<void> {
   await page.goto('./');
   await page.getByRole('button', { name: 'Googleでログイン' }).click();
