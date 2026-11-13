@@ -41,11 +41,25 @@ test('管理者は利用者の一覧と詳細を見られ、苦手問題を自�
   }
   const total = scored.length * 2;
   await expect.poll(async () => answeredOf(await findUserDoc(user.name)), { timeout: 20_000 }).toBe(total);
-  const userDocBefore = JSON.stringify(await findUserDoc(user.name));
 
   // 利用者の画面には「管理」タブも、見られていることが分かる表示もない
   await u.page.goto('./#/home');
   await expect(tabs(u.page).getByRole('button', { name: '管理' })).toHaveCount(0);
+
+  // 利用者の端末を閉じ、利用者自身の送信（セットの結果など）が終わって Firestore の記録が落ち着くのを待ってから控える。
+  // このあと管理者が見ても、この記録が1文字も変わらないことを最後に確かめる
+  await u.context.close();
+  let userDocBefore = '';
+  await expect
+    .poll(
+      async () => {
+        const prev = userDocBefore;
+        userDocBefore = JSON.stringify(await findUserDoc(user.name));
+        return prev === userDocBefore;
+      },
+      { timeout: 20_000, intervals: [1000] },
+    )
+    .toBe(true);
 
   // 管理者
   const a = await newDevice(browser, info, ADMIN_USER);
@@ -124,7 +138,6 @@ test('管理者は利用者の一覧と詳細を見られ、苦手問題を自�
   expect(JSON.stringify(await findUserDoc(user.name))).toBe(userDocBefore);
 
   expect(problems).toEqual([]);
-  await u.context.close();
   await a.context.close();
 });
 
