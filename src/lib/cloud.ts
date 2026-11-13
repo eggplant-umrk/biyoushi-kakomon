@@ -476,3 +476,78 @@ export async function deleteAccount(): Promise<void> {
   await deleteUser(user);
   await clearCaches();
 }
+
+// ---- 管理画面（SPEC §7）-----------------------------------------------------
+// 読むだけ。管理者以外が呼んでも、セキュリティルールが拒否する（SPEC §8.1）。
+
+/** 管理画面の一覧・詳細で使う、利用者1人分のデータ */
+export interface AdminUserData {
+  uid: string;
+  displayName: string;
+  /** users/{uid}.lastActiveAt（epoch ms） */
+  lastActiveAt: number;
+  answered: number;
+  correct: number;
+  byField: Partial<Record<FieldId, { answered: number; correct: number }>>;
+  /** 直近 ADMIN_DAYS 日分の日別の記録（記録のない日は含まない） */
+  days: DayRec[];
+}
+
+export const ADMIN_DAYS = 14;
+
+function toCount(v: unknown): { answered: number; correct: number } {
+  const m = (v ?? {}) as { answered?: unknown; correct?: unknown };
+  return { answered: Number(m.answered) || 0, correct: Number(m.correct) || 0 };
+}
+
+/**
+ * 利用者の一覧を、直近14日の日別の記録と一緒にまとめて読む。
+ * 読み取りは「利用者の数 ＋ 各利用者の直近14日で記録のある日数（最低1）」件。
+ */
+export async function adminLoadUsers(): Promise<AdminUserData[]> {
+  const { fs } = init();
+  requireUid();
+  const since = jstDate(Date.now() - (ADMIN_DAYS - 1) * DAY_MS);
+  const snap = await getDocs(collection(fs, 'users'));
+  return Promise.all(
+    snap.docs.map(async (d) => {
+      const x = d.data();
+      const dsnap = await getDocs(query(collection(fs, 'users', d.id, 'days'), where(documentId(), '>=', since)));
+      const totals = toCount(x.totals);
+      const byField: AdminUserData['byField'] = {};
+      for (const f of FIELDS) {
+        const c = toCount((x.byField as Record<string, unknown> | undefined)?.[f.id]);
+        if (c.answered > 0) byField[f.id] = c;
+      }
+      return {
+        uid: d.id,
+        displayName: cleanDisplayName(typeof x.displayName === 'string' ? x.displayName : '') || DEFAULT_DISPLAY_NAME,
+        lastActiveAt: x.lastActiveAt instanceof Timestamp ? x.lastActiveAt.toMillis() : 0,
+        answered: totals.answered,
+        correct: totals.correct,
+        byField,
+        days: dsnap.docs.map((dd) => ({ date: dd.id, ...toCount(dd.data()) })),
+      };
+    }),
+  );
+}
+
+/** 利用者1人の、問題ごとの記録を全部読む（最大770件）。詳細画面を初めて開いたときだけ呼ぶ */
+export async function adminLoadProgress(uid: string): Promise<ProgressRec[]> {
+  const { fs } = init();
+  requireUid();
+  const snap = await getDocs(collection(fs, 'users', uid, 'progress'));
+  return snap.docs.map((d) => {
+    const x = d.data();
+    const history = typeof x.history === 'string' ? x.history : '';
+    return {
+      id: d.id,
+      attempts: Number(x.attempts) || 0,
+      correctCount: Number(x.correctCount) || 0,
+      history,
+      lastAnsweredAt: x.lastAnsweredAt instanceof Timestamp ? x.lastAnsweredAt.toMillis() : 0,
+      checked: x.checked === true,
+      lastCorrect: history ? history.endsWith('○') : null,
+    };
+  });
+}

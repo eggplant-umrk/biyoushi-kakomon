@@ -55,9 +55,17 @@ export interface SyncState {
 
 export const MAX_SESSIONS_PER_DAY = 50;
 
+/**
+ * 出題のモード。
+ * - practice：ふつうの出題。解答を自分の記録に残す
+ * - study：管理者が、利用者の苦手問題を自分の端末で出題するとき（勉強会用。SPEC §7）。
+ *   解答・チェック・セットの結果を、自分の記録にもクラウドにも残さない
+ */
+export type QuizMode = 'practice' | 'study';
+
 export interface QuizSession {
   id: string;
-  mode: 'practice';
+  mode: QuizMode;
   questionIds: string[];
   answers: (number | null)[]; // 選んだ番号（1〜4）。未解答は null
   index: number;
@@ -66,6 +74,8 @@ export interface QuizSession {
 
 export interface QuizResult {
   sessionId: string;
+  /** 省略時は practice（この項目がなかった頃の結果） */
+  mode?: QuizMode;
   questionIds: string[];
   answers: (number | null)[];
   correctFlags: boolean[];

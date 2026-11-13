@@ -13,6 +13,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  documentId,
   getDoc,
   getDocs,
   increment,
@@ -223,6 +224,32 @@ describe('他人の記録', () => {
     await assertFails(deleteDoc(doc(db, 'users', ALICE, 'progress', '54-01')));
     await assertFails(setDoc(doc(db, 'users', ALICE, 'days', jstDate(Date.now())), day()));
     await assertFails(updateDoc(doc(db, 'users', ALICE, 'assignments', 'a1'), { doneAt: serverTimestamp() }));
+  });
+
+  // 管理画面（SPEC §7）が実際に使う読み方：利用者の一覧、直近14日の日別の記録、問題ごとの記録
+  const since = () => jstDate(Date.now() - 13 * DAY);
+  const adminScreenReads = (db: Firestore) => [
+    () => getDocs(collection(db, 'users')),
+    () => getDocs(query(collection(db, 'users', ALICE, 'days'), where(documentId(), '>=', since()))),
+    () => getDocs(collection(db, 'users', ALICE, 'progress')),
+  ];
+  test('管理画面の読み方：管理者は読める', async () => {
+    const [users, days, prog] = adminScreenReads(adminDb());
+    expect((await assertSucceeds(users!())).size).toBe(1);
+    expect((await assertSucceeds(days!())).size).toBe(1);
+    expect((await assertSucceeds(prog!())).size).toBe(1);
+  });
+  test.each<[string, () => Firestore]>([
+    ['未ログイン', () => anonDb()],
+    ['ほかの利用者', () => userDb(BOB)],
+    ['管理者と同じメールだが未確認', () => adminDb({ email_verified: false })],
+    ['管理者と同じメールだが Google ログインではない', () => adminDb({ firebase: { sign_in_provider: 'password', identities: {} } })],
+    ['メールが違う', () => adminDb({ email: 'admin@example.org' })],
+  ])('管理画面の読み方：%s は読めない', async (_name, makeDb) => {
+    for (const read of adminScreenReads(makeDb())) await assertFails(read());
+  });
+  test('本人でも、利用者の一覧（他人を含む）は読めない', async () => {
+    await assertFails(getDocs(collection(userDb(ALICE), 'users')));
   });
 });
 

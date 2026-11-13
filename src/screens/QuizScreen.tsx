@@ -86,8 +86,9 @@ export function QuizScreen() {
       lockTimer.current = window.setTimeout(() => setLocked(false), NEXT_LOCK_MS);
       if (!q.scoringExcluded) vibrate(correct ? 30 : [40, 60, 40]);
       await saveSession(next);
-      // 採点対象外の問題（公式に正解なし）は記録しない
-      if (q.scoringExcluded) return;
+      // 採点対象外の問題（公式に正解なし）は記録しない。
+      // 勉強会用の出題（管理者が利用者の苦手問題を解く）も、自分の記録には残さない
+      if (q.scoringExcluded || session.mode === 'study') return;
       const rec = await recordAnswer(q.id, correct);
       setProgress((m) => new Map(m).set(rec.id, rec));
       noteAnswered(); // ログイン中は10問ごとに Firestore へ送る
@@ -108,6 +109,7 @@ export function QuizScreen() {
     const scored = questions.map((qq, i) => ({ qq, i })).filter(({ qq }) => !qq.scoringExcluded);
     await saveLastResult({
       sessionId: session.id,
+      mode: session.mode,
       questionIds: scored.map(({ qq }) => qq.id),
       answers: scored.map(({ i }) => session.answers[i] ?? null),
       correctFlags: scored.map(({ qq, i }) => isCorrectChoice(qq, session.answers[i] ?? null)),
@@ -115,6 +117,10 @@ export function QuizScreen() {
       endedAt: Date.now(),
     });
     await clearSession();
+    if (session.mode === 'study') {
+      navigate('/result');
+      return;
+    }
     // ログイン中はセットの結果を記録して Firestore へ送る
     await noteSetFinished({
       mode: 'practice',
@@ -169,7 +175,9 @@ export function QuizScreen() {
   }
 
   const total = session.questionIds.length;
-  const p = progress.get(q.id);
+  const study = session.mode === 'study';
+  // 勉強会用の出題では、自分の過去の正誤・チェックは出さない（利用者の苦手問題を解いているため）
+  const p = study ? undefined : progress.get(q.id);
   const checked = p?.checked ?? false;
   const field = fieldById(q.fieldId);
   const correct = isCorrectChoice(q, chosen);
@@ -178,7 +186,12 @@ export function QuizScreen() {
     <div className="screen quiz has-bottom-bar" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <header className="quiz-header">
         <div className="quiz-topbar">
-          <button type="button" className="icon-btn" onClick={() => navigate('/home')} aria-label="中断してホームへ戻る">
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={() => navigate(study ? '/admin' : '/home')}
+            aria-label={study ? '中断して管理画面へ戻る' : '中断してホームへ戻る'}
+          >
             ←
           </button>
           <span className="quiz-count" data-testid="quiz-count">
@@ -194,16 +207,25 @@ export function QuizScreen() {
           >
             <span className="progress-fill" style={{ width: `${((session.index + 1) / total) * 100}%` }} />
           </span>
-          <button
-            type="button"
-            className={`icon-btn star ${checked ? 'on' : ''}`}
-            aria-pressed={checked}
-            aria-label={checked ? 'あとで見直すチェックを外す' : 'あとで見直すチェックを付ける'}
-            onClick={() => void toggleCheck()}
-          >
-            {checked ? '★' : '☆'}
-          </button>
+          {study ? (
+            <span className="icon-btn-spacer" aria-hidden="true" />
+          ) : (
+            <button
+              type="button"
+              className={`icon-btn star ${checked ? 'on' : ''}`}
+              aria-pressed={checked}
+              aria-label={checked ? 'あとで見直すチェックを外す' : 'あとで見直すチェックを付ける'}
+              onClick={() => void toggleCheck()}
+            >
+              {checked ? '★' : '☆'}
+            </button>
+          )}
         </div>
+        {study && (
+          <p className="study-note" data-testid="study-note">
+            勉強会用の出題です。解答はあなたの記録に残りません。
+          </p>
+        )}
         <div className="quiz-meta">
           <span>
             第{q.examNo}回 問{q.no}

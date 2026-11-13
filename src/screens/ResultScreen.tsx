@@ -39,6 +39,7 @@ export function ResultScreen() {
     );
   }
 
+  const study = result.mode === 'study';
   const total = result.questionIds.length;
   const ok = result.correctFlags.filter(Boolean).length;
   const wrongIds = result.questionIds.filter((_, i) => !result.correctFlags[i]);
@@ -46,7 +47,7 @@ export function ResultScreen() {
   async function retryWrong() {
     await saveSession({
       id: crypto.randomUUID(),
-      mode: 'practice',
+      mode: result?.mode ?? 'practice',
       questionIds: wrongIds,
       answers: wrongIds.map(() => null),
       index: 0,
@@ -58,6 +59,11 @@ export function ResultScreen() {
   return (
     <div className="screen">
       <h1 className="screen-title">結果</h1>
+      {study && (
+        <p className="study-note" data-testid="study-note">
+          勉強会用の出題の結果です。あなたの記録には残っていません。
+        </p>
+      )}
       <section className="card score-card">
         <p className="score" data-testid="score">
           <span className="score-big">{ok}</span> / {total} 問正解
@@ -93,9 +99,15 @@ export function ResultScreen() {
             間違えた問題を解き直す
           </button>
         )}
-        <button type="button" className="btn btn-secondary" onClick={() => navigate('/setup')}>
-          条件を変えて解く
-        </button>
+        {study ? (
+          <button type="button" className="btn btn-secondary" onClick={() => navigate('/admin')}>
+            管理画面へ戻る
+          </button>
+        ) : (
+          <button type="button" className="btn btn-secondary" onClick={() => navigate('/setup')}>
+            条件を変えて解く
+          </button>
+        )}
         <button type="button" className="btn btn-ghost" onClick={() => navigate('/home')}>
           ホームへ
         </button>
