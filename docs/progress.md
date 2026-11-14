@@ -116,8 +116,8 @@
 | 7 | #20 | 第45回 | `feature/phase6c-explanations-46` | 通過 |
 | 8 | #21 | 第44回 | `feature/phase6c-explanations-45` | 通過 |
 | 9 | #22 | 第43回 | `feature/phase6c-explanations-44` | 通過 |
-| 10 | #23 | 第42回 | `feature/phase6c-explanations-43` | この記録を書いた時点では未確認 |
-| 11 | #24 | 第41回 | `feature/phase6c-explanations-42` | この記録を書いた時点では未確認 |
+| 10 | #23 | 第42回 | `feature/phase6c-explanations-43` | 通過 |
+| 11 | #24 | 第41回 | `feature/phase6c-explanations-42` | 通過 |
 
 `main` は PR #13 までマージ済み。squash マージなので、1つマージするたびに、次のPRの土台を `main` に変え、`git merge -X ours origin/main` で取り込んでから（差分が自分の回のファイルだけになっていることを確かめて）CIを待ってマージする。
 
