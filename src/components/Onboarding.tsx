@@ -3,9 +3,21 @@ import { updateSettings } from '../lib/settings';
 import { Icon, type IconName } from './Icon';
 
 const POINTS: { icon: IconName; title: string; text: string }[] = [
-  { icon: 'play', title: 'ホームから1タップで解ける', text: '「続きから」「今日やること」「弱点」を押すと、すぐ1問目が出ます。' },
-  { icon: 'forward', title: '左右にスワイプで前後の問題へ', text: '解答するとすぐ正誤と解説が出ます。下のボタンでも移れます。' },
-  { icon: 'star', title: '★で、あとで見直す', text: '気になる問題に★を付けると、「解く」でまとめて解き直せます。' },
+  {
+    icon: 'play',
+    title: 'ホームから1タップで解ける',
+    text: '「続きから」「今日やること」「弱点」を押すと、すぐ1問目が出ます。',
+  },
+  {
+    icon: 'forward',
+    title: '左右にスワイプで前後の問題へ',
+    text: '解答するとすぐ正誤と解説が出ます。下のボタンでも移れます。',
+  },
+  {
+    icon: 'star',
+    title: '★で要復習に。メモも書ける',
+    text: '気になる問題に★（要復習）を付けると、ホームや「解く」でまとめて解き直せます。自分だけのメモも残せます。',
+  },
 ];
 
 /** 初回だけ出す1画面の説明（スキップできる）。見たかどうかは端末に覚える */

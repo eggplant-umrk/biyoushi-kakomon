@@ -2102,3 +2102,460 @@ fieldset.card > legend + * {
 .screen.quiz {
   overflow-x: clip;
 }
+
+/* =====================================================================
+   7a-2：閲覧モード・検索・要復習マーク・メモ
+   ===================================================================== */
+
+/* ダークモードの主なボタンは、暗めのベリーの塗りに白い文字（梅澤さんの決定。7a-2） */
+:root {
+  --primary-fill: var(--primary);
+  --primary-fill-text: var(--primary-text);
+  --primary-fill-press: var(--primary-press);
+}
+:root[data-theme='dark'] {
+  --primary-fill: #8f3a60;
+  --primary-fill-text: #ffffff;
+  --primary-fill-press: #a4466f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --primary-fill: #8f3a60;
+    --primary-fill-text: #ffffff;
+    --primary-fill-press: #a4466f;
+  }
+}
+.btn-primary,
+.hero.resume {
+  background: var(--primary-fill);
+  border-color: var(--primary-fill);
+  color: var(--primary-fill-text);
+}
+.btn-primary:not(:disabled):active {
+  background: var(--primary-fill-press);
+}
+.hero.resume .hero-icon {
+  color: var(--primary-fill-text);
+}
+.btn-primary:disabled {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.spacer {
+  flex: 1;
+}
+
+/* 要復習マーク・メモのボタン（上の段） */
+.quiz-topbar .memo-btn.on {
+  color: var(--primary);
+}
+.quiz-topbar .star,
+.quiz-topbar .memo-btn {
+  min-width: 52px;
+}
+
+/* ===== 閲覧モードの一覧 ===== */
+.read-tools {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.search-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 4px 0 12px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
+.search-box:focus-within {
+  border-color: var(--primary);
+}
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  padding: 10px 0;
+}
+.search-box input::-webkit-search-cancel-button {
+  display: none;
+}
+.search-clear {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+.filter-toggle {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+.filter-toggle.has {
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+.read-filters {
+  display: grid;
+  gap: 14px;
+}
+.filter-row {
+  display: grid;
+  gap: 6px;
+}
+.filter-row .small {
+  margin: 0;
+}
+.filter-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.read-count {
+  margin: 0 4px 8px;
+}
+.read-list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.read-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding-bottom: 8px;
+}
+.read-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  overflow: hidden;
+  cursor: pointer;
+}
+.read-item:active {
+  background: var(--surface-2);
+}
+.read-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.read-meta .badge {
+  margin: 0;
+}
+.read-badges {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 4px;
+}
+.mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  min-height: 1.5em;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+.mini.ng {
+  background: var(--ng-soft);
+  color: var(--ng);
+}
+.mini.mark {
+  color: #c98a00;
+}
+.mini.memo {
+  color: var(--primary);
+}
+.mini.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.read-stem {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+mark.hit {
+  background: var(--trap);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+  font-weight: 700;
+}
+
+/* ===== 1問を読む ===== */
+.read-detail-title {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.read-choices .choice {
+  cursor: default;
+}
+.read-choices .choice.is-dim {
+  opacity: 1;
+}
+.read-bar {
+  padding-top: 8px;
+}
+.read-nav {
+  max-width: 448px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  gap: 8px;
+  align-items: center;
+}
+.nav-btn {
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* ===== メモ ===== */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  background: rgb(15 10 13 / 0.55);
+  display: grid;
+  align-items: end;
+  animation: fade-in 150ms var(--ease);
+}
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+  animation: sheet-up 200ms var(--ease);
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sheet-head .card-title {
+  margin: 0;
+}
+.sheet .small {
+  margin: 4px 0 8px;
+}
+.memo-text {
+  width: 100%;
+  min-height: 9em;
+  resize: vertical;
+  padding: 10px 12px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: max(16px, 1rem);
+  line-height: 1.6;
+}
+.memo-text:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 0;
+}
+.memo-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+}
+.sheet-actions .btn {
+  flex: 1;
+}
+.memo-view {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-btn);
+  border: 1px dashed var(--primary);
+  background: var(--primary-soft);
+}
+.memo-view-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.memo-view-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.memo-view-head .link-btn {
+  min-height: 44px;
+  text-decoration: none;
+}
+.memo-view-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+/* 幅が狭い画面でも、検索欄と絞り込みボタンが横にはみ出さないようにする */
+.read-tools {
+  min-width: 0;
+}
+.search-box {
+  min-width: 0;
+}
+@media (max-width: 400px) {
+  .filter-toggle {
+    padding: 0 10px;
+    font-size: 0.88rem;
+  }
+}
+.read-meta {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ===== 7a-2：独立レビューの反映 ===== */
+/* 要復習の色。明るい背景では濃い金色（コントラスト 4.5:1 以上）、ダークは明るい金色 */
+:root {
+  --mark: #8a5a00;
+  --mark-soft: #fbf0d6;
+}
+:root[data-theme='dark'] {
+  --mark: #f0c35e;
+  --mark-soft: #362c14;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --mark: #f0c35e;
+    --mark-soft: #362c14;
+  }
+}
+.quiz-topbar .star.on,
+.mini.mark {
+  color: var(--mark);
+}
+/* 付いているときは、薄い面を敷いて「今の状態」だと分かるようにする */
+.quiz-topbar .star.on:not(.memo-btn) {
+  background: var(--mark-soft);
+}
+.quiz-topbar .memo-btn.on {
+  background: var(--primary-soft);
+}
+.mini.mark {
+  background: var(--mark-soft);
+}
+.mini.memo {
+  background: var(--primary-soft);
+}
+/* 選ばれている切り替えボタンも、主なボタンと同じ塗りにそろえる（ダークでは暗めのベリー） */
+.seg input:checked + span {
+  background: var(--primary-fill);
+  color: var(--primary-fill-text);
+  border-color: var(--primary-fill);
+}
+/* 一覧の1行目：回・問 → 印 → 分野名（幅が足りないときは分野名を「…」で省く） */
+.read-meta {
+  display: flex;
+  overflow: hidden;
+}
+.read-meta strong {
+  flex: none;
+}
+.read-badges {
+  margin-left: 0;
+  flex: none;
+}
+.read-field {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+.search-clear {
+  width: 48px;
+  height: 48px;
+}
+.memo-view-head .link-btn {
+  min-height: 48px;
+}
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+.filter-actions .btn {
+  flex: 1;
+}
+.read-filters .chips-grid {
+  grid-template-columns: repeat(auto-fill, minmax(5.6em, 1fr));
+}
+.nav-btn {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 0.66rem;
+  line-height: 1.1;
+}
+.back-to-list {
+  min-width: 52px;
+}
+.discard {
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-btn);
+  background: var(--warn-soft);
+}
+.discard p {
+  margin: 0 0 8px;
+  font-weight: 700;
+}

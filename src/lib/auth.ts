@@ -1,6 +1,20 @@
 import { useSyncExternalStore } from 'react';
 import { LOGIN_ENABLED } from './config';
-import { addSessionRecord, clearAllLocal, getOutbox, getSyncState, guestProgressCount, importGuestIntoUser, outboxSize, setLocalDb, setSyncState, type SessionRec } from './db';
+import {
+  addSessionRecord,
+  clearAllLocal,
+  getOutbox,
+  getPersonalOutbox,
+  getSyncState,
+  guestProgressCount,
+  importGuestIntoUser,
+  outboxSize,
+  personalOutboxSize,
+  setLocalDb,
+  setSyncState,
+  type SessionRec,
+} from './db';
+import { bumpPersonal, onPersonalChange } from './personal';
 import { getSettings, updateSettings } from './settings';
 
 /**
@@ -129,7 +143,15 @@ function onSignedOut(): void {
 }
 
 /** users/{uid} を読む → 未送信分を送る → 変更があれば取り込む */
-async function sync(cloud: Cloud, googleName: string | null = null): Promise<void> {
+/** いま動いている同期（ログイン直後は、users/{uid} の作成もここで行う） */
+let syncing: Promise<void> = Promise.resolve();
+
+function sync(cloud: Cloud, googleName: string | null = null): Promise<void> {
+  syncing = doSync(cloud, googleName);
+  return syncing;
+}
+
+async function doSync(cloud: Cloud, googleName: string | null = null): Promise<void> {
   lastRefreshAt = Date.now();
   if (!navigator.onLine) {
     set({ syncError: true });
@@ -142,7 +164,13 @@ async function sync(cloud: Cloud, googleName: string | null = null): Promise<voi
     const sent = await cloud.flush();
     // 未送信分が残っているときは取り込まない（端末内の記録を古い値で上書きしないため）
     const pulled = sent ? await cloud.pull(profile.lastActiveAt) : false;
-    set({ syncError: !sent, dataVersion: state.dataVersion + (pulled ? 1 : 0) });
+    // 要復習マーク・メモ（本人だけのもの）も、送ってから取り込む
+    const personalSent = await cloud.flushPersonal();
+    if (personalSent) {
+      await cloud.pullPersonal();
+      bumpPersonal();
+    }
+    set({ syncError: !sent || !personalSent, dataVersion: state.dataVersion + (pulled ? 1 : 0) });
   } catch {
     set({ syncError: true });
   }
@@ -179,11 +207,30 @@ export async function login(): Promise<LoginResult> {
 export function requestFlush(): void {
   if (state.status !== 'signedIn') return;
   answersSinceFlush = 0;
+  window.clearTimeout(personalTimer);
   void loadCloud()
-    .then((c) => c.flush())
+    .then(async (c) => (await c.flush()) && (await c.flushPersonal()))
     .then((ok) => set({ syncError: !ok }))
     .catch(() => set({ syncError: true }));
 }
+
+/**
+ * 要復習マーク・メモを変えたときに呼ぶ。続けて変えることが多いので、少し待ってからまとめて送る
+ * （書き込みを少なくするため。未送信分は端末内に残るので、送る前に閉じても失われない）
+ */
+const PERSONAL_DELAY_MS = 4000;
+let personalTimer: number | undefined;
+function requestPersonalFlush(): void {
+  if (state.status !== 'signedIn') return;
+  window.clearTimeout(personalTimer);
+  personalTimer = window.setTimeout(() => {
+    void loadCloud()
+      .then((c) => c.flushPersonal())
+      .then((ok) => set({ syncError: !ok }))
+      .catch(() => set({ syncError: true }));
+  }, PERSONAL_DELAY_MS);
+}
+onPersonalChange(requestPersonalFlush);
 
 /** 1問解くたびに呼ぶ。10問ごとに送信する */
 export function noteAnswered(): void {
@@ -203,6 +250,7 @@ export async function noteSetFinished(rec: SessionRec): Promise<void> {
 export async function importGuestRecords(): Promise<void> {
   if (state.status !== 'signedIn') return;
   await importGuestIntoUser();
+  bumpPersonal();
   set({ importCount: 0, dataVersion: state.dataVersion + 1 });
   requestFlush();
 }
@@ -214,15 +262,17 @@ export function declineImport(): void {
 }
 
 export async function changeDisplayName(name: string): Promise<void> {
+  // 初めてログインした直後は、users/{uid} の作成（同期）が終わってから変える（まだ文書がないと、更新は拒否される）
+  await syncing.catch(() => undefined);
   const clean = await (await loadCloud()).updateDisplayName(name);
   updateSettings({ displayName: clean });
   set({ displayName: clean });
 }
 
-/** まだ送れていない記録の件数（問題数＋日数） */
+/** まだ送れていない記録の件数（問題数＋日数＋要復習マーク・メモ） */
 export async function pendingCount(): Promise<number> {
   if (state.status !== 'signedIn') return 0;
-  return outboxSize(await getOutbox());
+  return outboxSize(await getOutbox()) + personalOutboxSize(await getPersonalOutbox());
 }
 
 function leave(): void {
@@ -240,6 +290,7 @@ export async function logout(force = false): Promise<{ pending: number }> {
   const cloud = await loadCloud();
   if (!force) {
     await cloud.flush().catch(() => false);
+    await cloud.flushPersonal().catch(() => false);
     const pending = await pendingCount();
     if (pending > 0) return { pending };
   }

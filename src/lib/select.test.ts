@@ -52,6 +52,8 @@ describe('selectQuestions', () => {
     ]);
     expect(selectQuestions(all, m, { ...base, filter: 'wrong' }).map((x) => x.id)).toEqual(['54-02']);
     expect(selectQuestions(all, m, { ...base, filter: 'checked' }).map((x) => x.id)).toEqual(['54-02']);
+    // 要復習マーク（7a-2）を渡したときは、マークで絞り込む（progress.checked は見ない）
+    expect(selectQuestions(all, m, { ...base, filter: 'checked' }, Math.random, new Set(['54-01'])).map((x) => x.id)).toEqual(['54-01']);
   });
   it('正答率が低い順。未解答は後ろ', () => {
     const m = new Map([

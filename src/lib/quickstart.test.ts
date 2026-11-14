@@ -29,6 +29,14 @@ describe('今日やること', () => {
     expect(p.opt).toMatchObject({ filter: 'unanswered', count: 10, order: 'random' });
     expect(p.detail).toContain('1問');
   });
+  test('間違えた問題がなく、要復習マークがあれば、要復習の問題（20問まで）', () => {
+    const p = todayPlan(map([rec('54-01')]), [54], 55, new Set(['54-02', '54-03']));
+    expect(p.kind).toBe('review');
+    expect(p.opt).toMatchObject({ filter: 'checked', count: 'all' });
+    expect(p.label).toContain('2問');
+    // 間違えた問題があれば、そちらが先
+    expect(todayPlan(map([rec('54-01', { lastCorrect: false })]), [54], 55, new Set(['54-02'])).kind).toBe('wrong');
+  });
   test('記録がなければ、未解答から10問', () => {
     expect(todayPlan(new Map(), [54], 55).kind).toBe('unanswered');
   });

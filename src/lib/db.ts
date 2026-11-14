@@ -375,6 +375,7 @@ export async function importGuestIntoUser(now = Date.now()): Promise<number> {
   }
   await kv.put(out, OUTBOX_KEY);
   await tx.done;
+  await importGuestPersonal();
   await clearAllLocal('guest');
   return gp.length;
 }
@@ -401,4 +402,188 @@ export async function clearAllLocal(kind: LocalDbKind = active): Promise<void> {
   const tx = d.transaction(['progress', 'days', 'kv'], 'readwrite');
   await Promise.all([tx.objectStore('progress').clear(), tx.objectStore('days').clear(), tx.objectStore('kv').clear()]);
   await tx.done;
+}
+
+// ---- 要復習マーク・メモ（7a-2。本人だけのもの。SPEC §14 #59） --------------------
+// 端末内では kv に置く（ゲストは端末内だけ、ログイン中は Firestore の写しと未送信分）。
+// 解答の記録（progress・days・outbox）とは別に持ち、記録の送信・管理画面の集計には関わらない。
+
+export const MEMO_MAX = 500;
+
+export interface MemoRec {
+  text: string;
+  /** 最後に書いた時刻（epoch ms） */
+  at: number;
+}
+
+/** 未送信の要復習マーク・メモ（ログイン中だけ）。値は「最後に決めた状態」なので、何度送っても同じ結果になる */
+export interface PersonalOutbox {
+  marks: Record<string, boolean>;
+  memos: Record<string, string>;
+}
+
+export interface PersonalSync {
+  uid: string;
+  /** メモを最後に取り込んだ時点（サーバー時刻の epoch ms） */
+  memosPulledAt: number;
+}
+
+const MARKS_KEY = 'reviewMarks';
+const MEMOS_KEY = 'memos';
+const POUT_KEY = 'personalOutbox';
+const PSYNC_KEY = 'personalSync';
+const MIGRATED_KEY = 'marksMigrated';
+
+const emptyPersonalOutbox = (): PersonalOutbox => ({ marks: {}, memos: {} });
+
+/**
+ * 要復習マークの一覧。初めて読むときに、これまでの「あとで見直すチェック」（progress.checked）を要復習マークに移す（SPEC §14 #59）
+ */
+export async function getMarks(kind: LocalDbKind = active): Promise<Set<string>> {
+  const d = await db(kind);
+  const tx = d.transaction(['progress', 'kv'], 'readwrite');
+  const kv = tx.objectStore('kv');
+  const marks = new Set((await kv.get(MARKS_KEY)) as string[] | undefined);
+  if (!(await kv.get(MIGRATED_KEY))) {
+    const checked = (await tx.objectStore('progress').getAll()).filter((p) => p.checked).map((p) => p.id);
+    if (checked.length) {
+      const out = ((await kv.get(POUT_KEY)) as PersonalOutbox | undefined) ?? emptyPersonalOutbox();
+      for (const id of checked) {
+        if (marks.has(id)) continue;
+        marks.add(id);
+        if (kind === 'user') out.marks[id] = true;
+      }
+      await kv.put([...marks], MARKS_KEY);
+      if (kind === 'user') await kv.put(out, POUT_KEY);
+    }
+    await kv.put(true, MIGRATED_KEY);
+  }
+  await tx.done;
+  return marks;
+}
+
+export async function setMark(qid: string, on: boolean): Promise<void> {
+  const kind = active;
+  await getMarks(kind); // 移行を先に済ませる
+  const d = await db(kind);
+  const tx = d.transaction('kv', 'readwrite');
+  const marks = new Set((await tx.store.get(MARKS_KEY)) as string[] | undefined);
+  if (on) marks.add(qid);
+  else marks.delete(qid);
+  await tx.store.put([...marks], MARKS_KEY);
+  if (kind === 'user') {
+    const out = ((await tx.store.get(POUT_KEY)) as PersonalOutbox | undefined) ?? emptyPersonalOutbox();
+    out.marks[qid] = on;
+    await tx.store.put(out, POUT_KEY);
+  }
+  await tx.done;
+}
+
+export async function getMemos(kind: LocalDbKind = active): Promise<Map<string, MemoRec>> {
+  const raw = ((await (await db(kind)).get('kv', MEMOS_KEY)) as Record<string, MemoRec> | undefined) ?? {};
+  return new Map(Object.entries(raw).filter(([, m]) => m.text));
+}
+
+/** メモを書く。空にすると消える。500文字を超えた分は切る */
+export async function setMemo(qid: string, text: string, now = Date.now()): Promise<void> {
+  const kind = active;
+  const clean = text.slice(0, MEMO_MAX);
+  const d = await db(kind);
+  const tx = d.transaction('kv', 'readwrite');
+  const memos = ((await tx.store.get(MEMOS_KEY)) as Record<string, MemoRec> | undefined) ?? {};
+  if (clean.trim()) memos[qid] = { text: clean, at: now };
+  else delete memos[qid];
+  await tx.store.put(memos, MEMOS_KEY);
+  if (kind === 'user') {
+    const out = ((await tx.store.get(POUT_KEY)) as PersonalOutbox | undefined) ?? emptyPersonalOutbox();
+    out.memos[qid] = clean.trim() ? clean : '';
+    await tx.store.put(out, POUT_KEY);
+  }
+  await tx.done;
+}
+
+export async function getPersonalOutbox(): Promise<PersonalOutbox> {
+  return ((await (await db('user')).get('kv', POUT_KEY)) as PersonalOutbox | undefined) ?? emptyPersonalOutbox();
+}
+
+export function personalOutboxSize(out: PersonalOutbox): number {
+  return Object.keys(out.marks).length + Object.keys(out.memos).length;
+}
+
+/** 送れた分を未送信から消す。送っている間に同じ問題がまた変わっていたら残す */
+export async function settlePersonal(sent: PersonalOutbox): Promise<void> {
+  const d = await db('user');
+  const tx = d.transaction('kv', 'readwrite');
+  const out = ((await tx.store.get(POUT_KEY)) as PersonalOutbox | undefined) ?? emptyPersonalOutbox();
+  for (const [q, v] of Object.entries(sent.marks)) if (out.marks[q] === v) delete out.marks[q];
+  for (const [q, v] of Object.entries(sent.memos)) if (out.memos[q] === v) delete out.memos[q];
+  await tx.store.put(out, POUT_KEY);
+  await tx.done;
+}
+
+/**
+ * Firestore から取り込んだ要復習マーク・メモで、端末内の写しを更新する。まだ送っていない変更は残す（上書きしない）。
+ * remoteMarks が null のときは、マークは取り込まない（文書がまだない）
+ */
+export async function putPulledPersonal(remoteMarks: Set<string> | null, memos: { qid: string; text: string; at: number }[]): Promise<void> {
+  await getMarks('user');
+  const d = await db('user');
+  const tx = d.transaction('kv', 'readwrite');
+  const out = ((await tx.store.get(POUT_KEY)) as PersonalOutbox | undefined) ?? emptyPersonalOutbox();
+  if (remoteMarks) {
+    const next = new Set(remoteMarks);
+    for (const [q, on] of Object.entries(out.marks)) {
+      if (on) next.add(q);
+      else next.delete(q);
+    }
+    await tx.store.put([...next], MARKS_KEY);
+  }
+  if (memos.length) {
+    const cur = ((await tx.store.get(MEMOS_KEY)) as Record<string, MemoRec> | undefined) ?? {};
+    for (const m of memos) {
+      if (m.qid in out.memos) continue;
+      if (m.text) cur[m.qid] = { text: m.text, at: m.at };
+      else delete cur[m.qid];
+    }
+    await tx.store.put(cur, MEMOS_KEY);
+  }
+  await tx.done;
+}
+
+export async function getPersonalSync(): Promise<PersonalSync | undefined> {
+  return (await (await db('user')).get('kv', PSYNC_KEY)) as PersonalSync | undefined;
+}
+export async function setPersonalSync(s: PersonalSync): Promise<void> {
+  await (await db('user')).put('kv', s, PSYNC_KEY);
+}
+
+/** ゲストの要復習マーク・メモを、ログイン中の端末内DBに足す（未送信分にも入れる）。ゲストの分は消す */
+export async function importGuestPersonal(): Promise<void> {
+  const [gm, gmemo] = await Promise.all([getMarks('guest'), getMemos('guest')]);
+  if (!gm.size && !gmemo.size) return;
+  await getMarks('user');
+  const d = await db('user');
+  const tx = d.transaction('kv', 'readwrite');
+  const marks = new Set((await tx.store.get(MARKS_KEY)) as string[] | undefined);
+  const memos = ((await tx.store.get(MEMOS_KEY)) as Record<string, MemoRec> | undefined) ?? {};
+  const out = ((await tx.store.get(POUT_KEY)) as PersonalOutbox | undefined) ?? emptyPersonalOutbox();
+  for (const q of gm) {
+    marks.add(q);
+    out.marks[q] = true;
+  }
+  for (const [q, m] of gmemo) {
+    // 同じ問題に両方のメモがあるときは、新しいほうを残す
+    if (!memos[q] || memos[q].at < m.at) {
+      memos[q] = m;
+      out.memos[q] = m.text;
+    }
+  }
+  await tx.store.put([...marks], MARKS_KEY);
+  await tx.store.put(memos, MEMOS_KEY);
+  await tx.store.put(out, POUT_KEY);
+  await tx.done;
+  const g = await db('guest');
+  const gtx = g.transaction('kv', 'readwrite');
+  await Promise.all([gtx.store.delete(MARKS_KEY), gtx.store.delete(MEMOS_KEY)]);
+  await gtx.done;
 }

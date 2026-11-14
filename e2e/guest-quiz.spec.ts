@@ -52,10 +52,10 @@ test('ゲストで10問解いて、結果と記録が残る', async ({ page }) =
     await expectNoHorizontalScroll(page);
 
     if (i === 1) {
-      // あとで見直すチェック
-      const star = page.getByRole('button', { name: 'あとで見直すチェックを付ける' });
+      // 要復習マーク（7a-2）
+      const star = page.getByRole('button', { name: '要復習マークを付ける' });
       await star.click();
-      await expect(page.getByRole('button', { name: 'あとで見直すチェックを外す' })).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.getByRole('button', { name: '要復習マークを外す' })).toHaveAttribute('aria-pressed', 'true');
     }
 
     await expect(page.locator('.quiz-meta')).toContainText(`第${latest}回 問${picked[i - 1]?.no}`);

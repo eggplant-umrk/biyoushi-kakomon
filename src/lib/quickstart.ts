@@ -1,5 +1,5 @@
 import { loadQuestions } from './data';
-import { getAllProgress, saveSession, type ProgressRec } from './db';
+import { getAllProgress, getMarks, saveSession, type ProgressRec } from './db';
 import { FIELDS } from './fields';
 import { navigate } from './router';
 import { selectQuestions, type SetupOptions } from './select';
@@ -11,8 +11,8 @@ import type { FieldId } from './types';
  * remember: 出題条件の画面から始めたときは、条件を「前回の条件」として覚える。
  */
 export async function startQuiz(opt: SetupOptions, { remember = false } = {}): Promise<'started' | 'empty'> {
-  const [all, progress] = await Promise.all([loadQuestions(opt.exams), getAllProgress()]);
-  const picked = selectQuestions(all, progress, opt);
+  const [all, progress, marks] = await Promise.all([loadQuestions(opt.exams), getAllProgress(), getMarks()]);
+  const picked = selectQuestions(all, progress, opt, Math.random, marks);
   if (picked.length === 0) return 'empty';
   if (remember) updateSettings({ lastSetup: opt });
   await saveSession({
@@ -32,7 +32,7 @@ const ALL_FIELDS: FieldId[] = FIELDS.map((f) => f.id);
 export const WEAK_MIN_ANSWERED = 5;
 
 export interface TodayPlan {
-  kind: 'wrong' | 'unanswered' | 'random';
+  kind: 'wrong' | 'review' | 'unanswered' | 'random';
   /** ボタンの文言 */
   label: string;
   /** ボタンの下の説明 */
@@ -48,10 +48,15 @@ export interface WeakPlan {
 }
 
 /**
- * ホームの「今日やること」：前回間違えた問題があればその解き直し、なければ未解答の問題から10問、
+ * ホームの「今日やること」：前回間違えた問題があればその解き直し、なければ要復習の問題、なければ未解答の問題から10問、
  * 全部解いていれば全体からランダムに10問。
  */
-export function todayPlan(progress: ReadonlyMap<string, ProgressRec>, examNos: readonly number[], totalQuestions: number): TodayPlan {
+export function todayPlan(
+  progress: ReadonlyMap<string, ProgressRec>,
+  examNos: readonly number[],
+  totalQuestions: number,
+  marks: ReadonlySet<string> = new Set(),
+): TodayPlan {
   const base = { exams: [...examNos], fields: ALL_FIELDS };
   const wrong = [...progress.values()].filter((p) => p.lastCorrect === false).length;
   if (wrong > 0) {
@@ -59,8 +64,24 @@ export function todayPlan(progress: ReadonlyMap<string, ProgressRec>, examNos: r
     return {
       kind: 'wrong',
       label: `前回間違えた問題を解き直す（${n}問）`,
-      detail: wrong > 20 ? `間違えたままの問題が ${wrong} 問あります。まず20問から。` : `間違えたままの問題が ${wrong} 問あります。`,
+      detail:
+        wrong > 20
+          ? `間違えたままの問題が ${wrong} 問あります。まず20問から。`
+          : `間違えたままの問題が ${wrong} 問あります。`,
       opt: { ...base, count: wrong > 20 ? 20 : 'all', order: 'random', filter: 'wrong' },
+    };
+  }
+  // 要復習マーク（7a-2）を付けた問題があれば、その解き直し（間違えた問題の次）
+  if (marks.size > 0) {
+    const n = Math.min(marks.size, 20);
+    return {
+      kind: 'review',
+      label: `要復習の問題を解く（${n}問）`,
+      detail:
+        marks.size > 20
+          ? `要復習の問題が ${marks.size} 問あります。まず20問から。`
+          : `要復習の問題が ${marks.size} 問あります。`,
+      opt: { ...base, count: marks.size > 20 ? 20 : 'all', order: 'random', filter: 'checked' },
     };
   }
   const answered = [...progress.values()].filter((p) => p.attempts > 0).length;
@@ -92,4 +113,17 @@ export function weakPlan(
     ...weakest,
     opt: { exams: [...examNos], fields: [weakest.fieldId], count: 10, order: 'random', filter: 'lowRate' },
   };
+}
+
+/** 指定した問題（閲覧モードの「この問題を解く」など）で、出題を始める */
+export async function startQuestions(ids: readonly string[]): Promise<void> {
+  await saveSession({
+    id: crypto.randomUUID(),
+    mode: 'practice',
+    questionIds: [...ids],
+    answers: ids.map(() => null),
+    index: 0,
+    startedAt: Date.now(),
+  });
+  navigate('/quiz');
 }
