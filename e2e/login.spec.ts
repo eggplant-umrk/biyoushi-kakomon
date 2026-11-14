@@ -48,7 +48,7 @@ test('ログインして解いた記録が、別の端末でログインして�
 
   await startDefaultSet(a.page);
   // 1問目にチェックを付けてから10問解く
-  await a.page.getByRole('button', { name: 'あとで見直すチェックを付ける' }).click();
+  await a.page.getByRole('button', { name: '要復習マークを付ける' }).click();
   await answerQuestions(a.page, 10);
   await expect(a.page).toHaveURL(/#\/result$/);
   await a.page.getByRole('button', { name: 'ホームへ' }).click();
@@ -74,7 +74,7 @@ test('ログインして解いた記録が、別の端末でログインして�
   await expect(b.page.getByTestId('day-col')).toHaveCount(1);
   // チェックと過去の正誤も引き継がれている
   await startDefaultSet(b.page);
-  await expect(b.page.getByRole('button', { name: 'あとで見直すチェックを外す' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(b.page.getByRole('button', { name: '要復習マークを外す' })).toHaveAttribute('aria-pressed', 'true');
   await expect(b.page.getByLabel(/^過去の正誤/)).toBeVisible();
 
   // 端末Bで2問解くと、端末Aを開き直したときに合計が増えている（上書きではなく加算）
@@ -184,7 +184,7 @@ test('表示名の変更・ログアウト時のキャッシュ消去・アカ�
   await context.close();
 });
 
-test('アカウント削除で、記録・報告・おすすめ復習・ログイン情報・端末内の写しがすべて消える', async ({ browser }, info) => {
+test('アカウント削除で、記録・報告・おすすめ復習・要復習マーク・メモ・ログイン情報・端末内の写しがすべて消える', async ({ browser }, info) => {
   const user = fakeUser(info, 'del');
   const { context, page } = await newDevice(browser, info, user);
   await login(page);
@@ -197,6 +197,9 @@ test('アカウント削除で、記録・報告・おすすめ復習・ログ�
 
   // 管理者が作ったおすすめ復習と、本人が送った報告がある状態にする（Emulator に直接書く）
   await seedDoc(`users/${uid}/assignments/a1`, { title: 'テスト用のおすすめ復習' });
+  // 要復習マーク・メモ（7a-2）
+  await seedDoc(`users/${uid}/memos/54-01`, { text: 'メモ' });
+  await seedDoc(`users/${uid}/review/marks`, { note: 'テスト' });
   await seedDoc(`reports/${uid}_54-01`, { uid, questionId: '54-01', comment: 'テスト' });
   // 別の人の報告は消えないこと（比べるため）
   const otherUid = `other-${uid}`;
@@ -217,7 +220,7 @@ test('アカウント削除で、記録・報告・おすすめ復習・ログ�
 
   // クラウドの記録（users と、その下の progress・days・assignments）と、本人の報告が消えている
   expect(await findUserDoc(user.name)).toBeNull();
-  for (const sub of ['progress', 'days', 'assignments']) expect.soft(await countDocs(`users/${uid}/${sub}`), sub).toBe(0);
+  for (const sub of ['progress', 'days', 'assignments', 'memos', 'review']) expect.soft(await countDocs(`users/${uid}/${sub}`), sub).toBe(0);
   const reportIds = async () => {
     const res = await fetch(`http://localhost:8080/v1/projects/demo-kakomon/databases/(default)/documents/reports?pageSize=300`, {
       headers: { Authorization: 'Bearer owner' },

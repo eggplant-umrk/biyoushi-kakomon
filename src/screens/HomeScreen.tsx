@@ -3,7 +3,8 @@ import { Footer, Skeleton } from '../components/common';
 import { Icon } from '../components/Icon';
 import { declineImport, importGuestRecords, useAuth } from '../lib/auth';
 import { loadExams } from '../lib/data';
-import { getAllDays, getAllProgress, getSession, jstDate, type QuizSession } from '../lib/db';
+import { getAllDays, getAllProgress, getMarks, getSession, jstDate, type QuizSession } from '../lib/db';
+import { usePersonalVersion } from '../lib/personal';
 import { fieldById } from '../lib/fields';
 import { startQuiz, todayPlan, weakPlan, WEAK_MIN_ANSWERED, type TodayPlan, type WeakPlan } from '../lib/quickstart';
 import { navigate } from '../lib/router';
@@ -27,21 +28,28 @@ export function HomeScreen() {
   // ログイン中は、Firestore から記録を取り込むたびに読み直す
   const auth = useAuth();
   const { dataVersion } = auth;
+  const personalVersion = usePersonalVersion();
 
   useEffect(() => {
     let alive = true;
     void (async () => {
-      const [s, progress, days, exams] = await Promise.all([getSession(), getAllProgress(), getAllDays(), loadExams().catch(() => [])]);
+      const [s, progress, days, exams, marks] = await Promise.all([
+        getSession(),
+        getAllProgress(),
+        getAllDays(),
+        loadExams().catch(() => []),
+        getMarks(),
+      ]);
       if (!alive) return;
       const summary = summarize(progress.values(), days, jstDate(Date.now()));
       const examNos = [...exams].map((e) => e.examNo).sort((a, b) => b - a);
       const total = exams.reduce((n, e) => n + e.questionCount, 0);
-      setData({ session: s ?? null, summary, today: todayPlan(progress, examNos, total), weak: weakPlan(summary.byField, examNos) });
+      setData({ session: s ?? null, summary, today: todayPlan(progress, examNos, total, marks), weak: weakPlan(summary.byField, examNos) });
     })();
     return () => {
       alive = false;
     };
-  }, [dataVersion]);
+  }, [dataVersion, personalVersion]);
 
   async function run(key: string, fn: () => Promise<'started' | 'empty'>) {
     setBusy(key);
@@ -141,7 +149,7 @@ export function HomeScreen() {
               disabled={busy !== null}
               onClick={() => void run('today', () => startQuiz(data.today.opt))}
             >
-              <Icon name={data.today.kind === 'wrong' ? 'redo' : 'play'} size={20} />
+              <Icon name={data.today.kind === 'wrong' ? 'redo' : data.today.kind === 'review' ? 'star' : 'play'} size={20} />
               {busy === 'today' ? '準備中…' : data.today.label}
             </button>
           </section>

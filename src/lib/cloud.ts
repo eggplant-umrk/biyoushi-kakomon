@@ -27,6 +27,7 @@ import {
   collection,
   connectFirestoreEmulator,
   deleteDoc,
+  deleteField,
   doc,
   documentId,
   getDoc,
@@ -54,6 +55,13 @@ import {
   emptyProgress,
   getInflight,
   getOutbox,
+  getPersonalOutbox,
+  getPersonalSync,
+  personalOutboxSize,
+  putPulledPersonal,
+  setPersonalSync,
+  settlePersonal,
+  type PersonalOutbox,
   getSyncState,
   getUserProgress,
   jstDate,
@@ -416,6 +424,65 @@ export async function pull(remoteLastActiveAt: number): Promise<boolean> {
   return true;
 }
 
+// ---- 要復習マーク・メモ（7a-2。SPEC §14 #59）-----------------------------------
+// 本人だけが読み書きできる場所に置く（管理者も読めない）。解答の記録（users・progress・days）には触らないので、
+// 記録の送信（syncSeq）・管理画面の集計に影響しない。値は「最後に決めた状態」なので、同じものを再送しても結果は変わらない。
+
+const PERSONAL_CHUNK = 100; // 1回に送るのは、マーク100件・メモ100件まで（ルールの上限と writeBatch の上限に収める）
+
+/** 未送信の要復習マーク・メモを送る。全部送れたら true */
+export async function flushPersonal(): Promise<boolean> {
+  const { fs } = init();
+  const uid = requireUid();
+  if (!navigator.onLine) return false;
+  for (let i = 0; i < 20; i++) {
+    const out = await getPersonalOutbox();
+    if (personalOutboxSize(out) === 0) return true;
+    const sent: PersonalOutbox = {
+      marks: Object.fromEntries(Object.entries(out.marks).slice(0, PERSONAL_CHUNK)),
+      memos: Object.fromEntries(Object.entries(out.memos).slice(0, PERSONAL_CHUNK)),
+    };
+    const batch = writeBatch(fs);
+    if (Object.keys(sent.marks).length) {
+      // ids の中の問題ごとに、付けたものは true、外したものはキーごと消す。merge なので、ほかの端末で変えた問題は上書きしない。
+      // 文書がまだなくても同じ書き方で作れるので、送る前に読まなくてよい（読み取りを増やさない）
+      const ids = Object.fromEntries(Object.entries(sent.marks).map(([q, on]) => [q, on ? true : deleteField()]));
+      batch.set(doc(fs, 'users', uid, 'review', 'marks'), { ids, updatedAt: serverTimestamp() }, { merge: true });
+    }
+    for (const [q, text] of Object.entries(sent.memos)) {
+      batch.set(doc(fs, 'users', uid, 'memos', q), { text, updatedAt: serverTimestamp() });
+    }
+    await batch.commit();
+    await settlePersonal(sent);
+  }
+  return personalOutboxSize(await getPersonalOutbox()) === 0;
+}
+
+/**
+ * ほかの端末で変えた要復習マーク・メモを取り込む。読み取りは「マークの文書1件 ＋ 前回より後に変わったメモの数（最低1）」。
+ * 未送信の変更があるときは、先に送ってから呼ぶこと（端末内の変更を古い値で上書きしないため）
+ */
+export async function pullPersonal(): Promise<void> {
+  const { fs } = init();
+  const uid = requireUid();
+  const st = await getPersonalSync();
+  const since = st?.uid === uid ? st.memosPulledAt : 0;
+  const msnap = await getDoc(doc(fs, 'users', uid, 'review', 'marks'));
+  const ids = msnap.exists() ? (msnap.data().ids as Record<string, unknown> | undefined) : undefined;
+  const marks = msnap.exists() ? new Set(Object.entries(ids ?? {}).filter(([, v]) => v === true).map(([q]) => q)) : null;
+  const col = collection(fs, 'users', uid, 'memos');
+  const qsnap = await getDocs(since > 0 ? query(col, where('updatedAt', '>', Timestamp.fromMillis(since))) : col);
+  let newest = since;
+  const memos = qsnap.docs.map((d) => {
+    const x = d.data();
+    const at = x.updatedAt instanceof Timestamp ? x.updatedAt.toMillis() : 0;
+    newest = Math.max(newest, at);
+    return { qid: d.id, text: typeof x.text === 'string' ? x.text : '', at };
+  });
+  await putPulledPersonal(marks, memos);
+  await setPersonalSync({ uid, memosPulledAt: newest });
+}
+
 // ---- 設定画面の操作 ---------------------------------------------------------
 
 export async function updateDisplayName(name: string): Promise<string> {
@@ -456,7 +523,7 @@ async function deleteAll(refs: DocumentReference[]): Promise<void> {
 
 /**
  * アカウント削除（SPEC §8.4）。直前に再ログインを求め、
- * progress・days・assignments・自分の reports・users/{uid} を消してから、Firebase Auth のユーザーを消す。
+ * progress・days・assignments・memos・review（要復習マーク）・自分の reports・users/{uid} を消してから、Firebase Auth のユーザーを消す。
  * 呼んだあとはページを読み込み直すこと。
  */
 export async function deleteAccount(): Promise<void> {
@@ -466,10 +533,12 @@ export async function deleteAccount(): Promise<void> {
   if (USE_EMULATOR) await reauthenticateWithCredential(user, e2eCredential());
   else await reauthenticateWithPopup(user, googleProvider());
   const uid = user.uid;
-  for (const sub of ['progress', 'days', 'assignments'] as const) {
+  for (const sub of ['progress', 'days', 'assignments', 'memos'] as const) {
     const snap = await getDocs(collection(fs, 'users', uid, sub));
     await deleteAll(snap.docs.map((d) => d.ref));
   }
+  // 要復習マークは1件だけ（review/marks）。一覧の読み取りはルールで許していないので、文書を指定して消す
+  await deleteDoc(doc(fs, 'users', uid, 'review', 'marks'));
   const reports = await getDocs(query(collection(fs, 'reports'), where('uid', '==', uid)));
   await deleteAll(reports.docs.map((d) => d.ref));
   await deleteDoc(doc(fs, 'users', uid));

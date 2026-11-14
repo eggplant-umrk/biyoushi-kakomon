@@ -15,6 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkExplanation, checkTextbookRefs } from '../src/lib/explanationCheck.ts';
 import { fieldOfNo } from '../src/lib/fields.ts';
+import { toBrowseItem, toSearchDoc, type BrowseItem, type SearchDoc } from '../src/lib/searchIndex.ts';
 import type { ExamMeta, Explanation, Question, Statement, TextbookRef } from '../src/lib/types.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -224,6 +225,8 @@ function main() {
     .filter((f) => /^exam-\d+\.txt$/.test(f))
     .sort();
   const metas: ExamMeta[] = [];
+  const browse: BrowseItem[] = [];
+  const searchDocs: SearchDoc[] = [];
   const review: { examNo: number; no: number; reason: string; page: number }[] = [];
   const reviewQuestions = new Map<string, Question>();
   let figures = 0;
@@ -303,6 +306,8 @@ function main() {
     }
 
     const questions: Question[] = parsed.questions.map(({ page: _p, ocrReasons: _r, ...q }) => q);
+    browse.push(...questions.map((q) => toBrowseItem(q)));
+    searchDocs.push(...questions.map((q) => toSearchDoc(q)));
     writeFileSync(
       join(outDir, `exam-${parsed.examNo}.json`),
       JSON.stringify({ examNo: parsed.examNo, questions }, null, 2) + '\n',
@@ -320,6 +325,13 @@ function main() {
 
   metas.sort((a, b) => b.examNo - a.examNo);
   writeFileSync(join(outDir, 'exams.json'), JSON.stringify(metas, null, 2) + '\n');
+  // 閲覧モードの一覧と、検索の索引（7a-2。SPEC §14 #60）。画面が必要なときに初めて読み込むので、改行・空白を入れずに小さくする
+  browse.sort((a, b) => b.e - a.e || a.n - b.n);
+  const order = new Map(browse.map((b, k) => [b.id, k]));
+  searchDocs.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+  writeFileSync(join(outDir, 'browse.json'), JSON.stringify(browse) + '\n');
+  writeFileSync(join(outDir, 'search.json'), JSON.stringify(searchDocs) + '\n');
+  console.log(`閲覧の一覧: ${browse.length}問 / 検索の索引: ${searchDocs.length}問`);
 
   // docs/ocr-review.md
   review.sort((a, b) => b.examNo - a.examNo || a.no - b.no);

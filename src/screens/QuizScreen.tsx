@@ -2,6 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState, type TouchEve
 import { ErrorBox, Skeleton } from '../components/common';
 import { Explanation } from '../components/Explanation';
 import { Icon } from '../components/Icon';
+import { MarkButton, MemoButton, MemoView } from '../components/PersonalControls';
+import { usePersonal } from '../lib/personal';
 import { isCorrectChoice, loadQuestionsByIds } from '../lib/data';
 import {
   clearSession,
@@ -10,7 +12,6 @@ import {
   recordAnswer,
   saveLastResult,
   saveSession,
-  setChecked,
   type ProgressRec,
   type QuizSession,
 } from '../lib/db';
@@ -22,6 +23,8 @@ import { vibrate } from '../lib/settings';
 import type { Question } from '../lib/types';
 
 // 図の拡大表示は、図をタップしたときに読み込む
+// メモを書く画面は、開いたときに読み込む
+const MemoSheet = lazy(() => import('../components/MemoSheet').then((m) => ({ default: m.MemoSheet })));
 const FigureViewer = lazy(() =>
   import('../components/FigureViewer').then((m) => ({
     default: m.FigureViewer,
@@ -38,6 +41,8 @@ export function QuizScreen() {
   const [error, setError] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
+  const [memoOpen, setMemoOpen] = useState(false);
+  const personal = usePersonal();
   // 問題を切り替えたときの動き（スワイプの向きに合わせて横から入る）
   const [enter, setEnter] = useState<'from-right' | 'from-left' | null>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
@@ -152,13 +157,6 @@ export function QuizScreen() {
     await saveSession(prev);
   }, [session]);
 
-  async function toggleCheck() {
-    if (!q) return;
-    const cur = progress.get(q.id)?.checked ?? false;
-    const rec = await setChecked(q.id, !cur);
-    setProgress((m) => new Map(m).set(rec.id, rec));
-  }
-
   function onTouchStart(e: TouchEvent) {
     const t = e.touches[0];
     touch.current = t ? { x: t.clientX, y: t.clientY } : null;
@@ -202,7 +200,8 @@ export function QuizScreen() {
   const study = session.mode === 'study';
   // 勉強会用の出題では、自分の過去の正誤・チェックは出さない（利用者の苦手問題を解いているため）
   const p = study ? undefined : progress.get(q.id);
-  const checked = p?.checked ?? false;
+  const marked = personal?.marks.has(q.id) ?? false;
+  const memo = personal?.memos.get(q.id);
   const field = fieldById(q.fieldId);
   const correct = isCorrectChoice(q, chosen);
   // 解答したあとだけ、誤りの原因になっている語句を問題の中でも強調する（解答前に見えると答えが分かってしまう）
@@ -233,19 +232,14 @@ export function QuizScreen() {
           >
             <span className="progress-fill" style={{ width: `${((session.index + 1) / total) * 100}%` }} />
           </span>
+          {/* 要復習マーク・メモ（7a-2）。勉強会用の出題（管理者が利用者の苦手問題を解く）では出さない */}
           {study ? (
             <span className="icon-btn-spacer" aria-hidden="true" />
           ) : (
-            <button
-              type="button"
-              className={`icon-btn star ${checked ? 'on' : ''}`}
-              aria-pressed={checked}
-              aria-label={checked ? 'あとで見直すチェックを外す' : 'あとで見直すチェックを付ける'}
-              onClick={() => void toggleCheck()}
-            >
-              <Icon name="star" filled={checked} />
-              <span className="star-label">{checked ? '見直す★' : '見直す'}</span>
-            </button>
+            <>
+              <MemoButton memo={memo} onOpen={() => setMemoOpen(true)} />
+              <MarkButton qid={q.id} on={marked} />
+            </>
           )}
         </div>
         {study && (
@@ -349,6 +343,7 @@ export function QuizScreen() {
         {answered && (
           <section className="answer-block" id="answer-block">
             <Explanation q={q} chosen={chosen} />
+            {memo && !study && <MemoView memo={memo} onEdit={() => setMemoOpen(true)} />}
           </section>
         )}
       </div>
@@ -407,6 +402,11 @@ export function QuizScreen() {
         </div>
       </div>
 
+      {memoOpen && !study && (
+        <Suspense fallback={null}>
+          <MemoSheet qid={q.id} title={`第${q.examNo}回 問${q.no}`} memo={memo} onClose={() => setMemoOpen(false)} />
+        </Suspense>
+      )}
       {zoom && (
         <Suspense fallback={null}>
           <FigureViewer src={zoom} alt="問題の図（拡大）" onClose={() => setZoom(null)} />

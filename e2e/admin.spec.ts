@@ -134,7 +134,7 @@ test('管理者は利用者の一覧と詳細を見られ、苦手問題を自�
   await expect(a.page).toHaveURL(/#\/quiz$/);
   await expect(a.page.getByTestId('quiz-count')).toHaveText(`1/${WRONG}`);
   await expect(a.page.getByTestId('study-note')).toBeVisible();
-  await expect(a.page.getByRole('button', { name: /あとで見直すチェック/ })).toHaveCount(0);
+  await expect(a.page.getByRole('button', { name: /要復習マーク|メモ/ })).toHaveCount(0);
   await answerQuestions(a.page, WRONG);
   await expect(a.page).toHaveURL(/#\/result$/);
   await expect(a.page.getByTestId('study-note')).toBeVisible();

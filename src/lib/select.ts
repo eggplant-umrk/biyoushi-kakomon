@@ -17,7 +17,7 @@ export const FILTER_LABELS: Record<FilterOpt, string> = {
   all: 'すべて',
   unanswered: '未解答だけ',
   wrong: '前回間違えた問題だけ',
-  checked: 'チェック（★）した問題だけ',
+  checked: '要復習のみ（★）',
   lowRate: '正答率が低い順',
 };
 
@@ -44,6 +44,8 @@ export function selectQuestions(
   progress: ReadonlyMap<string, ProgressRec>,
   opt: SetupOptions,
   rng: () => number = Math.random,
+  /** 要復習マーク（7a-2）。渡さないときは、これまでの「チェック」（progress.checked）で絞り込む */
+  marks?: ReadonlySet<string>,
 ): Question[] {
   let qs = all.filter((q) => opt.exams.includes(q.examNo) && opt.fields.includes(q.fieldId));
 
@@ -55,7 +57,7 @@ export function selectQuestions(
       qs = qs.filter((q) => progress.get(q.id)?.lastCorrect === false);
       break;
     case 'checked':
-      qs = qs.filter((q) => progress.get(q.id)?.checked === true);
+      qs = qs.filter((q) => (marks ? marks.has(q.id) : progress.get(q.id)?.checked === true));
       break;
     case 'lowRate':
     case 'all':

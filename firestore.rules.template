@@ -151,6 +151,23 @@ service cloud.firestore {
 
     // ---- 利用者の記録 -----------------------------------------------------
 
+    // 要復習マーク：ids は { 問題ID: true } の map。770件まで、値は true だけ。1回の更新で変えられるのは100件まで
+    function validReview(d) {
+      return hasExactly(d, ['ids', 'updatedAt'])
+        && d.ids is map
+        && d.ids.size() <= 770
+        && d.ids.values().hasOnly([true])
+        && d.updatedAt == request.time
+        && (resource == null || d.ids.diff(resource.data.ids).affectedKeys().size() <= 100);
+    }
+    // メモ：本文は文字列で500文字まで（空文字＝消したメモ）
+    function validMemo(d) {
+      return hasExactly(d, ['text', 'updatedAt'])
+        && d.text is string
+        && d.text.size() <= 500
+        && d.updatedAt == request.time;
+    }
+
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
       // createdAt は作成時だけ request.time と一致させ、更新では変更不可。
@@ -199,6 +216,23 @@ service cloud.firestore {
         allow update: if isOwner(uid)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['doneAt'])
           && request.resource.data.doneAt == request.time;
+      }
+
+      // ---- 要復習マーク・メモ（7a-2。本人だけ。管理者も読めない。SPEC §14 #59） ----
+
+      // 要復習マーク：1人1文書（review/marks）に、問題IDをキーにした map でまとめる（書き込み・読み取りを少なくするため）
+      match /review/{rid} {
+        allow read: if isOwner(uid) && rid == 'marks';
+        allow create, update: if isOwner(uid) && rid == 'marks' && validReview(request.resource.data);
+        allow delete: if isOwner(uid);
+      }
+
+      // メモ：1問1文書（memos/{問題ID}）。問題IDの形を検査するので、1人最大770件。本文は500文字まで。
+      // 消すときは空文字にする（ほかの端末が「消えた」ことを取り込めるように）
+      match /memos/{qid} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && isValidQid(qid) && validMemo(request.resource.data);
+        allow delete: if isOwner(uid);
       }
     }
 

@@ -805,3 +805,91 @@ describe('ルールに書いていないパス', () => {
     await assertFails(setDoc(doc(adminDb(), 'secrets', 'x'), { a: 1 }));
   });
 });
+
+// ---- 要復習マーク・メモ（7a-2。本人だけ。管理者も読めない。SPEC §14 #59） ----
+
+const marksRef = (db: Firestore, uid = ALICE) => doc(db, 'users', uid, 'review', 'marks');
+const memoRef = (db: Firestore, qid = '54-01', uid = ALICE) => doc(db, 'users', uid, 'memos', qid);
+const marks = (ids: Record<string, unknown>) => ({ ids, updatedAt: serverTimestamp() });
+const memo = (text: unknown) => ({ text, updatedAt: serverTimestamp() });
+
+describe('要復習マーク（users/{uid}/review/marks）', () => {
+  test('本人は作成・更新・読み取り・削除ができる', async () => {
+    const db = userDb(ALICE);
+    await assertSucceeds(setDoc(marksRef(db), marks({ '54-01': true })));
+    await assertSucceeds(setDoc(marksRef(db), marks({ '54-02': true }), { merge: true }));
+    const snap = await assertSucceeds(getDoc(marksRef(db)));
+    expect(Object.keys(snap.data()?.ids ?? {}).sort()).toEqual(['54-01', '54-02']);
+    await assertSucceeds(deleteDoc(marksRef(db)));
+  });
+  test('管理者・ほかの利用者・未ログインは読めない。他人のものは書けない', async () => {
+    await seed(async (db) => {
+      await setDoc(marksRef(db), { ids: { '54-01': true }, updatedAt: Timestamp.now() });
+    });
+    await assertFails(getDoc(marksRef(adminDb())));
+    await assertFails(getDoc(marksRef(userDb(BOB))));
+    await assertFails(getDoc(marksRef(anonDb())));
+    await assertFails(getDocs(collection(adminDb(), 'users', ALICE, 'review')));
+    await assertFails(setDoc(marksRef(userDb(BOB)), marks({ '54-02': true })));
+    await assertFails(setDoc(marksRef(adminDb()), marks({ '54-02': true })));
+    await assertFails(deleteDoc(marksRef(userDb(BOB))));
+    await assertFails(deleteDoc(marksRef(adminDb())));
+  });
+  test('marks 以外の文書・余計なキー・true 以外の値・時刻の偽装を拒否', async () => {
+    const db = userDb(ALICE);
+    await assertFails(setDoc(doc(db, 'users', ALICE, 'review', 'other'), marks({ '54-01': true })));
+    await assertFails(setDoc(marksRef(db), { ...marks({ '54-01': true }), extra: 1 }));
+    await assertFails(setDoc(marksRef(db), marks({ '54-01': 'x' })));
+    await assertFails(setDoc(marksRef(db), marks({ '54-01': false })));
+    await assertFails(setDoc(marksRef(db), { ids: { '54-01': true }, updatedAt: Timestamp.fromMillis(0) }));
+    await assertFails(setDoc(marksRef(db), { ids: ['54-01'], updatedAt: serverTimestamp() }));
+  });
+  test('770件までは保存でき、771件は拒否。1回の更新で変えられるのは100件まで', async () => {
+    const db = userDb(ALICE);
+    const ids = (n: number, prefix = 'q') => Object.fromEntries(Array.from({ length: n }, (_, i) => [`${prefix}${i}`, true]));
+    await assertFails(setDoc(marksRef(db), marks(ids(771))));
+    await assertSucceeds(setDoc(marksRef(db), marks(ids(770))));
+    // 作成済みの文書に、101件を一度に足す更新は拒否（100件までなら通る）
+    await assertSucceeds(deleteDoc(marksRef(db)));
+    await assertSucceeds(setDoc(marksRef(db), marks({})));
+    await assertFails(setDoc(marksRef(db), marks(ids(101)), { merge: true }));
+    await assertSucceeds(setDoc(marksRef(db), marks(ids(100)), { merge: true }));
+  });
+});
+
+describe('メモ（users/{uid}/memos/{問題ID}）', () => {
+  test('本人は500文字まで書ける・読める・空文字にできる・削除できる', async () => {
+    const db = userDb(ALICE);
+    await assertSucceeds(setDoc(memoRef(db), memo('あ'.repeat(500))));
+    await assertSucceeds(setDoc(memoRef(db), memo('')));
+    await assertSucceeds(getDoc(memoRef(db)));
+    await assertSucceeds(getDocs(query(collection(db, 'users', ALICE, 'memos'), where('updatedAt', '>', Timestamp.fromMillis(0)))));
+    await assertSucceeds(deleteDoc(memoRef(db)));
+  });
+  test('501文字・文字列以外・余計なキー・時刻の偽装を拒否', async () => {
+    const db = userDb(ALICE);
+    await assertFails(setDoc(memoRef(db), memo('あ'.repeat(501))));
+    await assertFails(setDoc(memoRef(db), memo(123)));
+    await assertFails(setDoc(memoRef(db), { ...memo('a'), html: '<b>' }));
+    await assertFails(setDoc(memoRef(db), { text: 'a', updatedAt: Timestamp.fromMillis(0) }));
+  });
+  test('件数の上限：問題IDの形のものだけ作れる（1人最大770件）', async () => {
+    const db = userDb(ALICE);
+    await assertSucceeds(setDoc(memoRef(db, '41-55'), memo('a')));
+    for (const bad of ['54-00', '54-56', '40-01', '55-01', 'x', '54-01-extra']) await assertFails(setDoc(memoRef(db, bad), memo('a')));
+  });
+  test('管理者・ほかの利用者・未ログインは読めない。他人のものは書けない・消せない', async () => {
+    await seed(async (db) => {
+      await setDoc(memoRef(db), { text: '秘密', updatedAt: Timestamp.now() });
+    });
+    await assertFails(getDoc(memoRef(adminDb())));
+    await assertFails(getDocs(collection(adminDb(), 'users', ALICE, 'memos')));
+    await assertFails(getDoc(memoRef(userDb(BOB))));
+    await assertFails(getDocs(collection(userDb(BOB), 'users', ALICE, 'memos')));
+    await assertFails(getDoc(memoRef(anonDb())));
+    await assertFails(setDoc(memoRef(userDb(BOB)), memo('書き換え')));
+    await assertFails(setDoc(memoRef(adminDb()), memo('書き換え')));
+    await assertFails(deleteDoc(memoRef(userDb(BOB))));
+    await assertFails(deleteDoc(memoRef(adminDb())));
+  });
+});

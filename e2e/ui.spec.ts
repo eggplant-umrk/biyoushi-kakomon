@@ -119,7 +119,7 @@ test('図の問題：タップで拡大表示が開き、拡大・元に戻す�
   await expect(viewer).toHaveCount(0);
 });
 
-test('記録：解いたあとは分野別・回別・日別のグラフが出る。読む画面は準備中の案内', async ({ page }) => {
+test('記録：解いたあとは分野別・回別・日別のグラフが出る。読む画面に一覧が出る', async ({ page }) => {
   await enterAsGuest(page);
   await tabs(page).getByRole('button', { name: '記録' }).click();
   await expect(page.getByText('まだ記録がありません。')).toBeVisible();
@@ -139,7 +139,7 @@ test('記録：解いたあとは分野別・回別・日別のグラフが出�
   await expect(page.getByTestId('day-col')).toHaveAttribute('aria-label', /3問/);
   await noHorizontalScroll(page);
   await tabs(page).getByRole('button', { name: '読む' }).click();
-  await expect(page.getByText('閲覧モードは準備中です')).toBeVisible();
+  await expect(page.getByTestId('read-count')).toHaveText('770問');
 });
 
 test('ダークモードと文字サイズの変更が、画面にすぐ反映される', async ({ page }) => {

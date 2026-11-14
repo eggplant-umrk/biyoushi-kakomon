@@ -26,11 +26,24 @@ const PATHS = {
   info: 'M12 4a8 8 0 1 1 0 16 8 8 0 0 1 0-16zM12 11v5M12 8h.01',
   list: 'M8 6.5h12M8 12h12M8 17.5h12M4 6.5h.01M4 12h.01M4 17.5h.01',
   calendar: 'M5 6h14v14H5zM5 10h14M9 3.5V7M15 3.5V7',
+  note: 'M6 4h9l3 3v13H6zM15 4v3h3M9 11h6M9 14.5h6M9 18h3',
+  search: 'M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zM15.5 15.5 20 20',
+  filter: 'M4 6h16M7 12h10M10 18h4',
 } as const;
 
 export type IconName = keyof typeof PATHS;
 
-export function Icon({ name, size = 24, filled = false, className }: { name: IconName; size?: number; filled?: boolean; className?: string }) {
+export function Icon({
+  name,
+  size = 24,
+  filled = false,
+  className,
+}: {
+  name: IconName;
+  size?: number;
+  filled?: boolean;
+  className?: string;
+}) {
   return (
     <svg
       className={`icon ${className ?? ''}`}
