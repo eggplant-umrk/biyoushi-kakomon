@@ -1,49 +1,9 @@
 #!/usr/bin/env bash
 # ビルド結果（dist/）に、入ってはいけないものが入っていないかを調べる（SPEC §6.5 / §8.4）。
-#   - 管理者のメールアドレス（環境変数 ADMIN_EMAIL。値は表示しない）
-#   - E2E テスト用のコード（Firebase Emulator への接続）
+# 検査の本体は scripts/check-dist.ts（Node）。grep を使うと、Windows の Git Bash では既定のロケールで
+# `grep -i -F` が異常終了し、「入っていない」と見分けがつかなかったため（SPEC §14）。
 # 使い方: ADMIN_EMAIL=... bash scripts/check-dist.sh [dist]
 #   REQUIRE_ADMIN_EMAIL=1 のときは、ADMIN_EMAIL が空なら失敗にする（デプロイ前の検査用）
+#   bash scripts/check-dist.sh --self-test [dist]   検査が効いていることの確認
 set -euo pipefail
-# ロケールによっては grep -i が日本語を含むファイルで異常終了し、「含まれていない」と見分けがつかなくなる（Windows の Git Bash で確認）
-export LC_ALL=C.UTF-8
-
-# grep の終了コード：0＝見つかった／1＝見つからない／それ以外＝検査そのものの失敗（見逃しにしない）
-search() {
-  local rc=0
-  hits="$(grep "$@")" || rc=$?
-  if [ "$rc" -gt 1 ]; then
-    echo "::error::grep が失敗しました（終了コード $rc）。検査できていません"
-    exit 1
-  fi
-  return "$rc"
-}
-DIST="${1:-dist}"
-[ -d "$DIST" ] || { echo "::error::$DIST がありません（先にビルドしてください）"; exit 1; }
-fail=0
-
-if [ -n "${ADMIN_EMAIL:-}" ]; then
-  # -F: 文字列そのまま / -i: 大文字小文字を区別しない / -l: ファイル名だけ表示（メールアドレスは表示しない）
-  if search -rIilF -- "$ADMIN_EMAIL" "$DIST"; then
-    echo "::error::ビルド結果に管理者のメールアドレスが含まれています:"
-    echo "$hits"
-    fail=1
-  else
-    echo "OK: 管理者のメールアドレスは含まれていません"
-  fi
-elif [ "${REQUIRE_ADMIN_EMAIL:-}" = "1" ]; then
-  echo "::error::ADMIN_EMAIL が設定されていないので検査できません"
-  fail=1
-else
-  echo "::notice::ADMIN_EMAIL がないので、管理者メールの検査を飛ばしました（Secrets を使えないPRなど）"
-fi
-
-for marker in 'localhost:9099' 'e2e-user' '__ADMIN_EMAIL__'; do
-  if search -rIlF -- "$marker" "$DIST"; then
-    echo "::error::ビルド結果にテスト用・テンプレート用の文字列（$marker）が含まれています:"
-    echo "$hits"
-    fail=1
-  fi
-done
-[ "$fail" = 0 ] && echo "OK: テスト用のコードは含まれていません"
-exit "$fail"
+exec node "$(dirname "$0")/check-dist.ts" "$@"
