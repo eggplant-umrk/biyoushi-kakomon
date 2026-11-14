@@ -109,7 +109,8 @@ function ReadList() {
   const [exams, setExams] = useState<ExamMeta[]>([]);
   const [wrong, setWrong] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
-  const [hits, setHits] = useState<SearchHit[] | null>(null);
+  // 検索の結果は、どの検索語の結果かと一緒に持つ（検索語を変えた直後に、前の結果を新しい検索語の結果として出さないため）
+  const [result, setResult] = useState<{ query: string; hits: SearchHit[] } | null>(null);
   const [searching, setSearching] = useState(false);
   const [input, setInput] = useState(f.query);
   const [showFilters, setShowFilters] = useState(false);
@@ -133,14 +134,14 @@ function ReadList() {
 
   useEffect(() => {
     if (!f.query.trim()) {
-      setHits(null);
+      setResult(null);
       return;
     }
     let alive = true;
     setSearching(true);
     loadSearch()
       .then((docs) => {
-        if (alive) setHits(searchDocs(docs, f.query, 770));
+        if (alive) setResult({ query: f.query, hits: searchDocs(docs, f.query, 770) });
       })
       .catch((e: unknown) => alive && setError(e instanceof Error ? e.message : String(e)))
       .finally(() => alive && setSearching(false));
@@ -153,10 +154,13 @@ function ReadList() {
     () => ({ marks: personal?.marks ?? new Set<string>(), memos: new Set(personal?.memos.keys() ?? []), wrong }),
     [personal, wrong],
   );
+  // いまの検索語の結果がまだないときは「検索しています…」
+  const hits = f.query.trim() && result?.query === f.query ? result.hits : null;
+  const pending = !!f.query.trim() && !hits;
   const rows = useMemo(() => {
     if (!items) return [];
     const byId = new Map(items.map((i) => [i.id, i]));
-    if (f.query.trim() && !hits) return [];
+    if (pending) return [];
     if (hits) {
       return hits.flatMap((h) => {
         const it = byId.get(h.id);
@@ -164,7 +168,7 @@ function ReadList() {
       });
     }
     return items.filter((it) => matchesFilter(it, f, ctx)).map((item) => ({ item, hit: null as SearchHit | null }));
-  }, [items, hits, f, ctx]);
+  }, [items, hits, pending, f, ctx]);
 
   const { start, end, rowPx } = useWindowedRange(rows.length, listRef);
 
@@ -348,7 +352,7 @@ function ReadList() {
       ) : (
         <>
           <p className="read-count small muted" aria-live="polite" data-testid="read-count">
-            {searching || (f.query.trim() && !hits)
+            {searching || pending
               ? '検索しています…'
               : f.query.trim()
                 ? `「${f.query.trim()}」に一致：${rows.length}問`

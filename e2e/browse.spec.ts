@@ -36,6 +36,14 @@ test('閲覧モード：全770問の一覧、絞り込み、検索の強調、1�
   await page.getByRole('searchbox').fill('ぱーまねんと');
   await expect(page.getByTestId('read-count')).toContainText('に一致');
   await expect(page.locator('mark.hit').first()).toHaveText(/パーマネント/);
+  // 検索語を続けて変えても、前の検索語の結果を新しい検索語の件数として出さない
+  const firstCount = await page.getByTestId('read-count').innerText();
+  await page.getByRole('searchbox').fill('ぱーまねんと 酸化');
+  await expect(page.getByTestId('read-count')).toContainText('「ぱーまねんと 酸化」に一致');
+  expect(await page.getByTestId('read-count').innerText()).not.toBe(firstCount.replace('ぱーまねんと', 'ぱーまねんと 酸化'));
+  const narrowed = Number((await page.getByTestId('read-count').innerText()).match(/：(\d+)問/)?.[1]);
+  const wide = Number(firstCount.match(/：(\d+)問/)?.[1]);
+  expect(narrowed).toBeLessThan(wide);
   // 検索語は、HTML として解釈しない
   await page.getByRole('searchbox').fill('<b>x</b>');
   await expect(page.getByTestId('read-count')).toContainText('<b>x</b>');
