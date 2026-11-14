@@ -11,6 +11,7 @@ export interface Settings {
   displayName: string; // ログイン中の表示名の写し（通信できないときの表示用）
   guestImportDeclined: boolean; // ゲストの記録の引き継ぎを断った（次から確認しない）
   lastSetup: SetupOptions | null; // 前回の出題条件
+  onboarded: boolean; // 初回の説明を見た（スキップを含む）。ログアウトしても消さない
 }
 
 const KEY = 'kakomon-settings-v1';
@@ -23,6 +24,7 @@ const DEFAULTS: Settings = {
   displayName: '',
   guestImportDeclined: false,
   lastSetup: null,
+  onboarded: false,
 };
 
 function read(): Settings {
@@ -59,7 +61,16 @@ export function resetSettings(): void {
   } catch {
     /* noop */
   }
-  current = DEFAULTS;
+  // 初回の説明は、端末で一度見れば十分なので、ログアウト・データ削除でも消さない
+  const { onboarded } = current;
+  current = { ...DEFAULTS, onboarded };
+  if (onboarded) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ onboarded }));
+    } catch {
+      /* noop */
+    }
+  }
   applyToDocument(current);
   listeners.forEach((l) => l());
 }

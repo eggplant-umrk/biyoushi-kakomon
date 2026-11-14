@@ -1,23 +1,27 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Skeleton } from './components/common';
 import { TabBar } from './components/TabBar';
 import { useAuth } from './lib/auth';
 import { navigate, useRoute, type Route } from './lib/router';
 import { useSettings } from './lib/settings';
-import { AdminScreen } from './screens/AdminScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { QuizScreen } from './screens/QuizScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { SetupScreen } from './screens/SetupScreen';
-import { StatsScreen } from './screens/StatsScreen';
 
-const WITH_TABS: readonly Route[] = ['/home', '/setup', '/result', '/stats', '/settings', '/admin'];
+// 最初の画面（ホーム・解く・出題）に要らない画面は、使うときに読み込む（初回表示を軽くする）
+const AdminScreen = lazy(() => import('./screens/AdminScreen').then((m) => ({ default: m.AdminScreen })));
+const StatsScreen = lazy(() => import('./screens/StatsScreen').then((m) => ({ default: m.StatsScreen })));
+const ReadScreen = lazy(() => import('./screens/ReadScreen').then((m) => ({ default: m.ReadScreen })));
+const Onboarding = lazy(() => import('./components/Onboarding').then((m) => ({ default: m.Onboarding })));
+
+const WITH_TABS: readonly Route[] = ['/home', '/setup', '/result', '/read', '/stats', '/settings', '/admin'];
 
 export default function App() {
   const route = useRoute();
-  const { guest } = useSettings();
+  const { guest, onboarded } = useSettings();
   const auth = useAuth();
 
   const loading = auth.status === 'loading';
@@ -42,7 +46,7 @@ export default function App() {
       <div className="app">
         <main className="main">
           <div className="screen">
-            <Skeleton lines={6} />
+            <Skeleton lines={6} label="準備しています…" />
           </div>
         </main>
       </div>
@@ -54,16 +58,31 @@ export default function App() {
   return (
     <div className={`app ${showTabs ? 'has-tabs' : ''}`}>
       <main className="main">
-        {route === '/' && <LoginScreen />}
-        {route === '/home' && <HomeScreen />}
-        {route === '/setup' && <SetupScreen />}
-        {route === '/quiz' && <QuizScreen />}
-        {route === '/result' && <ResultScreen />}
-        {route === '/stats' && <StatsScreen />}
-        {route === '/settings' && <SettingsScreen />}
-        {route === '/admin' && auth.isAdmin && <AdminScreen />}
+        <Suspense
+          fallback={
+            <div className="screen">
+              <Skeleton lines={6} />
+            </div>
+          }
+        >
+          {route === '/' && <LoginScreen />}
+          {route === '/home' && <HomeScreen />}
+          {route === '/setup' && <SetupScreen />}
+          {route === '/quiz' && <QuizScreen />}
+          {route === '/result' && <ResultScreen />}
+          {route === '/read' && <ReadScreen />}
+          {route === '/stats' && <StatsScreen />}
+          {route === '/settings' && <SettingsScreen />}
+          {route === '/admin' && auth.isAdmin && <AdminScreen />}
+        </Suspense>
       </main>
       {showTabs && <TabBar route={route} admin={auth.isAdmin} />}
+      {/* 初回だけ、ホームで1画面の説明を出す（スキップできる） */}
+      {entered && route === '/home' && !onboarded && (
+        <Suspense fallback={null}>
+          <Onboarding />
+        </Suspense>
+      )}
     </div>
   );
 }

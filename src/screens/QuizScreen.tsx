@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react';
-import { ErrorBox, Lightbox, Skeleton } from '../components/common';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type TouchEvent } from 'react';
+import { ErrorBox, Skeleton } from '../components/common';
 import { Explanation } from '../components/Explanation';
+import { Icon } from '../components/Icon';
 import { isCorrectChoice, loadQuestionsByIds } from '../lib/data';
 import {
   clearSession,
@@ -20,6 +21,13 @@ import { navigate } from '../lib/router';
 import { vibrate } from '../lib/settings';
 import type { Question } from '../lib/types';
 
+// 図の拡大表示は、図をタップしたときに読み込む
+const FigureViewer = lazy(() =>
+  import('../components/FigureViewer').then((m) => ({
+    default: m.FigureViewer,
+  })),
+);
+
 const NEXT_LOCK_MS = 300; // 解答直後に「次へ」を無効にする時間（SPEC §4.3）
 const CHOICE_LABELS = ['(1)', '(2)', '(3)', '(4)'];
 
@@ -30,6 +38,8 @@ export function QuizScreen() {
   const [error, setError] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
+  // 問題を切り替えたときの動き（スワイプの向きに合わせて横から入る）
+  const [enter, setEnter] = useState<'from-right' | 'from-left' | null>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
   const lockTimer = useRef<number | undefined>(undefined);
 
@@ -100,6 +110,7 @@ export function QuizScreen() {
     if (!session || !questions || !answered || locked) return;
     if (!isLast) {
       const next = { ...session, index: session.index + 1 };
+      setEnter('from-right');
       setSession(next);
       window.scrollTo(0, 0);
       await saveSession(next);
@@ -131,6 +142,16 @@ export function QuizScreen() {
     navigate('/result');
   }, [session, questions, answered, locked, isLast]);
 
+  // 前の問題に戻る（解答済みの問題は、選んだ選択肢と解説をそのまま見られる）
+  const goPrev = useCallback(async () => {
+    if (!session || session.index === 0) return;
+    const prev = { ...session, index: session.index - 1 };
+    setEnter('from-left');
+    setSession(prev);
+    window.scrollTo(0, 0);
+    await saveSession(prev);
+  }, [session]);
+
   async function toggleCheck() {
     if (!q) return;
     const cur = progress.get(q.id)?.checked ?? false;
@@ -149,8 +170,11 @@ export function QuizScreen() {
     if (!start || !t) return;
     const dx = t.clientX - start.x;
     const dy = t.clientY - start.y;
-    // 解答後の左スワイプで次の問題へ（SPEC §4.3）
-    if (dx < -70 && Math.abs(dy) < 50) void goNext();
+    // 横に大きく動かしたときだけ（縦のスクロールや、図・文字の選択と区別する）
+    if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6) return;
+    // 左スワイプで次の問題（解答後だけ。SPEC §4.3）、右スワイプで前の問題
+    if (dx < 0) void goNext();
+    else void goPrev();
   }
 
   if (error) {
@@ -169,7 +193,7 @@ export function QuizScreen() {
   if (!session || !questions || !q) {
     return (
       <div className="screen">
-        <Skeleton lines={8} />
+        <Skeleton lines={8} label="問題を読み込んでいます…" />
       </div>
     );
   }
@@ -194,7 +218,7 @@ export function QuizScreen() {
             onClick={() => navigate(study ? '/admin' : '/home')}
             aria-label={study ? '中断して管理画面へ戻る' : '中断してホームへ戻る'}
           >
-            ←
+            <Icon name="close" />
           </button>
           <span className="quiz-count" data-testid="quiz-count">
             {session.index + 1}/{total}
@@ -219,7 +243,8 @@ export function QuizScreen() {
               aria-label={checked ? 'あとで見直すチェックを外す' : 'あとで見直すチェックを付ける'}
               onClick={() => void toggleCheck()}
             >
-              {checked ? '★' : '☆'}
+              <Icon name="star" filled={checked} />
+              <span className="star-label">{checked ? '見直す★' : '見直す'}</span>
             </button>
           )}
         </div>
@@ -238,119 +263,155 @@ export function QuizScreen() {
           <span>{field.short}</span>
           {p && p.history && (
             <span className="history" aria-label={`過去の正誤 ${p.history}`}>
+              <span className="history-label">これまで</span>
               {p.history}
             </span>
           )}
         </div>
       </header>
 
-      <section className="question" aria-label="問題文">
-        <p className="stem">
-          <RichText text={q.stem} />
-        </p>
-        {q.statements && (
-          <ol className="statements">
-            {q.statements.map((s) => (
-              <li key={s.label}>
-                <span className="st-label">{s.label}</span>
-                <span>
-                  <RichText text={s.text} traps={shownTraps} />
-                </span>
-              </li>
-            ))}
-          </ol>
-        )}
-        {q.images.map((src, i) => {
-          const url = `${import.meta.env.BASE_URL}${src.replace(/^\//, '')}`;
-          return (
-            <button key={src} type="button" className="figure" onClick={() => setZoom(url)} aria-label="図を拡大する">
-              <img src={url} alt={`問題の図${i + 1}`} loading="lazy" />
-              <span className="small muted">タップで拡大</span>
-            </button>
-          );
-        })}
-        {q.caution && (
-          <p className="caution" role="note">
-            <span aria-hidden="true">⚠ </span>
-            {q.caution}
+      <div key={session.index} className={`quiz-body ${enter ?? ''}`}>
+        <section className="question" aria-label="問題文">
+          <p className="stem">
+            <RichText text={q.stem} />
           </p>
-        )}
-      </section>
-
-      <ul className="choices" aria-label="選択肢">
-        {/* 解答したあとは、誤りの原因になっている語句（traps）を選択肢の中でも強調する（SPEC §6.7.3） */}
-        {q.choices.map((c, i) => {
-          const n = i + 1;
-          const isAnswer = n === q.answer || (q.altAnswers ?? []).includes(n);
-          const isChosen = n === chosen;
-          let state = '';
-          let mark: string | null = null;
-          if (answered && q.scoringExcluded) {
-            state = isChosen ? 'is-chosen' : 'is-dim';
-          } else if (answered) {
-            if (isAnswer) {
-              state = 'is-correct';
-              mark = '○ 正答';
-            } else if (isChosen) {
-              state = 'is-wrong';
-              mark = '× あなたの解答';
-            } else state = 'is-dim';
-          }
-          return (
-            <li key={i}>
-              <button
-                type="button"
-                className={`choice ${state}`}
-                disabled={answered}
-                aria-label={`${CHOICE_LABELS[i] ?? ''} ${c}${mark ? `（${mark}）` : ''}`}
-                onClick={() => void choose(n)}
-              >
-                <span className="choice-no">{CHOICE_LABELS[i]}</span>
-                <span className="choice-text">
-                  <RichText text={c} traps={shownTraps} />
+          {q.statements && (
+            <ol className="statements">
+              {q.statements.map((s) => (
+                <li key={s.label}>
+                  <span className="st-label">{s.label}</span>
+                  <span>
+                    <RichText text={s.text} traps={shownTraps} />
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+          {q.images.map((src, i) => {
+            const url = `${import.meta.env.BASE_URL}${src.replace(/^\//, '')}`;
+            return (
+              <button key={src} type="button" className="figure" onClick={() => setZoom(url)} aria-label="図を拡大する">
+                <img src={url} alt={`問題の図${i + 1}`} loading="lazy" />
+                <span className="figure-hint small">
+                  <Icon name="expand" size={16} />
+                  タップで拡大
                 </span>
-                {mark && <span className="choice-mark">{mark}</span>}
               </button>
-            </li>
-          );
-        })}
-      </ul>
+            );
+          })}
+          {q.caution && (
+            <p className="caution" role="note">
+              <span aria-hidden="true">⚠ </span>
+              {q.caution}
+            </p>
+          )}
+        </section>
 
-      {answered && (
-        <section className="answer-block" aria-live="polite">
-          {q.scoringExcluded ? (
-            <p className="verdict" data-testid="verdict">
+        <ul className="choices" aria-label="選択肢">
+          {/* 解答したあとは、誤りの原因になっている語句（traps）を選択肢の中でも強調する（SPEC §6.7.3） */}
+          {q.choices.map((c, i) => {
+            const n = i + 1;
+            const isAnswer = n === q.answer || (q.altAnswers ?? []).includes(n);
+            const isChosen = n === chosen;
+            let state = '';
+            let mark: string | null = null;
+            if (answered && q.scoringExcluded) {
+              state = isChosen ? 'is-chosen' : 'is-dim';
+            } else if (answered) {
+              if (isAnswer) {
+                state = 'is-correct';
+                mark = isChosen ? '○ 正答（あなたの解答）' : '○ 正答';
+              } else if (isChosen) {
+                state = 'is-wrong';
+                mark = '× あなたの解答';
+              } else state = 'is-dim';
+            }
+            return (
+              <li key={i}>
+                <button
+                  type="button"
+                  className={`choice ${state}`}
+                  disabled={answered}
+                  aria-label={`${CHOICE_LABELS[i] ?? ''} ${c}${mark ? `（${mark}）` : ''}`}
+                  onClick={() => void choose(n)}
+                >
+                  <span className="choice-no">{CHOICE_LABELS[i]}</span>
+                  <span className="choice-text">
+                    <RichText text={c} traps={shownTraps} />
+                  </span>
+                  {mark && <span className="choice-mark">{mark}</span>}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+
+        {answered && (
+          <section className="answer-block" id="answer-block">
+            <Explanation q={q} chosen={chosen} />
+          </section>
+        )}
+      </div>
+
+      {/* 片手で届く下の段に、正誤と「前へ」「次へ」をまとめる */}
+      <div className="bottom-bar quiz-bar">
+        {answered ? (
+          q.scoringExcluded ? (
+            <p className="verdict" data-testid="verdict" aria-live="polite">
               採点対象外（公式に正解となる選択肢なし）
             </p>
           ) : (
-          <p className={`verdict ${correct ? 'ok' : 'ng'}`} data-testid="verdict">
-            <span className="verdict-icon" aria-hidden="true">
-              {correct ? '○' : '×'}
-            </span>
-            {correct
-              ? '正解'
-              : `不正解　正答は ${[q.answer, ...(q.altAnswers ?? [])].map((n) => CHOICE_LABELS[n - 1] ?? '').join('・')}`}
-          </p>
-          )}
-          <Explanation q={q} chosen={chosen} />
-        </section>
-      )}
-
-      {answered && (
-        <div className="bottom-bar">
+            <p className={`verdict ${correct ? 'ok' : 'ng'}`} data-testid="verdict" aria-live="polite">
+              <span className="verdict-icon" aria-hidden="true">
+                <Icon name={correct ? 'circle' : 'cross'} size={20} />
+              </span>
+              <span className="verdict-text">
+                {correct
+                  ? '正解'
+                  : `不正解　正答は ${[q.answer, ...(q.altAnswers ?? [])].map((n) => CHOICE_LABELS[n - 1] ?? '').join('・')}`}
+              </span>
+              <button
+                type="button"
+                className="to-explanation"
+                onClick={() => document.getElementById('answer-block')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              >
+                解説
+                <Icon name="forward" size={16} className="down" />
+              </button>
+            </p>
+          )
+        ) : (
+          <p className="quiz-hint small">選択肢をタップして解答</p>
+        )}
+        <div className="quiz-nav">
           <button
             type="button"
-            className="btn btn-primary"
-            disabled={locked}
+            className="btn btn-secondary btn-icon"
+            disabled={session.index === 0}
+            onClick={() => void goPrev()}
+            data-testid="prev"
+          >
+            <Icon name="back" size={20} />
+            前へ
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-icon"
+            disabled={!answered || locked}
             onClick={() => void goNext()}
             data-testid="next"
           >
             {isLast ? '結果を見る' : '次へ'}
+            <Icon name="forward" size={20} />
           </button>
         </div>
-      )}
+      </div>
 
-      {zoom && <Lightbox src={zoom} alt="問題の図（拡大）" onClose={() => setZoom(null)} />}
+      {zoom && (
+        <Suspense fallback={null}>
+          <FigureViewer src={zoom} alt="問題の図（拡大）" onClose={() => setZoom(null)} />
+        </Suspense>
+      )}
     </div>
   );
 }

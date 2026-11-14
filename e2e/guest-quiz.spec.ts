@@ -39,7 +39,7 @@ test('ゲストで10問解いて、結果と記録が残る', async ({ page }) =
   await expectNoHorizontalScroll(page);
 
   // 出題条件 → 開始
-  await page.getByRole('navigation', { name: 'メインメニュー' }).getByRole('button', { name: '出題' }).click();
+  await page.getByRole('navigation', { name: 'メインメニュー' }).getByRole('button', { name: '解く' }).click();
   await page.getByRole('button', { name: 'この条件で始める' }).click();
   await expect(page).toHaveURL(/#\/quiz$/);
 

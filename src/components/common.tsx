@@ -1,4 +1,5 @@
-import { useEffect, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
+import { Icon, type IconName } from './Icon';
 
 export function Footer() {
   return (
@@ -11,12 +12,38 @@ export function Footer() {
   );
 }
 
-export function Skeleton({ lines = 3 }: { lines?: number }) {
+/** 読み込み中の表示。何を待っているかを文字でも出す */
+export function Skeleton({ lines = 3, label = '読み込み中…' }: { lines?: number; label?: string }) {
   return (
-    <div className="skeleton" aria-busy="true" aria-label="読み込み中">
+    <div className="skeleton" aria-busy="true" aria-label={label}>
+      <p className="skeleton-label small muted">{label}</p>
       {Array.from({ length: lines }, (_, i) => (
         <div key={i} className="skeleton-line" />
       ))}
+    </div>
+  );
+}
+
+/** 空の状態。何がないのか、次に何をすればよいかを出す */
+export function EmptyState({
+  icon = 'info',
+  title,
+  children,
+  action,
+}: {
+  icon?: IconName;
+  title: string;
+  children?: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="empty">
+      <span className="empty-icon">
+        <Icon name={icon} size={28} />
+      </span>
+      <p className="empty-title">{title}</p>
+      {children && <div className="empty-body small muted">{children}</div>}
+      {action}
     </div>
   );
 }
@@ -25,27 +52,6 @@ export function ErrorBox({ children }: { children: ReactNode }) {
   return (
     <div className="card error" role="alert">
       {children}
-    </div>
-  );
-}
-
-/** 図の全画面表示。ピンチズームはブラウザ標準のものを使う（viewport でズームを止めていない） */
-export function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-  return (
-    <div className="lightbox" role="dialog" aria-modal="true" aria-label="図の拡大表示">
-      <button type="button" className="lightbox-close" onClick={onClose} aria-label="閉じる">
-        ✕ 閉じる
-      </button>
-      <div className="lightbox-body">
-        <img src={src} alt={alt} />
-      </div>
     </div>
   );
 }

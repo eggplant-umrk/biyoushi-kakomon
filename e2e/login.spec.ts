@@ -71,7 +71,7 @@ test('ログインして解いた記録が、別の端末でログインして�
   // 記録画面にも出る
   await b.page.getByRole('navigation', { name: 'メインメニュー' }).getByRole('button', { name: '記録' }).click();
   await expect(b.page.getByRole('heading', { name: '最近の学習（日別）' })).toBeVisible();
-  await expect(b.page.locator('table').nth(1).locator('tbody tr')).toHaveCount(1);
+  await expect(b.page.getByTestId('day-col')).toHaveCount(1);
   // チェックと過去の正誤も引き継がれている
   await startDefaultSet(b.page);
   await expect(b.page.getByRole('button', { name: 'あとで見直すチェックを外す' })).toHaveAttribute('aria-pressed', 'true');

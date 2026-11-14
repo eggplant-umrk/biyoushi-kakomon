@@ -139,14 +139,7 @@ export function Explanation({ q, chosen = null }: { q: Question; chosen?: number
           {ex.asOf && <p className="small muted">{asOfLabel(ex.asOf)} 時点で確認</p>}
         </details>
       )}
-      <div className="report">
-        <button type="button" className="btn btn-ghost" disabled aria-describedby="report-note">
-          解説が分かりにくい／間違っているかも
-        </button>
-        <p id="report-note" className="small muted">
-          報告はログインすると使えます（準備中）
-        </p>
-      </div>
+      <p className="report small muted">解説が分かりにくい・間違っているかもしれないときの報告は、準備中です（ログインすると使えるようになります）。</p>
     </div>
   );
 }

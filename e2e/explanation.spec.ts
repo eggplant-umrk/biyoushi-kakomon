@@ -19,7 +19,7 @@ const pendingExam = exams
 async function enterAsGuest(page: Page) {
   await page.goto('./');
   await page.getByRole('button', { name: 'ログインせずに使う' }).click();
-  await page.getByRole('navigation', { name: 'メインメニュー' }).getByRole('button', { name: '出題' }).click();
+  await page.getByRole('navigation', { name: 'メインメニュー' }).getByRole('button', { name: '解く' }).click();
 }
 
 const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
