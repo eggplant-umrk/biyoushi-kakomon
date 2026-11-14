@@ -1,5 +1,5 @@
 import { RichText, safeHttpsUrl } from '../lib/markup';
-import { textbookLine } from '../lib/textbooks';
+import { bookOf, textbookLine } from '../lib/textbooks';
 import type { Question, SourceType, TextbookRef } from '../lib/types';
 
 const SOURCE_TYPE: Record<SourceType, string> = {
@@ -34,7 +34,7 @@ function TextbookRefs({ refs }: { refs: readonly TextbookRef[] }) {
           <span>
             {line}
             <span className="muted">
-              （{line.split(' ')[1]}の場合{r.via === 'toc' ? '。目次からの推定' : ''}）
+              （{bookOf(r.bookId)?.edition}の場合{r.via === 'toc' ? '。目次からの推定' : ''}）
             </span>
             <span className="textbook-title">「{r.title}」</span>
           </span>

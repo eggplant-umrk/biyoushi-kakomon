@@ -159,7 +159,18 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第1編 第3章",
+          "section": "第5節",
+          "title": "税金について",
+          "page": 42,
+          "via": "toc",
+          "confidence": "low"
+        }
+      ]
     },
     {
       "id": "43-09",
@@ -179,7 +190,27 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第2節",
+          "title": "社会保険① 〜公的年金〜",
+          "page": 64,
+          "via": "index",
+          "confidence": "medium"
+        },
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第3節",
+          "title": "社会保険② 〜医療保険〜",
+          "page": 68,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "43-10",
@@ -199,7 +230,18 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第4節",
+          "title": "社会保険③ 〜労働保険〜",
+          "page": 76,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "43-11",

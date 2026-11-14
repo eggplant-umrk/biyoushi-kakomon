@@ -203,15 +203,20 @@ function loadExplanations(examNo: number): Map<number, ExplanationSrc> {
   return byNo;
 }
 
-/** data-src/textbook-refs.json：{ "54-08": [参照…], "54-07": [] }。空の配列は「調べたが該当なし」（問題データには出さない） */
+/**
+ * data-src/textbook-refs.json：{ "refs": { "54-08": [参照…] }, "none": { "unei-2ed-2024": ["53-07", …] } }。
+ * none は教科書ごとの「調べたが、対応する内容がない」問題の記録で、問題データには出さない（scripts/textbook-refs.ts が書く）
+ */
 function loadTextbookRefs(): Map<string, TextbookRef[]> {
   const path = join(srcDir, 'textbook-refs.json');
   if (!existsSync(path)) return new Map();
-  return new Map(Object.entries(JSON.parse(readFileSync(path, 'utf8')) as Record<string, TextbookRef[]>));
+  const file = JSON.parse(readFileSync(path, 'utf8')) as { refs?: Record<string, TextbookRef[]> };
+  return new Map(Object.entries(file.refs ?? {}));
 }
 
 function main() {
   const textbookRefs = loadTextbookRefs();
+  const knownIds = new Set<string>();
   const exReview: ReviewRow[] = [];
   const exCount = { total: 0, high: 0, medium: 0, low: 0, draft: 0 };
   const dataErrors: string[] = [];
@@ -291,6 +296,7 @@ function main() {
           if (ex.confidence === 'low' && !review) dataErrors.push(`${q.id}: confidence が low なのに review（理由と確認してほしい点）がない`);
         }
       }
+      knownIds.add(q.id);
       const refs = textbookRefs.get(q.id);
       if (refs && refs.length > 0) q.textbookRefs = refs;
       for (const e of [...checkExplanation(q), ...checkTextbookRefs(q)]) dataErrors.push(`${q.id}: ${e}`);
@@ -305,6 +311,7 @@ function main() {
     console.log(`第${parsed.examNo}回: ${questions.length}問（ocrChecked: false ${questions.filter((q) => !q.ocrChecked).length}問）`);
   }
 
+  for (const id of textbookRefs.keys()) if (!knownIds.has(id)) dataErrors.push(`textbook-refs.json: ${id} は問題データにない`);
   if (dataErrors.length) {
     console.error(`解説・教科書の参照のエラー ${dataErrors.length}件`);
     for (const e of dataErrors) console.error(`  - ${e}`);

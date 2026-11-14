@@ -176,7 +176,27 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第1編 第3章",
+          "section": "第5節",
+          "title": "税金について",
+          "page": 42,
+          "via": "index",
+          "confidence": "medium"
+        },
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第1編 第3章",
+          "section": "第6節",
+          "title": "税金の申告",
+          "page": 44,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "47-09",
@@ -196,7 +216,18 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第1章",
+          "section": "第6節",
+          "title": "労働者の権利",
+          "page": 58,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "47-10",
@@ -233,7 +264,18 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第3節",
+          "title": "社会保険② 〜医療保険〜",
+          "page": 69,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "47-11",
