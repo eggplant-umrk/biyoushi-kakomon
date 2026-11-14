@@ -68,7 +68,9 @@ export function checkExplanation(q: Question): string[] {
     }
   }
 
-  // 一次情報の根拠がないまま high にしない（§6.7.1）
+  // 根拠の資料が1件もない問題は、解説サイト何件と一致していても low（§6.7.7）
+  if (ex.confidence === 'medium' && Array.isArray(ex.sources) && ex.sources.length === 0) errs.push('confidence が medium なのに sources がない（low にする）');
+  // 一次情報の根拠がないまま high にしない（§6.7.7）
   if (ex.confidence === 'high' && Array.isArray(ex.sources)) {
     if (ex.sources.length === 0) errs.push('confidence が high なのに sources がない');
     else if (q.fieldId === 'law' && !ex.sources.some((s) => s.type === 'law' || s.type === 'gov'))

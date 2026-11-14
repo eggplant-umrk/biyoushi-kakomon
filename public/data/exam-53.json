@@ -738,7 +738,7 @@
       "answer": 2,
       "images": [],
       "explanation": {
-        "summary": "認知症の高齢者は今後も増えると推計されているので、「減少する」とした(2)が誤りで正答。厚生労働省の資料では2022年の約443万人が、2040年には約584万人になると見込まれている。",
+        "summary": "認知症の高齢者は今後も増えると推計されているので、「減少する」とした(2)が誤りで正答。2022年の調査に基づく推計では、約443万人（2022年）から約584万人（2040年）へ増える見込み。",
         "perChoice": [
           "正しい。記憶や思考などの認知機能が低下し、日常生活に支障が出ている状態をいう。",
           "誤り。減少ではなく増加。2022年約443万人から2040年約584万人と推計されている。",
@@ -1490,6 +1490,11 @@
             "title": "厚生労働省『新型コロナウイルスの消毒・除菌方法について（厚生労働省・経済産業省・消費者庁特設ページ）』",
             "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/syoudoku_00001.html",
             "type": "gov"
+          },
+          {
+            "title": "製品評価技術基盤機構（NITE）『新型コロナウイルスに対する消毒方法の有効性評価について よくあるお問い合わせ』",
+            "url": "https://www.nite.go.jp/information/osirasefaq20200430.html",
+            "type": "gov"
           }
         ],
         "crossChecked": 1,
@@ -1651,7 +1656,7 @@
           }
         ],
         "crossChecked": 1,
-        "confidence": "medium",
+        "confidence": "high",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -1709,7 +1714,7 @@
           }
         ],
         "crossChecked": 1,
-        "confidence": "medium",
+        "confidence": "high",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -1752,7 +1757,7 @@
           }
         ],
         "crossChecked": 1,
-        "confidence": "medium",
+        "confidence": "high",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -1840,7 +1845,7 @@
           }
         ],
         "crossChecked": 1,
-        "confidence": "medium",
+        "confidence": "high",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -2314,10 +2319,15 @@
             "title": "日本化粧品技術者会 化粧品用語集『ニトロセルロース』",
             "url": "https://www.sccj-ifscc.com/library/glossary_detail/1203",
             "type": "academic"
+          },
+          {
+            "title": "小出美容専門学校『香粧品化学』（ヘアスプレーの皮膜形成剤）",
+            "url": "https://www.koide-beauty.ac.jp/_src/110376/2026kagaku.pdf",
+            "type": "edu"
           }
         ],
         "crossChecked": 1,
-        "confidence": "medium",
+        "confidence": "high",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -3102,7 +3112,7 @@
           }
         ],
         "crossChecked": 1,
-        "confidence": "medium",
+        "confidence": "high",
         "status": "published",
         "asOf": null,
         "caution": null
