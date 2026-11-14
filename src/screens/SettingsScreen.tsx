@@ -12,7 +12,7 @@ const FONT: [Settings['fontSize'], string][] = [
   ['xlarge', '特大'],
 ];
 const THEME: [Settings['theme'], string][] = [
-  ['system', '端末に合わせる'],
+  ['system', '自動'],
   ['light', 'ライト'],
   ['dark', 'ダーク'],
 ];
@@ -47,6 +47,7 @@ export function SettingsScreen() {
 
       <fieldset className="card">
         <legend className="card-title">画面の明るさ</legend>
+        <p className="small muted field-note">「自動」は、端末のライト・ダークの設定に合わせます。</p>
         <div className="segmented">
           {THEME.map(([v, label]) => (
             <label key={v} className="seg">

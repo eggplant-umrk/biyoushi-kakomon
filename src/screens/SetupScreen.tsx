@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 import { ErrorBox, Skeleton } from '../components/common';
-import { loadQuestions, loadExams } from '../lib/data';
-import { getAllProgress, saveSession } from '../lib/db';
+import { Icon } from '../components/Icon';
+import { loadExams } from '../lib/data';
 import { FIELDS } from '../lib/fields';
-import { navigate } from '../lib/router';
+import { startQuiz } from '../lib/quickstart';
 import {
   FILTER_LABELS,
-  selectQuestions,
   type CountOpt,
   type FilterOpt,
   type OrderOpt,
   type SetupOptions,
 } from '../lib/select';
-import { getSettings, updateSettings } from '../lib/settings';
+import { getSettings } from '../lib/settings';
 import type { ExamMeta, FieldId } from '../lib/types';
 
 const COUNTS: CountOpt[] = [10, 20, 30, 'all'];
@@ -46,27 +45,12 @@ export function SetupScreen() {
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
   }, []);
 
-  async function start() {
-    if (!opt) return;
+  async function start(o: SetupOptions | null = opt) {
+    if (!o) return;
     setBusy(true);
     setMessage(null);
     try {
-      const [all, progress] = await Promise.all([loadQuestions(opt.exams), getAllProgress()]);
-      const picked = selectQuestions(all, progress, opt);
-      if (picked.length === 0) {
-        setMessage('条件に合う問題がありません。条件を変えてください。');
-        return;
-      }
-      updateSettings({ lastSetup: opt });
-      await saveSession({
-        id: crypto.randomUUID(),
-        mode: 'practice',
-        questionIds: picked.map((q) => q.id),
-        answers: picked.map(() => null),
-        index: 0,
-        startedAt: Date.now(),
-      });
-      navigate('/quiz');
+      if ((await startQuiz(o, { remember: true })) === 'empty') setMessage('条件に合う問題がありません。条件を変えてください。');
     } catch (e) {
       setMessage(e instanceof Error ? e.message : String(e));
     } finally {
@@ -77,7 +61,7 @@ export function SetupScreen() {
   if (error) {
     return (
       <div className="screen">
-        <h1 className="screen-title">出題条件</h1>
+        <h1 className="screen-title">解く</h1>
         <ErrorBox>問題データを読み込めませんでした：{error}</ErrorBox>
       </div>
     );
@@ -86,22 +70,51 @@ export function SetupScreen() {
   if (!exams || !opt) {
     return (
       <div className="screen">
-        <h1 className="screen-title">出題条件</h1>
-        <Skeleton lines={6} />
+        <h1 className="screen-title">解く</h1>
+        <Skeleton lines={6} label="問題の一覧を読み込んでいます…" />
       </div>
     );
   }
 
   const set = (p: Partial<SetupOptions>) => setOpt({ ...opt, ...p });
   const canStart = opt.exams.length > 0 && opt.fields.length > 0 && !busy;
+  const last = getSettings().lastSetup;
+  const examLabel = (o: SetupOptions) =>
+    o.exams.length === exams.length ? 'すべての回' : o.exams.length === 1 ? `第${o.exams[0]}回` : `${o.exams.length}回分`;
+  const fieldLabel = (o: SetupOptions) => (o.fields.length === FIELDS.length ? '全分野' : `${o.fields.length}分野`);
+  const countLabel = (o: SetupOptions) => (o.count === 'all' ? '全部' : `${o.count}問`);
+  const summaryOf = (o: SetupOptions) => `${examLabel(o)}・${fieldLabel(o)}・${countLabel(o)}・${FILTER_LABELS[o.filter]}`;
 
   return (
-    <div className="screen has-bottom-bar">
-      <h1 className="screen-title">出題条件</h1>
+    <div className="screen has-bottom-bar setup">
+      <h1 className="screen-title">解く</h1>
+
+      {last && last.exams.some((n) => exams.some((e) => e.examNo === n)) && (
+        <button type="button" className="hero" disabled={busy} onClick={() => void start({ ...last, exams: last.exams.filter((n) => exams.some((e) => e.examNo === n)) })}>
+          <span className="hero-icon">
+            <Icon name="redo" />
+          </span>
+          <span className="hero-body">
+            <span className="hero-kicker">前回の条件で始める</span>
+            <span className="hero-main small">{summaryOf(last)}</span>
+          </span>
+          <Icon name="forward" className="hero-arrow" />
+        </button>
+      )}
+
+      <h2 className="section-title">条件を選んで始める</h2>
 
       <fieldset className="card">
         <legend className="card-title">回（複数選択）</legend>
-        <div className="chips">
+        <div className="chip-actions">
+          <button type="button" className="link-btn" onClick={() => set({ exams: exams.slice(0, 1).map((e) => e.examNo) })}>
+            最新の回だけ
+          </button>
+          <button type="button" className="link-btn" onClick={() => set({ exams: exams.map((e) => e.examNo) })}>
+            すべての回
+          </button>
+        </div>
+        <div className="chips chips-grid">
           {exams.map((e) => (
             <label key={e.examNo} className="chip">
               <input
@@ -193,6 +206,9 @@ export function SetupScreen() {
       )}
 
       <div className="bottom-bar with-tabs">
+        <p className="bottom-bar-note small" aria-live="polite">
+          {opt.exams.length === 0 ? '回を1つ以上選んでください' : opt.fields.length === 0 ? '分野を1つ以上選んでください' : summaryOf(opt)}
+        </p>
         <button type="button" className="btn btn-primary" disabled={!canStart} onClick={() => void start()}>
           {busy ? '準備中…' : 'この条件で始める'}
         </button>

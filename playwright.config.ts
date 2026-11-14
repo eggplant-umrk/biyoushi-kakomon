@@ -16,6 +16,8 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}/biyoushi-kakomon/`,
     trace: 'retain-on-failure',
     serviceWorkers: 'block',
+    // 初回の説明（Onboarding）は見たことにしておく。説明そのものは e2e/ui.spec.ts で確かめる
+    storageState: 'e2e/storage-state.json',
   },
   projects: [
     { name: 'iPhone', use: { ...devices['iPhone 15'] } },

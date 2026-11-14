@@ -44,6 +44,28 @@ export function summarize(progress: Iterable<ProgressRec>, days: readonly DayRec
   };
 }
 
+export interface ExamStat {
+  examNo: number;
+  /** 一度でも解いた問題の数 */
+  seen: number;
+  answered: number;
+  correct: number;
+}
+
+/** 回別の成績（新しい回から）。解いていない回も、seen 0 で含める */
+export function byExam(progress: Iterable<ProgressRec>, examNos: readonly number[]): ExamStat[] {
+  const by = new Map<number, ExamStat>(examNos.map((n) => [n, { examNo: n, seen: 0, answered: 0, correct: 0 }]));
+  for (const p of progress) {
+    if (!p.attempts) continue;
+    const s = by.get(Number(p.id.split('-')[0]));
+    if (!s) continue;
+    s.seen += 1;
+    s.answered += p.attempts;
+    s.correct += p.correctCount;
+  }
+  return [...by.values()].sort((a, b) => b.examNo - a.examNo);
+}
+
 export function pct(correct: number, answered: number): string {
   return answered ? `${Math.round((correct / answered) * 100)}%` : '—';
 }

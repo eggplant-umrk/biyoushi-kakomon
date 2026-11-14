@@ -171,7 +171,7 @@ export async function answerQuestions(page: Page, count: number): Promise<void> 
 }
 
 export async function startDefaultSet(page: Page): Promise<void> {
-  await page.getByRole('navigation', { name: 'メインメニュー' }).getByRole('button', { name: '出題' }).click();
+  await page.getByRole('navigation', { name: 'メインメニュー' }).getByRole('button', { name: '解く' }).click();
   await page.getByRole('button', { name: 'この条件で始める' }).click();
   await expect(page).toHaveURL(/#\/quiz$/);
 }
