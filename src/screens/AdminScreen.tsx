@@ -10,7 +10,6 @@ import {
   recentAnswered,
   RECENT_DAYS,
   SERIES_DAYS,
-  WEAK_MIN_ATTEMPTS,
   WEAK_QUIZ_MAX,
   WEAK_SHOWN,
   weakQuestions,
@@ -307,7 +306,7 @@ function UserDetail({ user, reloadKey }: { user: AdminUserData; reloadKey: numbe
         <h2 id="admin-weak" className="card-title">
           苦手問題
         </h2>
-        <p className="small muted">{WEAK_MIN_ATTEMPTS}回以上解いて、間違えたことのある問題です。正答率の低い順に並べています。</p>
+        <p className="small muted">直近の解答が不正解だった問題です。正答率の低い順に並べています。</p>
         {error ? (
           <p className="small error-text" role="alert">
             問題ごとの記録を読み込めませんでした。「利用者の一覧へ」戻って「最新の状態に更新」を押してください。
@@ -316,7 +315,7 @@ function UserDetail({ user, reloadKey }: { user: AdminUserData; reloadKey: numbe
           <Skeleton lines={4} />
         ) : weak.length === 0 ? (
           <p className="muted" data-testid="admin-weak-empty">
-            まだありません（同じ問題を{WEAK_MIN_ATTEMPTS}回以上解くと、ここに出ます）。
+            まだありません（直近の解答が不正解の問題が、ここに出ます）。
           </p>
         ) : (
           <>

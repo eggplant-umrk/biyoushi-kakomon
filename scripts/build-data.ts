@@ -1,6 +1,8 @@
 /**
  * data-src/exam-{回}.txt（読み取り結果）と data-src/check-{回}.txt（二重チェック）から、
  * public/data/exam-{回}.json・public/data/exams.json・docs/ocr-review.md を作る（SPEC §5 / §6.1）。
+ * data-src/explanations/exam-{回}.json（解説）と data-src/textbook-refs.json（教科書の参照）があれば問題に付け、
+ * docs/explanation-review.md（解説の確認待ち）を作る（SPEC §6.7）。
  *
  * - id・fieldId・polarity は自動で付ける（手入力のミスを減らすため）
  * - 二重チェックと正答・選択肢の数が食い違う問題、!ocr を付けた問題は ocrChecked: false にする
@@ -11,8 +13,9 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkExplanation, checkTextbookRefs } from '../src/lib/explanationCheck.ts';
 import { fieldOfNo } from '../src/lib/fields.ts';
-import type { ExamMeta, Question, Statement } from '../src/lib/types.ts';
+import type { ExamMeta, Explanation, Question, Statement, TextbookRef } from '../src/lib/types.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const srcDir = join(root, 'data-src');
@@ -174,7 +177,44 @@ export function parseCheck(text: string): CheckRow[] {
   return rows;
 }
 
+/** data-src/explanations/exam-{回}.json の1問ぶん。review は確認待ちの一覧（docs/explanation-review.md）にだけ出す */
+interface ExplanationSrc extends Explanation {
+  no: number;
+  review: { reason: string; ask: string } | null;
+}
+
+interface ReviewRow {
+  examNo: number;
+  no: number;
+  confidence: string;
+  reason: string;
+  ask: string;
+}
+
+function loadExplanations(examNo: number): Map<number, ExplanationSrc> {
+  const path = join(srcDir, 'explanations', `exam-${examNo}.json`);
+  if (!existsSync(path)) return new Map();
+  const list = JSON.parse(readFileSync(path, 'utf8')) as ExplanationSrc[];
+  const byNo = new Map<number, ExplanationSrc>();
+  for (const e of list) {
+    if (byNo.has(e.no)) throw new ParseError(`explanations/exam-${examNo}.json: 問${e.no} が重複`);
+    byNo.set(e.no, e);
+  }
+  return byNo;
+}
+
+/** data-src/textbook-refs.json：{ "54-08": [参照…], "54-07": [] }。空の配列は「調べたが該当なし」（問題データには出さない） */
+function loadTextbookRefs(): Map<string, TextbookRef[]> {
+  const path = join(srcDir, 'textbook-refs.json');
+  if (!existsSync(path)) return new Map();
+  return new Map(Object.entries(JSON.parse(readFileSync(path, 'utf8')) as Record<string, TextbookRef[]>));
+}
+
 function main() {
+  const textbookRefs = loadTextbookRefs();
+  const exReview: ReviewRow[] = [];
+  const exCount = { total: 0, high: 0, medium: 0, low: 0, draft: 0 };
+  const dataErrors: string[] = [];
   const files = readdirSync(srcDir)
     .filter((f) => /^exam-\d+\.txt$/.test(f))
     .sort();
@@ -214,6 +254,48 @@ function main() {
       }
     }
 
+    // 解説と教科書の参照を付ける
+    const explanations = loadExplanations(parsed.examNo);
+    for (const no of explanations.keys()) {
+      if (!parsed.questions.some((q) => q.no === no)) dataErrors.push(`explanations/exam-${parsed.examNo}.json: 問${no} は問題データにない`);
+    }
+    for (const q of parsed.questions) {
+      const src = explanations.get(q.no);
+      if (src) {
+        const { no: _no, review, ...ex } = src;
+        // フィールドの順番をそろえる（差分を読みやすくするため）
+        q.explanation = {
+          summary: ex.summary,
+          perChoice: ex.perChoice,
+          perStatement: ex.perStatement ?? null,
+          traps: ex.traps,
+          keyPoint: ex.keyPoint ?? null,
+          sources: ex.sources,
+          crossChecked: ex.crossChecked,
+          confidence: ex.confidence,
+          status: ex.status,
+          asOf: ex.asOf ?? null,
+          caution: ex.caution ?? null,
+        };
+        exCount.total += 1;
+        exCount[ex.confidence] += 1;
+        if (ex.status === 'draft') exCount.draft += 1;
+        if (review || ex.confidence === 'low') {
+          exReview.push({
+            examNo: q.examNo,
+            no: q.no,
+            confidence: ex.confidence,
+            reason: review?.reason ?? '（理由が書かれていない）',
+            ask: review?.ask ?? '（確認してほしい点が書かれていない）',
+          });
+          if (ex.confidence === 'low' && !review) dataErrors.push(`${q.id}: confidence が low なのに review（理由と確認してほしい点）がない`);
+        }
+      }
+      const refs = textbookRefs.get(q.id);
+      if (refs && refs.length > 0) q.textbookRefs = refs;
+      for (const e of [...checkExplanation(q), ...checkTextbookRefs(q)]) dataErrors.push(`${q.id}: ${e}`);
+    }
+
     const questions: Question[] = parsed.questions.map(({ page: _p, ocrReasons: _r, ...q }) => q);
     writeFileSync(
       join(outDir, `exam-${parsed.examNo}.json`),
@@ -221,6 +303,12 @@ function main() {
     );
     metas.push({ examNo: parsed.examNo, year: parsed.year, month: parsed.month, questionCount: questions.length });
     console.log(`第${parsed.examNo}回: ${questions.length}問（ocrChecked: false ${questions.filter((q) => !q.ocrChecked).length}問）`);
+  }
+
+  if (dataErrors.length) {
+    console.error(`解説・教科書の参照のエラー ${dataErrors.length}件`);
+    for (const e of dataErrors) console.error(`  - ${e}`);
+    process.exit(1);
   }
 
   metas.sort((a, b) => b.examNo - a.examNo);
@@ -250,6 +338,30 @@ function main() {
   writeFileSync(join(root, 'docs', 'ocr-review.md'), md);
   writeFileSync(join(root, 'docs', 'ocr-review.html'), reviewHtml(review, reviewQuestions));
   console.log(`図を使った問題: ${figures}問 / OCR確認待ち: ${review.length}件`);
+
+  // docs/explanation-review.md
+  exReview.sort((a, b) => b.examNo - a.examNo || a.no - b.no);
+  const cell = (v: string) => v.replace(/\|/g, '｜').replace(/\s+/g, ' ');
+  const LEVEL: Record<string, string> = { high: '高', medium: '中', low: '低' };
+  const exMd = [
+    '# 解説の確認待ちの一覧',
+    '',
+    '`scripts/build-data.ts` が `data-src/explanations/exam-{回}.json` の `review` から自動で作るファイルです（手で編集しないでください）。',
+    '',
+    '確信度が低い問題、一次情報の出典が見つからなかった問題、正答に疑いがある問題、教科書でしか確かめられない問題の一覧です（SPEC §6.7）。',
+    '確認できたら、`data-src/explanations/exam-{回}.json` の該当問題の解説を直し、`confidence` を上げて `review` を `null` にし、`node scripts/build-data.ts` を実行してください。',
+    '確信度が「低」の解説には、アプリで「この解説は確認中です」と表示されます。',
+    '',
+    `解説のある問題: ${exCount.total}問（確信度 高 ${exCount.high}・中 ${exCount.medium}・低 ${exCount.low}）／確認待ち: ${exReview.length}問`,
+    '',
+    '| 回 | 問題 | 確信度 | 理由 | 確認してほしい点 |',
+    '|---|---|---|---|---|',
+    ...exReview.map((r) => `| 第${r.examNo}回 | 問${r.no} | ${LEVEL[r.confidence] ?? r.confidence} | ${cell(r.reason)} | ${cell(r.ask)} |`),
+    '',
+  ].join('\n');
+  writeFileSync(join(root, 'docs', 'explanation-review.md'), exMd);
+  const refCount = [...textbookRefs.values()].filter((r) => r.length > 0).length;
+  console.log(`解説: ${exCount.total}問（高 ${exCount.high}・中 ${exCount.medium}・低 ${exCount.low}・下書き ${exCount.draft}）/ 解説の確認待ち: ${exReview.length}問 / 教科書の参照: ${refCount}問`);
 }
 
 /**

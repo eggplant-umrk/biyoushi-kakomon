@@ -51,3 +51,51 @@ python scripts/data/check-strips.py 54         # raw/check/（二重チェック
 python scripts/data/crop-figure.py 54 22 440 590 800 925 --name 54-47   # 図を WebP で切り出す
 node scripts/build-data.ts && node scripts/validate.ts
 ```
+
+## explanations/exam-{回}.json（解説。SPEC §6.7）
+
+1回分の解説を、問題ごとのオブジェクトの配列で書く。`node scripts/build-data.ts` が `public/data/exam-{回}.json` の `explanation` に入れる。
+解説のない問題は書かなくてよい（`explanation: null` のままになり、画面には「解説準備中」と出る）。
+
+```json
+{
+  "no": 1,
+  "summary": "最初の1文で、なぜその選択肢が正答かを言い切る。2〜4文。",
+  "perChoice": ["(1)の説明", "(2)の説明", "(3)の説明", "(4)の説明"],
+  "perStatement": null,
+  "traps": ["選択肢にそのまま出てくる、誤りの原因の語句"],
+  "keyPoint": "ここだけ覚える1〜2行（なければ null）",
+  "sources": [{ "title": "美容師法 第3条", "url": "https://laws.e-gov.go.jp/law/332AC1000000163", "type": "law" }],
+  "crossChecked": 1,
+  "confidence": "high",
+  "status": "published",
+  "asOf": "2026-11",
+  "caution": null,
+  "review": null
+}
+```
+
+- `perStatement`：a〜d の組合せ問題だけ。記述ごとの説明を、記述と同じ数だけ書く。
+- `traps`：選択肢・記述にそのまま出てくる語句だけ（出てこない語句はエラー）。解答後に、問題と解説の中で強調される。
+- `sources`：実際に開いて確かめた資料だけ。`type` は `law`・`gov`・`academic`・`edu`。解説サイト（`site`）は結論の照合にだけ使い、ここには入れない（エラー）。
+- `asOf`・`caution`：法令・統計・制度など時点で変わる内容を確認した年月と、「出題時は○○、現在は△△」の注記。解答後に解説の中で表示する。
+- `review`：確信度が低い・出典が見つからない・正答に疑いがある・教科書でしか確かめられないときに `{ "reason": "…", "ask": "確認してほしい点" }` を書く。
+  問題データには入らず、`docs/explanation-review.md` に一覧で出る。`confidence` が `low` のときは必須。
+
+## textbook-refs.json（教科書の参照。SPEC §14）
+
+問題ごとの、教科書の参照先。キーは問題の id。空の配列は「調べたが、対応する内容がなかった」という記録で、問題データには出ない。
+
+```json
+{
+  "54-08": [
+    { "bookId": "unei-2ed-2024", "chapter": "第2編 第2章", "section": "第3節", "title": "節の見出し", "page": 68, "via": "index", "confidence": "high" }
+  ],
+  "54-07": []
+}
+```
+
+- `bookId` は `src/lib/textbooks.ts` の一覧にあるもの（版と発行年を含む）。
+- `via`：`index`＝索引に語があり、そのページを使った（節は目次で決める）／`toc`＝索引になく、目次から節を推定した（`confidence` は `low` にする。`page` は節の開始ページ）。
+- **教科書の本文、目次・索引の全文は、ここにもリポジトリのどこにも書かない**（私的使用以外のデジタル化が認められていないため）。書くのは、問題ごとの節の見出しとページだけ。
+- 教科書の写真は `textbook-src/`（コミットしない）に置く。

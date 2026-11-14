@@ -5,12 +5,14 @@
  * - `fieldId` と問題番号が一致、`id` が正規表現に合い、回・番号と一致
  * - `polarity`・`statements` の形、下線記法 [[u:…]] の閉じ忘れ、図のファイルの存在
  * - exams.json の一覧と各回のファイルが一致
+ * - 解説（SPEC §6.7.5）と教科書の参照（§14）の形（ない問題は explanation: null のままでよい）
  *
  * 使い方: node scripts/validate.ts [--expect 41-54]
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkExplanation, checkTextbookRefs } from '../src/lib/explanationCheck.ts';
 import { fieldOfNo, QID_PATTERN } from '../src/lib/fields.ts';
 import type { ExamFile, ExamMeta } from '../src/lib/types.ts';
 
@@ -27,6 +29,7 @@ const expectRange = expectArg > 0 ? process.argv[expectArg + 1] : undefined;
 const metas = JSON.parse(readFileSync(join(dataDir, 'exams.json'), 'utf8')) as ExamMeta[];
 const seenExam = new Set<number>();
 let total = 0;
+let withExplanation = 0;
 
 if (expectRange) {
   const [a, b] = expectRange.split('-').map(Number);
@@ -96,7 +99,10 @@ for (const meta of metas) {
       if (!/^images\/\d+\/[\w-]+\.webp$/.test(img)) err(`${at}: 図のパスが不正: ${img}`);
       else if (!existsSync(join(root, 'public', img))) err(`${at}: 図のファイルがない: ${img}`);
     }
-    if (q.explanation !== null && typeof q.explanation !== 'object') err(`${at}: explanation が不正`);
+    if (q.explanation === undefined) err(`${at}: explanation がない（解説のない問題は null にする）`);
+    else for (const e of checkExplanation(q)) err(`${at}: ${e}`);
+    for (const e of checkTextbookRefs(q)) err(`${at}: ${e}`);
+    if (q.explanation) withExplanation += 1;
     if (typeof q.ocrChecked !== 'boolean') err(`${at}: ocrChecked が boolean ではない`);
   }
   for (let i = 1; i <= QUESTIONS_PER_EXAM; i++) if (!nos.has(i)) err(`${p}: 問${i} がない`);
@@ -107,4 +113,4 @@ if (errors.length) {
   for (const e of errors) console.error(`  - ${e}`);
   process.exit(1);
 }
-console.log(`OK: ${metas.length}回・${total}問`);
+console.log(`OK: ${metas.length}回・${total}問（解説あり ${withExplanation}問）`);

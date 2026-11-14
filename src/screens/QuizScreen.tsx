@@ -181,6 +181,8 @@ export function QuizScreen() {
   const checked = p?.checked ?? false;
   const field = fieldById(q.fieldId);
   const correct = isCorrectChoice(q, chosen);
+  // 解答したあとだけ、誤りの原因になっている語句を問題の中でも強調する（解答前に見えると答えが分かってしまう）
+  const shownTraps = answered && q.explanation?.status === 'published' ? q.explanation.traps : [];
 
   return (
     <div className="screen quiz has-bottom-bar" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -252,7 +254,7 @@ export function QuizScreen() {
               <li key={s.label}>
                 <span className="st-label">{s.label}</span>
                 <span>
-                  <RichText text={s.text} />
+                  <RichText text={s.text} traps={shownTraps} />
                 </span>
               </li>
             ))}
@@ -276,6 +278,7 @@ export function QuizScreen() {
       </section>
 
       <ul className="choices" aria-label="選択肢">
+        {/* 解答したあとは、誤りの原因になっている語句（traps）を選択肢の中でも強調する（SPEC §6.7.3） */}
         {q.choices.map((c, i) => {
           const n = i + 1;
           const isAnswer = n === q.answer || (q.altAnswers ?? []).includes(n);
@@ -304,7 +307,7 @@ export function QuizScreen() {
               >
                 <span className="choice-no">{CHOICE_LABELS[i]}</span>
                 <span className="choice-text">
-                  <RichText text={c} />
+                  <RichText text={c} traps={shownTraps} />
                 </span>
                 {mark && <span className="choice-mark">{mark}</span>}
               </button>
@@ -329,7 +332,7 @@ export function QuizScreen() {
               : `不正解　正答は ${[q.answer, ...(q.altAnswers ?? [])].map((n) => CHOICE_LABELS[n - 1] ?? '').join('・')}`}
           </p>
           )}
-          <Explanation q={q} />
+          <Explanation q={q} chosen={chosen} />
         </section>
       )}
 
