@@ -88,6 +88,9 @@ describe('checkExplanation', () => {
     expect(checkExplanation(question({ explanation: edu }))).not.toEqual([]); // 法規は法令か官公庁が必要
     expect(checkExplanation(question({ id: '54-41', no: 41, fieldId: 'theory', explanation: edu }))).toEqual([]);
     expect(checkExplanation(question({ explanation: { ...edu, confidence: 'medium' } }))).toEqual([]);
+    // 根拠の資料が0件なら、中にもできない（低にする）
+    expect(checkExplanation(question({ explanation: ex({ sources: [], confidence: 'medium' }) }))).not.toEqual([]);
+    expect(checkExplanation(question({ explanation: ex({ sources: [], confidence: 'low' }) }))).toEqual([]);
   });
 
   it('asOf は YYYY-MM。caution には asOf が必要', () => {
