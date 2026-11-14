@@ -336,7 +336,7 @@ function main() {
     '',
   ].join('\n');
   writeFileSync(join(root, 'docs', 'ocr-review.md'), md);
-  writeFileSync(join(root, 'docs', 'ocr-review.html'), reviewHtml(review, reviewQuestions));
+  writeFileSync(join(root, 'docs', 'ocr-review.html'), reviewHtml(review, reviewQuestions, loadFigureMarks()));
   console.log(`図を使った問題: ${figures}問 / OCR確認待ち: ${review.length}件`);
 
   // docs/explanation-review.md
@@ -369,9 +369,32 @@ function main() {
  * 切り出し・〇印消去後の図（public/images）を横に並べる確認用ページ。
  * ローカルでファイルを直接開いて使う（raw/ はコミットしないので、公開先では画像が出ない）。
  */
+/** data-src/figure-marks.json：図の中の〇印の消し跡の検査結果（python scripts/data/check-figure-marks.py が書く） */
+interface FigureMark {
+  id: string;
+  exam: number;
+  no: number;
+  image: string;
+  status: 'clean' | 'residue' | 'nomark' | 'unknown';
+  mode?: 'plain' | 'texture';
+  brightDiff?: number;
+  darkRatio?: number;
+  roughDiff?: number;
+  fixed?: boolean;
+  before?: { brightDiff?: number; darkRatio?: number; roughDiff?: number };
+  reason?: string;
+  note?: string;
+}
+
+function loadFigureMarks(): FigureMark[] {
+  const path = join(srcDir, 'figure-marks.json');
+  return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as FigureMark[]) : [];
+}
+
 function reviewHtml(
   review: { examNo: number; no: number; reason: string; page: number }[],
   questions: Map<string, Question>,
+  marks: FigureMark[],
 ): string {
   const esc = (v: string) =>
     v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -400,6 +423,38 @@ function reviewHtml(
   </div>
 </section>`;
   });
+  // 図の中の〇印の消し跡：PDF の元の図（〇印あり）と、処理前後の図（〇印のあたりを拡大し、明るさ・コントラストを上げたもの）を並べる
+  const STATUS: Record<FigureMark['status'], string> = { clean: '跡なし', residue: '跡あり', nomark: 'この図に〇印はない', unknown: '判定できず' };
+  const num = (m: { brightDiff?: number; darkRatio?: number; roughDiff?: number } | undefined) =>
+    m && m.brightDiff !== undefined
+      ? `明るさの差 ${m.brightDiff}／${m.roughDiff !== undefined ? `ざらつきの差 ${m.roughDiff}` : `濃い画素の割合 ${m.darkRatio ?? 0}`}`
+      : '—';
+  const shot = (id: string, name: string, alt: string) =>
+    `<figure><a href="../raw/marks/${esc(id)}-${name}.png"><img src="../raw/marks/${esc(id)}-${name}.png" alt="${esc(alt)}" loading="lazy"></a><figcaption>${esc(alt)}</figcaption></figure>`;
+  const markSections = marks.map((m) => {
+    const head = `<h3 id="m${esc(m.id)}">第${m.exam}回 問${m.no}（${esc(m.id)}）— <span class="st-${m.status}">${STATUS[m.status]}</span>${m.fixed ? '（今回、処理をやり直した）' : ''}</h3>`;
+    if (m.status === 'nomark') return `${head}<p class="none">この図に〇印はありません（同じ問題の別の図にあります）。</p>`;
+    const nums = `<p class="path">検査の値：${num(m)}${m.before ? `（やり直す前：${num(m.before)}）` : ''}${m.mode === 'texture' ? '　※〇印が網点の上にある図' : ''}${m.note ? `　${esc(m.note)}` : ''}${m.reason ? `　${esc(m.reason)}` : ''}</p>`;
+    return `${head}${nums}<div class="marks">
+${shot(m.id, 'original-zoom', 'PDF の元の図（〇印あり）')}
+${shot(m.id, 'before-bright', '処理前：明るさを上げた')}
+${shot(m.id, 'before-contrast', '処理前：コントラストを上げた')}
+${shot(m.id, 'after-bright', '処理後：明るさを上げた')}
+${shot(m.id, 'after-contrast', '処理後：コントラストを上げた')}
+<figure><a href="../public/${esc(m.image.replace(/^public\//, ''))}"><img class="whole" src="../public/${esc(m.image.replace(/^public\//, ''))}" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>`;
+  });
+  const markCount = (st: FigureMark['status']) => marks.filter((m) => m.status === st).length;
+  const marksHtml = marks.length
+    ? `<h2 id="marks">図の中の〇印の消し跡の確認（${marks.length}枚）</h2>
+<p>図の中に正答の〇印が描かれていた問題です。〇印を画像処理で消した跡（薄い輪・点線・線の欠け）が残ると、図を見ただけで正答が分かってしまいます。
+<code>python scripts/data/check-figure-marks.py</code> が、PDF の〇印の位置と切り出した図を見比べて自動で調べます（<code>--fix</code> で処理をやり直します）。
+結果：跡なし ${markCount('clean')}枚／跡あり ${markCount('residue')}枚／〇印のない図 ${markCount('nomark')}枚／判定できず ${markCount('unknown')}枚。
+下の画像は、〇印のあたりを拡大したものです（<code>raw/marks/</code>。スクリプトを実行すると作られます）。「処理前」は、最後に <code>--fix</code> を実行する前の図です。
+〇印が網点の上にある図（第54回 問50）は、自動では直さず、手作業で直しています。</p>
+<nav>${marks.map((m) => `<a href="#m${esc(m.id)}">${esc(m.id)}</a>`).join('')}</nav>
+${markSections.join('\n')}`
+    : '';
   return `<!doctype html>
 <html lang="ja">
 <head>
@@ -418,6 +473,12 @@ function reviewHtml(
   .pair img { max-width: 100%; border: 1px solid #ccc; background: #fff; }
   .path, .none { font-size: 12px; color: #777; margin: 2px 0 8px; }
   .ans { font-weight: bold; color: #0a6b2d; }
+  .marks { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 10px; }
+  .marks figure { margin: 0; }
+  .marks img { max-height: 260px; max-width: 320px; border: 1px solid #ccc; background: #fff; image-rendering: pixelated; }
+  .marks img.whole { image-rendering: auto; }
+  .marks figcaption { font-size: 12px; color: #555; }
+  .st-clean { color: #0a6b2d; } .st-residue, .st-unknown { color: #a03030; } .st-nomark { color: #777; }
   @media (max-width: 800px) { .pair { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -427,6 +488,7 @@ function reviewHtml(
 問題がなければ data-src/exam-{回}.txt の該当問題から !ocr の行を消し、node scripts/build-data.ts を実行します。画像はクリックで原寸表示。</p>
 <nav>${keys.map((k) => `<a href="#q${k}">${k.replace('-', '回 問')}</a>`).join('')}</nav>
 ${sections.join('\n')}
+${marksHtml}
 </body>
 </html>
 `;

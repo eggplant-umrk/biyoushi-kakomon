@@ -16,6 +16,12 @@
   .pair img { max-width: 100%; border: 1px solid #ccc; background: #fff; }
   .path, .none { font-size: 12px; color: #777; margin: 2px 0 8px; }
   .ans { font-weight: bold; color: #0a6b2d; }
+  .marks { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 10px; }
+  .marks figure { margin: 0; }
+  .marks img { max-height: 260px; max-width: 320px; border: 1px solid #ccc; background: #fff; image-rendering: pixelated; }
+  .marks img.whole { image-rendering: auto; }
+  .marks figcaption { font-size: 12px; color: #555; }
+  .st-clean { color: #0a6b2d; } .st-residue, .st-unknown { color: #a03030; } .st-nomark { color: #777; }
   @media (max-width: 800px) { .pair { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -169,5 +175,133 @@
     <div><h3>切り出し・〇印消去後</h3><a href="../public/images/41/41-49.webp"><img src="../public/images/41/41-49.webp" alt="処理後の図 images/41/41-49.webp"></a><p class="path">public/images/41/41-49.webp</p><h3>登録した内容</h3><p class="stem">下図はピンカールのピンを取ったところを表したものである。このカールウェーブをつくるためのピンカールは、次のうちどれか。</p><ol><li>(1)の図</li><li class="ans">(2)の図　← 正答として登録</li><li>(3)の図</li><li>(4)の図</li></ol></div>
   </div>
 </section>
+<h2 id="marks">図の中の〇印の消し跡の確認（16枚）</h2>
+<p>図の中に正答の〇印が描かれていた問題です。〇印を画像処理で消した跡（薄い輪・点線・線の欠け）が残ると、図を見ただけで正答が分かってしまいます。
+<code>python scripts/data/check-figure-marks.py</code> が、PDF の〇印の位置と切り出した図を見比べて自動で調べます（<code>--fix</code> で処理をやり直します）。
+結果：跡なし 15枚／跡あり 0枚／〇印のない図 1枚／判定できず 0枚。
+下の画像は、〇印のあたりを拡大したものです（<code>raw/marks/</code>。スクリプトを実行すると作られます）。「処理前」は、最後に <code>--fix</code> を実行する前の図です。
+〇印が網点の上にある図（第54回 問50）は、自動では直さず、手作業で直しています。</p>
+<nav><a href="#m41-43">41-43</a><a href="#m41-49">41-49</a><a href="#m42-42">42-42</a><a href="#m43-53">43-53</a><a href="#m44-49">44-49</a><a href="#m45-43">45-43</a><a href="#m46-48">46-48</a><a href="#m48-43">48-43</a><a href="#m48-51">48-51</a><a href="#m48-51-2">48-51-2</a><a href="#m51-50">51-50</a><a href="#m51-51">51-51</a><a href="#m51-53">51-53</a><a href="#m52-41">52-41</a><a href="#m52-53">52-53</a><a href="#m54-50">54-50</a></nav>
+<h3 id="m41-43">第41回 問43（41-43）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -3.75／濃い画素の割合 0.0179）</p><div class="marks">
+<figure><a href="../raw/marks/41-43-original-zoom.png"><img src="../raw/marks/41-43-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/41-43-before-bright.png"><img src="../raw/marks/41-43-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/41-43-before-contrast.png"><img src="../raw/marks/41-43-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/41-43-after-bright.png"><img src="../raw/marks/41-43-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/41-43-after-contrast.png"><img src="../raw/marks/41-43-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/41/41-43.webp"><img class="whole" src="../public/images/41/41-43.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m41-49">第41回 問49（41-49）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -3.66／濃い画素の割合 0.0042）</p><div class="marks">
+<figure><a href="../raw/marks/41-49-original-zoom.png"><img src="../raw/marks/41-49-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/41-49-before-bright.png"><img src="../raw/marks/41-49-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/41-49-before-contrast.png"><img src="../raw/marks/41-49-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/41-49-after-bright.png"><img src="../raw/marks/41-49-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/41-49-after-contrast.png"><img src="../raw/marks/41-49-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/41/41-49.webp"><img class="whole" src="../public/images/41/41-49.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m42-42">第42回 問42（42-42）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -4.07／濃い画素の割合 0.0165）</p><div class="marks">
+<figure><a href="../raw/marks/42-42-original-zoom.png"><img src="../raw/marks/42-42-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/42-42-before-bright.png"><img src="../raw/marks/42-42-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/42-42-before-contrast.png"><img src="../raw/marks/42-42-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/42-42-after-bright.png"><img src="../raw/marks/42-42-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/42-42-after-contrast.png"><img src="../raw/marks/42-42-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/42/42-42.webp"><img class="whole" src="../public/images/42/42-42.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m43-53">第43回 問53（43-53）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -3.94／濃い画素の割合 0.0049）</p><div class="marks">
+<figure><a href="../raw/marks/43-53-original-zoom.png"><img src="../raw/marks/43-53-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/43-53-before-bright.png"><img src="../raw/marks/43-53-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/43-53-before-contrast.png"><img src="../raw/marks/43-53-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/43-53-after-bright.png"><img src="../raw/marks/43-53-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/43-53-after-contrast.png"><img src="../raw/marks/43-53-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/43/43-53.webp"><img class="whole" src="../public/images/43/43-53.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m44-49">第44回 問49（44-49）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -3.39／濃い画素の割合 0.0139）</p><div class="marks">
+<figure><a href="../raw/marks/44-49-original-zoom.png"><img src="../raw/marks/44-49-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/44-49-before-bright.png"><img src="../raw/marks/44-49-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/44-49-before-contrast.png"><img src="../raw/marks/44-49-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/44-49-after-bright.png"><img src="../raw/marks/44-49-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/44-49-after-contrast.png"><img src="../raw/marks/44-49-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/44/44-49.webp"><img class="whole" src="../public/images/44/44-49.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m45-43">第45回 問43（45-43）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -6.27／濃い画素の割合 0.0255）</p><div class="marks">
+<figure><a href="../raw/marks/45-43-original-zoom.png"><img src="../raw/marks/45-43-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/45-43-before-bright.png"><img src="../raw/marks/45-43-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/45-43-before-contrast.png"><img src="../raw/marks/45-43-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/45-43-after-bright.png"><img src="../raw/marks/45-43-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/45-43-after-contrast.png"><img src="../raw/marks/45-43-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/45/45-43.webp"><img class="whole" src="../public/images/45/45-43.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m46-48">第46回 問48（46-48）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -3.48／濃い画素の割合 0.0294）</p><div class="marks">
+<figure><a href="../raw/marks/46-48-original-zoom.png"><img src="../raw/marks/46-48-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/46-48-before-bright.png"><img src="../raw/marks/46-48-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/46-48-before-contrast.png"><img src="../raw/marks/46-48-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/46-48-after-bright.png"><img src="../raw/marks/46-48-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/46-48-after-contrast.png"><img src="../raw/marks/46-48-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/46/46-48.webp"><img class="whole" src="../public/images/46/46-48.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m48-43">第48回 問43（48-43）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -1.86／濃い画素の割合 0.0023）</p><div class="marks">
+<figure><a href="../raw/marks/48-43-original-zoom.png"><img src="../raw/marks/48-43-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/48-43-before-bright.png"><img src="../raw/marks/48-43-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/48-43-before-contrast.png"><img src="../raw/marks/48-43-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/48-43-after-bright.png"><img src="../raw/marks/48-43-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/48-43-after-contrast.png"><img src="../raw/marks/48-43-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/48/48-43.webp"><img class="whole" src="../public/images/48/48-43.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m48-51">第48回 問51（48-51）— <span class="st-nomark">この図に〇印はない</span></h3><p class="none">この図に〇印はありません（同じ問題の別の図にあります）。</p>
+<h3 id="m48-51-2">第48回 問51（48-51-2）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -0.98／濃い画素の割合 -0.0092）</p><div class="marks">
+<figure><a href="../raw/marks/48-51-2-original-zoom.png"><img src="../raw/marks/48-51-2-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/48-51-2-before-bright.png"><img src="../raw/marks/48-51-2-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/48-51-2-before-contrast.png"><img src="../raw/marks/48-51-2-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/48-51-2-after-bright.png"><img src="../raw/marks/48-51-2-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/48-51-2-after-contrast.png"><img src="../raw/marks/48-51-2-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/48/48-51-2.webp"><img class="whole" src="../public/images/48/48-51-2.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m51-50">第51回 問50（51-50）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -5.34／濃い画素の割合 0.0381）</p><div class="marks">
+<figure><a href="../raw/marks/51-50-original-zoom.png"><img src="../raw/marks/51-50-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/51-50-before-bright.png"><img src="../raw/marks/51-50-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-50-before-contrast.png"><img src="../raw/marks/51-50-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-50-after-bright.png"><img src="../raw/marks/51-50-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-50-after-contrast.png"><img src="../raw/marks/51-50-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/51/51-50.webp"><img class="whole" src="../public/images/51/51-50.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m51-51">第51回 問51（51-51）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -4.55／濃い画素の割合 0.0146）</p><div class="marks">
+<figure><a href="../raw/marks/51-51-original-zoom.png"><img src="../raw/marks/51-51-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/51-51-before-bright.png"><img src="../raw/marks/51-51-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-51-before-contrast.png"><img src="../raw/marks/51-51-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-51-after-bright.png"><img src="../raw/marks/51-51-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-51-after-contrast.png"><img src="../raw/marks/51-51-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/51/51-51.webp"><img class="whole" src="../public/images/51/51-51.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m51-53">第51回 問53（51-53）— <span class="st-clean">跡なし</span>（今回、処理をやり直した）</h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0（やり直す前：明るさの差 -3.46／濃い画素の割合 0.0118）</p><div class="marks">
+<figure><a href="../raw/marks/51-53-original-zoom.png"><img src="../raw/marks/51-53-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/51-53-before-bright.png"><img src="../raw/marks/51-53-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-53-before-contrast.png"><img src="../raw/marks/51-53-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-53-after-bright.png"><img src="../raw/marks/51-53-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/51-53-after-contrast.png"><img src="../raw/marks/51-53-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/51/51-53.webp"><img class="whole" src="../public/images/51/51-53.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m52-41">第52回 問41（52-41）— <span class="st-clean">跡なし</span></h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 0</p><div class="marks">
+<figure><a href="../raw/marks/52-41-original-zoom.png"><img src="../raw/marks/52-41-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/52-41-before-bright.png"><img src="../raw/marks/52-41-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/52-41-before-contrast.png"><img src="../raw/marks/52-41-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/52-41-after-bright.png"><img src="../raw/marks/52-41-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/52-41-after-contrast.png"><img src="../raw/marks/52-41-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/52/52-41.webp"><img class="whole" src="../public/images/52/52-41.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m52-53">第52回 問53（52-53）— <span class="st-clean">跡なし</span></h3><p class="path">検査の値：明るさの差 0／濃い画素の割合 -0.0005</p><div class="marks">
+<figure><a href="../raw/marks/52-53-original-zoom.png"><img src="../raw/marks/52-53-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/52-53-before-bright.png"><img src="../raw/marks/52-53-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/52-53-before-contrast.png"><img src="../raw/marks/52-53-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/52-53-after-bright.png"><img src="../raw/marks/52-53-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/52-53-after-contrast.png"><img src="../raw/marks/52-53-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/52/52-53.webp"><img class="whole" src="../public/images/52/52-53.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
+<h3 id="m54-50">第54回 問50（54-50）— <span class="st-clean">跡なし</span></h3><p class="path">検査の値：明るさの差 10.44／ざらつきの差 -6.67　※〇印が網点の上にある図</p><div class="marks">
+<figure><a href="../raw/marks/54-50-original-zoom.png"><img src="../raw/marks/54-50-original-zoom.png" alt="PDF の元の図（〇印あり）" loading="lazy"></a><figcaption>PDF の元の図（〇印あり）</figcaption></figure>
+<figure><a href="../raw/marks/54-50-before-bright.png"><img src="../raw/marks/54-50-before-bright.png" alt="処理前：明るさを上げた" loading="lazy"></a><figcaption>処理前：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/54-50-before-contrast.png"><img src="../raw/marks/54-50-before-contrast.png" alt="処理前：コントラストを上げた" loading="lazy"></a><figcaption>処理前：コントラストを上げた</figcaption></figure>
+<figure><a href="../raw/marks/54-50-after-bright.png"><img src="../raw/marks/54-50-after-bright.png" alt="処理後：明るさを上げた" loading="lazy"></a><figcaption>処理後：明るさを上げた</figcaption></figure>
+<figure><a href="../raw/marks/54-50-after-contrast.png"><img src="../raw/marks/54-50-after-contrast.png" alt="処理後：コントラストを上げた" loading="lazy"></a><figcaption>処理後：コントラストを上げた</figcaption></figure>
+<figure><a href="../public/images/54/54-50.webp"><img class="whole" src="../public/images/54/54-50.webp" alt="処理後の図（全体）" loading="lazy"></a><figcaption>処理後の図（全体）</figcaption></figure>
+</div>
 </body>
 </html>
