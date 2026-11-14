@@ -41,6 +41,8 @@ export async function newDevice(browser: Browser, info: TestInfo, user: FakeUser
 export function isReloadNoise(text: string): boolean {
   return (
     (/google\.firestore\.v1\.Firestore\/(Listen|Write)\/channel/.test(text) && /access control checks/.test(text)) ||
+    // 読み込み直しで、Auth Emulator への問い合わせ（accounts:lookup など）が途中で切れたとき
+    (/localhost:9099\/identitytoolkit\.googleapis\.com\//.test(text) && /access control checks/.test(text)) ||
     /Could not reach Cloud Firestore backend/.test(text) ||
     (/www\.google\.com\/images\/cleardot\.gif/.test(text) && /img-src/.test(text))
   );

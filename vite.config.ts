@@ -113,7 +113,7 @@ export default defineConfig(({ mode }) => ({
     target: 'es2022',
   },
   test: {
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
     environment: 'node',
     setupFiles: ['src/test-setup.ts'],
   },

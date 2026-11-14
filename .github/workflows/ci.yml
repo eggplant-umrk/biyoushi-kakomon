@@ -60,6 +60,8 @@ jobs:
         run: |
           npm run build
           bash scripts/check-dist.sh dist
+      # 上の検査が効いていることの確認：ビルド結果の写しに、ダミーの管理者メールとテスト用の文字列を仕込み、検査が失敗することを確かめる
+      - run: bash scripts/check-dist.sh --self-test dist
       # E2E（Auth・Firestore Emulator に対して、iPhone・Pixel のエミュレーションで実行）
       - run: npm run test:e2e
       - if: failure()
