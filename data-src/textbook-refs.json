@@ -1,1 +1,559 @@
-{}
+{
+  "refs": {
+    "54-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "54-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 69,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "54-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 74,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "53-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第1章",
+        "section": "第6節",
+        "title": "労働者の権利",
+        "page": 58,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "53-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "53-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 76,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "52-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第5節",
+        "title": "税金について",
+        "page": 42,
+        "via": "index",
+        "confidence": "medium"
+      },
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第6節",
+        "title": "税金の申告",
+        "page": 44,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "52-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第1章",
+        "section": "第6節",
+        "title": "労働者の権利",
+        "page": 58,
+        "via": "index",
+        "confidence": "medium"
+      },
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第3章",
+        "section": "第1節",
+        "title": "健康管理の基礎",
+        "page": 84,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "52-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "51-07": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第2章",
+        "section": "第1節",
+        "title": "業界の概要",
+        "page": 21,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "51-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第3節",
+        "title": "会計の考え方",
+        "page": 38,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "51-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "51-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 74,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "50-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第3章",
+        "section": "第1節",
+        "title": "健康管理の基礎",
+        "page": 84,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "50-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "50-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 69,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "49-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第5節",
+        "title": "税金について",
+        "page": 42,
+        "via": "index",
+        "confidence": "medium"
+      },
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第6節",
+        "title": "税金の申告",
+        "page": 44,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "49-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第1章",
+        "section": "第6節",
+        "title": "労働者の権利",
+        "page": 58,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "49-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "48-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "48-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "high"
+      }
+    ],
+    "48-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 74,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "47-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第5節",
+        "title": "税金について",
+        "page": 42,
+        "via": "index",
+        "confidence": "medium"
+      },
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第6節",
+        "title": "税金の申告",
+        "page": 44,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "47-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第1章",
+        "section": "第6節",
+        "title": "労働者の権利",
+        "page": 58,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "47-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 69,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "46-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第3節",
+        "title": "会計の考え方",
+        "page": 38,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "46-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "46-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 74,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "45-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第3章",
+        "section": "第1節",
+        "title": "健康管理の基礎",
+        "page": 84,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "45-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "45-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "44-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第5節",
+        "title": "税金について",
+        "page": 42,
+        "via": "index",
+        "confidence": "medium"
+      },
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第6節",
+        "title": "税金の申告",
+        "page": 44,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "44-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "44-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 74,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "43-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第5節",
+        "title": "税金について",
+        "page": 42,
+        "via": "toc",
+        "confidence": "low"
+      }
+    ],
+    "43-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "medium"
+      },
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "43-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 76,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "42-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第1章",
+        "section": "第6節",
+        "title": "労働者の権利",
+        "page": 58,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "42-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第2節",
+        "title": "社会保険① 〜公的年金〜",
+        "page": 64,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "42-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第4節",
+        "title": "社会保険③ 〜労働保険〜",
+        "page": 74,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "41-07": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第1章",
+        "section": "第6節",
+        "title": "労働者の権利",
+        "page": 58,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "41-08": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第5節",
+        "title": "税金について",
+        "page": 42,
+        "via": "index",
+        "confidence": "medium"
+      },
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第1編 第3章",
+        "section": "第6節",
+        "title": "税金の申告",
+        "page": 44,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "41-09": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第3章",
+        "section": "第1節",
+        "title": "健康管理の基礎",
+        "page": 84,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ],
+    "41-10": [
+      {
+        "bookId": "unei-2ed-2024",
+        "chapter": "第2編 第2章",
+        "section": "第3節",
+        "title": "社会保険② 〜医療保険〜",
+        "page": 68,
+        "via": "index",
+        "confidence": "medium"
+      }
+    ]
+  },
+  "none": {
+    "unei-2ed-2024": [
+      "53-07",
+      "48-07",
+      "44-07",
+      "43-07"
+    ]
+  }
+}

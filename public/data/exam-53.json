@@ -457,7 +457,18 @@
         "caution": "パワーハラスメント防止措置の条文は、出題時は労働施策総合推進法第30条の2、現在は第31条（内容は同じ）。2026年10月1日からは、顧客等からのカスタマーハラスメントについても防止措置が事業主の義務になった（第33条）。休憩・休日・就業規則の条文は出題時から変わっていない。"
       },
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第1章",
+          "section": "第6節",
+          "title": "労働者の権利",
+          "page": 58,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "53-09",
@@ -517,7 +528,18 @@
         "caution": "一部負担金の割合は出題時から変わっていない。高額療養費は出題後の2026年8月に見直され、月ごとの上限額が改められ、年間上限が新設された。2027年8月には所得区分を細かくする見直しが予定されている。制度があること自体は変わらない。"
       },
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第3節",
+          "title": "社会保険② 〜医療保険〜",
+          "page": 68,
+          "via": "index",
+          "confidence": "high"
+        }
+      ]
     },
     {
       "id": "53-10",
@@ -592,7 +614,18 @@
         "caution": "出題後の2026年7月に労災保険法等の改正法（令和8年法律第60号）が公布され、2027年4月1日（一部は公布から5年以内の政令で定める日）に施行される。保険料の負担や選択肢の条文は、2026年11月時点で出題時から変わっていない。"
       },
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第4節",
+          "title": "社会保険③ 〜労働保険〜",
+          "page": 76,
+          "via": "index",
+          "confidence": "high"
+        }
+      ]
     },
     {
       "id": "53-11",

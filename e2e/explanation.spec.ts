@@ -85,6 +85,62 @@ test('解説のある問題：要点が先に出て、選択肢ごとの説明�
   expect(problems).toEqual([]);
 });
 
+// 教科書の参照（SPEC §14）。最初の10問（問1〜10）の中で、参照が付いている最初の問題まで解いて表示を確かめる
+async function answerUntil(page: Page, no: number) {
+  for (let i = 1; i < no; i++) {
+    await expect(page.getByTestId('quiz-count')).toHaveText(`${i}/10`);
+    await page.getByRole('list', { name: '選択肢' }).getByRole('button').first().click();
+    await expect(page.getByTestId('verdict')).toBeVisible();
+    await page.getByTestId('next').click();
+  }
+  await expect(page.getByTestId('quiz-count')).toHaveText(`${no}/10`);
+  await page.getByRole('list', { name: '選択肢' }).getByRole('button').first().click();
+  await expect(page.getByTestId('verdict')).toBeVisible();
+}
+
+const withRef = (n: number) =>
+  [...examFile(n).questions].sort((a, b) => a.no - b.no).find((q) => q.no <= 10 && (q.textbookRefs?.length ?? 0) > 0);
+
+test('教科書の参照：解説のある問題にも、解説のまだない問題にも、1行で表示される', async ({ browser }, info) => {
+  const explained = withRef(latest);
+  const pending = pendingExam === undefined ? undefined : withRef(pendingExam);
+  test.skip(!explained && !pending, '教科書の参照が付いた問題がない');
+
+  for (const [examNo, q] of [
+    [latest, explained],
+    [pendingExam, pending],
+  ] as const) {
+    if (!q || examNo === undefined) continue;
+    const context = await browser.newContext({ ...info.project.use });
+    const page = await context.newPage();
+    await enterAsGuest(page);
+    for (const e of exams) {
+      const box = page.getByRole('checkbox', { name: `第${e.examNo}回` });
+      if (e.examNo === examNo) await box.check();
+      else await box.uncheck();
+    }
+    await page.getByRole('button', { name: 'この条件で始める' }).click();
+    await expect(page).toHaveURL(/#\/quiz$/);
+
+    // 解答する前は出さない（どの分野の何ページかが、答えの手がかりになりうる）
+    await expect(page.getByTestId('textbook-refs')).toHaveCount(0);
+    await answerUntil(page, q.no);
+
+    const refs = page.getByTestId('textbook-refs').getByRole('listitem');
+    await expect(refs).toHaveCount(q.textbookRefs!.length);
+    const r = q.textbookRefs![0]!;
+    await expect(refs.first()).toContainText('教科書');
+    await expect(refs.first()).toContainText(`p.${r.page}`);
+    await expect(refs.first()).toContainText(r.title);
+    // 版が違うとページがずれるので、「第○版の場合」と添える
+    await expect(refs.first()).toContainText(/第\d+版の場合|初版の場合/);
+    if (q.explanation?.status === 'published') await expect(page.getByTestId('explanation')).toBeVisible();
+    else await expect(page.getByText('解説準備中')).toBeVisible();
+    expect(await overflow(page)).toBeLessThanOrEqual(0);
+    await context.close();
+  }
+});
+
 test('解説のない問題：「解説準備中」と出て、そのまま解き進められる', async ({ page }) => {
   test.skip(pendingExam === undefined, 'すべての回に解説がある');
   await enterAsGuest(page);

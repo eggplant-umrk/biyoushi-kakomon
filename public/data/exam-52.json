@@ -500,7 +500,27 @@
         "caution": "源泉所得税の納付期限、確定申告の期間、固定資産税の対象は、出題時（2025年9月）と現在で変わっていない（国税庁の説明は令和8年4月1日現在の法令による）。税額の計算に使う控除額などは年ごとの改正がある。"
       },
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第1編 第3章",
+          "section": "第5節",
+          "title": "税金について",
+          "page": 42,
+          "via": "index",
+          "confidence": "medium"
+        },
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第1編 第3章",
+          "section": "第6節",
+          "title": "税金の申告",
+          "page": 44,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "52-09",
@@ -588,7 +608,27 @@
         "caution": "この問題に関わる条文は、出題時（2025年9月）と現在で変わっていない。厚生労働省は2025年1月に労働基準法制の見直しに関する研究会報告書を公表しており、休日などのルールが今後改正される可能性がある。"
       },
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第1章",
+          "section": "第6節",
+          "title": "労働者の権利",
+          "page": 58,
+          "via": "index",
+          "confidence": "medium"
+        },
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第3章",
+          "section": "第1節",
+          "title": "健康管理の基礎",
+          "page": 84,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "52-10",
@@ -643,7 +683,18 @@
         "caution": "満額は毎年度改定される。出題時の令和7年度は月69,308円、現在の令和8年度は月70,608円。令和7年6月成立の年金制度改正法により、遺族年金は2028年4月に見直しが予定されている（主に遺族厚生年金）。"
       },
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第2節",
+          "title": "社会保険① 〜公的年金〜",
+          "page": 64,
+          "via": "index",
+          "confidence": "high"
+        }
+      ]
     },
     {
       "id": "52-11",

@@ -87,8 +87,13 @@ export function checkTextbookRefs(q: Question): string[] {
   if (!Array.isArray(refs) || refs.length === 0) return ['textbookRefs が空（該当なしのときは省略する）'];
   const errs: string[] = [];
   for (const r of refs) {
-    if (!isText(r.bookId) || !bookOf(r.bookId)) errs.push(`textbookRefs の bookId が教科書の一覧にない: ${String(r.bookId)}`);
-    if (!isText(r.chapter)) errs.push('textbookRefs の chapter が空');
+    const book = isText(r.bookId) ? bookOf(r.bookId) : undefined;
+    if (!book) errs.push(`textbookRefs の bookId が教科書の一覧（data-src/textbooks.json）にない: ${String(r.bookId)}`);
+    // 教科書ごとに、対象の分野が決まっている
+    else if (!book.fields.includes(q.fieldId)) errs.push(`textbookRefs: ${book.title} は、この問題の分野（${q.fieldId}）を対象にしていない`);
+    // 目次のない教科書（索引だけ）は、章・節を決められないので空でよい。そのときは索引から引いた参照に限る
+    if (typeof r.chapter !== 'string') errs.push('textbookRefs の chapter が文字列ではない');
+    else if (!r.chapter.trim() && r.via !== 'index') errs.push('textbookRefs の chapter が空（目次から推定した参照には章が必要）');
     if (typeof r.section !== 'string') errs.push('textbookRefs の section が文字列ではない');
     if (!isText(r.title)) errs.push('textbookRefs の title が空');
     // 見出しより長い文章（教科書の本文）を入れない

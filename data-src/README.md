@@ -83,20 +83,22 @@ node scripts/build-data.ts && node scripts/validate.ts
 - `review`：確信度が低い・出典が見つからない・正答に疑いがある・教科書でしか確かめられないときに `{ "reason": "…", "ask": "確認してほしい点" }` を書く。
   問題データには入らず、`docs/explanation-review.md` に一覧で出る。`confidence` が `low` のときは必須。
 
-## textbook-refs.json（教科書の参照。SPEC §14）
+## textbooks.json・textbook-refs.json（教科書の参照。SPEC §14-54・57）
 
-問題ごとの、教科書の参照先。キーは問題の id。空の配列は「調べたが、対応する内容がなかった」という記録で、問題データには出ない。
+- `textbooks.json`：教科書の登録（`bookId`・書名・版・発行年・初版の発行日・発行者・写真フォルダ名・対象の分野）。教科書を足すときは、ここに1件足す
+- `textbook-refs.json`：`refs`＝問題ごとの参照（節の見出しとページだけ）、`none`＝教科書ごとの「調べたが、対応する内容がない」問題。**手で書かず、`scripts/textbook-refs.ts assign` で作る**
 
 ```json
 {
-  "54-08": [
-    { "bookId": "unei-2ed-2024", "chapter": "第2編 第2章", "section": "第3節", "title": "節の見出し", "page": 68, "via": "index", "confidence": "high" }
-  ],
-  "54-07": []
+  "refs": {
+    "54-08": [
+      { "bookId": "unei-2ed-2024", "chapter": "第2編 第2章", "section": "第2節", "title": "節の見出し", "page": 64, "via": "index", "confidence": "high" }
+    ]
+  },
+  "none": { "unei-2ed-2024": ["53-07"] }
 }
 ```
 
-- `bookId` は `src/lib/textbooks.ts` の一覧にあるもの（版と発行年を含む）。
-- `via`：`index`＝索引に語があり、そのページを使った（節は目次で決める）／`toc`＝索引になく、目次から節を推定した（`confidence` は `low` にする。`page` は節の開始ページ）。
-- **教科書の本文、目次・索引の全文は、ここにもリポジトリのどこにも書かない**（私的使用以外のデジタル化が認められていないため）。書くのは、問題ごとの節の見出しとページだけ。
-- 教科書の写真は `textbook-src/`（コミットしない）に置く。
+- `via`：`index`＝索引に語があり、そのページを使った（節は目次で決める）／`toc`＝索引になく、目次から節を推定した（`confidence` は `low`、`page` は節の開始ページ）
+- **教科書の本文、目次・索引の全文は、ここにもリポジトリのどこにも書かない**（私的使用以外のデジタル化が認められていないため）。教科書の写真は `textbook-src/<教科書ごとのフォルダ>/`（コミットしない）に置く
+- 手順（写真の頼み方、設定の足し方、コマンド、検証、やってはいけないこと）は `docs/textbook-howto.md`

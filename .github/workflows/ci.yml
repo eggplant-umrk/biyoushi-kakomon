@@ -45,6 +45,8 @@ jobs:
           echo "$RUNNER_TEMP/firebase-tools/node_modules/.bin" >> "$GITHUB_PATH"
       - run: npm run typecheck
       - run: npm run validate -- --expect 41-54
+      # 教科書の参照の決まり（登録済みの教科書・対象の分野・確信度）。目次・索引との突き合わせは、写真のある手元で行う（docs/textbook-howto.md）
+      - run: node scripts/textbook-refs.ts verify
       - run: npm test
       # セキュリティルールのテスト（SPEC §8.1）。通らなければマージもデプロイもしない
       - run: npm run test:rules

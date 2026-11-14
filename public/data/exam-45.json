@@ -159,7 +159,18 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第3章",
+          "section": "第1節",
+          "title": "健康管理の基礎",
+          "page": 84,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "45-09",
@@ -179,7 +190,18 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第2節",
+          "title": "社会保険① 〜公的年金〜",
+          "page": 64,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "45-10",
@@ -199,7 +221,18 @@
       "images": [],
       "explanation": null,
       "caution": null,
-      "ocrChecked": true
+      "ocrChecked": true,
+      "textbookRefs": [
+        {
+          "bookId": "unei-2ed-2024",
+          "chapter": "第2編 第2章",
+          "section": "第3節",
+          "title": "社会保険② 〜医療保険〜",
+          "page": 68,
+          "via": "index",
+          "confidence": "medium"
+        }
+      ]
     },
     {
       "id": "45-11",
