@@ -88,6 +88,7 @@
 |---|---|---|---|---|---|---|
 | 第51回 | `feature/phase6c-explanations-51` | 55問 | 37・12・6 | 26問 | 1件（問9）。対応済み | `docs/review-6c-第51回.md` |
 | 第50回 | `feature/phase6c-explanations-50` | 55問 | 35・15・5 | 25問 | 2件（問46・48）。対応済み | `docs/review-6c-第50回.md` |
+| 第49回 | `feature/phase6c-explanations-49` | 55問 | 38・13・4 | 29問 | 0件 | `docs/review-6c-第49回.md` |
 <!-- phase6c-log -->
 
 **次はここから**：上の表にない回のうち、いちばん新しい回。作業用のファイル（範囲ごとの解説、レビューの結果）は、作業したPCの一時フォルダと `data-src/explanations/parts/`（コミットしない）にある。
