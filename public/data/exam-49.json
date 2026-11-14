@@ -17,7 +17,38 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "美容師法の目的（第1条）は、美容師の資格を定め、美容の業務が適正に行われるように規律し、公衆衛生の向上に資することで、経営の健全化や業の振興は入っていないので2が誤り。経営の健全化と振興を掲げるのは生活衛生関係営業の運営の適正化及び振興に関する法律（生衛法）である。",
+        "perChoice": [
+          "正しい。第1条は「公衆衛生の向上に資すること」を目的としており、これは国民全体の利益につながる。",
+          "誤り。経営の健全化や振興は美容師法の目的にない。これを掲げるのは生衛法（第1条）。",
+          "正しい。第1条に「美容の業務が適正に行われるように規律し」とある。",
+          "正しい。第1条で資格を定めるとし、第6条で美容師でなければ美容を業としてはならないと定める。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "経営の健全化",
+          "美容業の振興"
+        ],
+        "keyPoint": "美容師法の目的は「資格を定める・業務の適正・公衆衛生の向上」。経営の健全化と振興は生衛法の目的。",
+        "sources": [
+          {
+            "title": "美容師法 第1条・第6条",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000163",
+            "type": "law"
+          },
+          {
+            "title": "生活衛生関係営業の運営の適正化及び振興に関する法律 第1条",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000164",
+            "type": "law"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -37,7 +68,39 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "業務停止処分を受けた者は、速やかに、処分を行った都道府県知事等に免許証（免許証明書）を提出するので3が正しい（美容師法施行規則第7条第3項）。免許の申請、名簿の訂正、再交付の相手は都道府県知事ではなく厚生労働大臣（登録事務を行う指定登録機関）である。",
+        "perChoice": [
+          "誤り。免許申請に添えるのは精神の機能の障害に関する医師の診断書（施行規則第1条）。伝染性疾病の診断書は美容所の開設届に添える。",
+          "誤り。住所は美容師名簿の登録事項ではない。訂正が必要なのは本籍地都道府県、氏名などの変更で、期限は30日以内（施行規則第2条・第3条）。",
+          "正しい。業務停止処分を受けた者は、速やかに、処分を行った知事等に免許証（免許証明書）を提出する（施行規則第7条第3項）。",
+          "誤り。再交付の申請先は厚生労働大臣（指定登録機関）で、住所地の知事ではない。条文は「申請することができる」（施行規則第6条）。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "伝染性の疾病の有無に関する診断書",
+          "住所地を変更",
+          "住所地の都道府県知事"
+        ],
+        "keyPoint": "業務停止は知事等が行い、免許証は知事等に提出。免許取消は厚生労働大臣が行い、免許証は大臣に返納。名簿の訂正は30日以内。",
+        "sources": [
+          {
+            "title": "美容師法施行規則 第1条・第2条・第3条・第6条・第7条・第9条",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          },
+          {
+            "title": "美容師法 第5条の3・第5条の4・第10条",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000163",
+            "type": "law"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -57,7 +120,30 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "業務停止処分に違反して停止期間中に美容の業をしたときは、厚生労働大臣が免許を取り消すことができるので1が対象（美容師法第10条第3項）。2から4はいずれも、都道府県知事等による業務停止の理由である（同条第2項）。",
+        "perChoice": [
+          "免許取消の対象。業務の停止処分に違反したときは、厚生労働大臣が免許を取り消すことができる（第10条第3項）。",
+          "免許取消ではない。衛生上必要な措置（第8条）を講じなかったときは、業務停止の対象（第10条第2項）。",
+          "免許取消ではない。伝染性の疾病で就業が公衆衛生上不適当と認められるときは、業務停止の対象（第10条第2項）。",
+          "免許取消ではない。特別の事情なく美容所以外で業をしたとき（第7条違反）は、業務停止の対象（第10条第2項）。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "免許取消は2つ。心身の障害（精神の機能の障害）と業務停止処分への違反。業務停止は3つ。第7条違反、第8条違反、伝染性の疾病。",
+        "sources": [
+          {
+            "title": "美容師法 第3条・第7条・第8条・第10条",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000163",
+            "type": "law"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -77,7 +163,39 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "管理美容師を置く美容所の開設届には、管理美容師の氏名と住所を記載するので4が正しい（美容師法施行規則第19条第1項第3号）。管理美容師が必要なのは美容師が常時2人以上の美容所で、要件は免許取得後3年以上の業務従事と、都道府県知事が指定した講習会の修了である。",
+        "perChoice": [
+          "誤り。管理美容師を置くのは、美容師である従業者が常時2人以上の美容所。美容師以外の従業者は数えない（第12条の3第1項）。",
+          "誤り。「3年以上経過」ではなく3年以上美容の業務に従事。講習会を指定するのは厚生労働大臣ではなく都道府県知事（同条第2項）。",
+          "誤り。開設者が自ら管理美容師になれるのは、自ら主として管理する1つの美容所だけ（同条第1項ただし書）。",
+          "正しい。開設届の記載事項に「管理美容師の氏名及び住所」がある（施行規則第19条第1項第3号）。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "3年以上経過",
+          "厚生労働大臣が指定する",
+          "複数の美容所"
+        ],
+        "keyPoint": "管理美容師は、美容師が常時2人以上の美容所ごとに置く。要件は3年以上の業務従事と、知事指定の講習会の修了。",
+        "sources": [
+          {
+            "title": "美容師法 第11条・第12条の3",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000163",
+            "type": "law"
+          },
+          {
+            "title": "美容師法施行規則 第19条",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -97,7 +215,57 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "理容所と美容所の重複開設（同じ場所での開設）は、施術をする者の全員が理容師と美容師の両方の資格を持つなどの条件を満たせば認められるので、「いかなる場合でも認められない」とする3が誤り。平成28年4月の施行規則改正で可能になった。",
+        "perChoice": [
+          "正しい。開設しようとする者は、あらかじめ都道府県知事等に届け出なければならない（美容師法第11条第1項）。",
+          "正しい。自動車に設備を設けた移動美容所も美容所として扱われ、開設の届出や構造設備の検査・確認など美容所の要件を満たせば開設できる。",
+          "誤り。施術者全員が理容師と美容師の両方の資格を持ち、双方の衛生上の措置を満たせば重複開設できる。",
+          "正しい。開設者の地位を承継した者は、遅滞なく、事実を証する書面を添えて届け出る（美容師法第12条の2第2項）。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "いかなる場合でも認められない"
+        ],
+        "keyPoint": "重複開設は平成28年4月から可能。条件は施術者の全員が理容師と美容師の両方の資格を持つこと。",
+        "sources": [
+          {
+            "title": "美容師法 第11条・第12条の2",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000163",
+            "type": "law"
+          },
+          {
+            "title": "美容師法施行規則 第19条・第20条の2・第21条",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          },
+          {
+            "title": "東京都保健医療局『理容所と美容所の同一場所での開設（重複開設）に関すること』",
+            "url": "https://www.hokeniryo.metro.tokyo.lg.jp/documents/d/hokeniryo/jyuufuku",
+            "type": "gov"
+          },
+          {
+            "title": "総務省『規制の簡素合理化に関する調査』事例1-1-2「理・美容車の取扱い」",
+            "url": "https://www.soumu.go.jp/main_content/000315366.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "松江市『松江市移動理・美容所取扱要領』",
+            "url": "https://www.city.matsue.lg.jp/material/files/group/51/idou_ribi_youryou.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省『事業譲渡に関する手続が整備されます』",
+            "url": "https://www.mhlw.go.jp/content/11130500/001176060.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": "地位の承継は、出題時（令和6年3月）も現在も、相続・合併・分割に加えて営業の譲渡が対象（令和5年12月13日施行の改正）。それより前の過去問や古い資料では譲渡が入っていない。"
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -117,7 +285,39 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "構造設備の検査と確認を受けないまま美容所を使用すると、30万円以下の罰金に処されることがあるので4が正しい（美容師法第12条・第18条第3号）。立入検査で調べるのは衛生上の措置の実施状況だけで、検査を妨げた場合も罰金の対象である。",
+        "perChoice": [
+          "誤り。立入検査の対象は第8条・第13条の衛生上の措置の実施状況。経営状況は入っていない（第14条第1項）。",
+          "誤り。検査をするのは都道府県等の職員で、環境衛生監視員と呼ぶ（施行規則第28条）。委託された生活衛生監視員ではない。",
+          "誤り。立入検査を拒み、妨げ、忌避した者は30万円以下の罰金（第18条第4号）。閉鎖命令の理由（第15条）には入っていない。",
+          "正しい。確認を受ける前に美容所を使用すると第12条違反となり、30万円以下の罰金（第18条第3号）。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "経営状況",
+          "生活衛生監視員",
+          "閉鎖処分"
+        ],
+        "keyPoint": "立入検査をするのは環境衛生監視員。検査の拒否・妨害と、確認前の美容所の使用は、どちらも30万円以下の罰金。",
+        "sources": [
+          {
+            "title": "美容師法 第12条・第14条・第15条・第18条",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000163",
+            "type": "law"
+          },
+          {
+            "title": "美容師法施行規則 第28条（環境衛生監視員）",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -154,7 +354,38 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "生活衛生同業組合は、組合員が任意に加入・脱退でき（b）、厚生労働大臣の振興指針に適合する振興計画を作ることができる（c）ので2が正しい。組合は営利を目的とせず、営業方法の制限には適正化規程（制限の内容などの定め）と大臣の認可が必要である。",
+        "perChoice": [
+          "bは正しいが、aが誤り。",
+          "bもcも正しい。",
+          "cは正しいが、dが誤り。",
+          "aもdも誤り。"
+        ],
+        "perStatement": [
+          "誤り。組合の要件の1つは「営利を目的としないこと」（生衛法第5条第1号）。",
+          "正しい。組合員が任意に加入し、又は脱退できることが組合の要件（第5条第2号）。",
+          "正しい。組合は振興計画を作成し、振興指針に適合するものとして厚生労働大臣の認定を受けることができる（第56条の3）。",
+          "誤り。営業方法の制限は過度の競争がある場合に限られ、適正化規程を定めて厚生労働大臣の認可を受ける必要がある（第8条・第9条）。"
+        ],
+        "traps": [
+          "営利を目的として",
+          "制約なく"
+        ],
+        "keyPoint": "組合の3要件は、営利を目的としない、加入・脱退が任意、議決権と選挙権が平等。振興指針は大臣が定め、振興計画は組合が作る。",
+        "sources": [
+          {
+            "title": "生活衛生関係営業の運営の適正化及び振興に関する法律 第5条・第8条・第9条・第56条の2・第56条の3",
+            "url": "https://laws.e-gov.go.jp/law/332AC1000000164",
+            "type": "law"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -191,7 +422,58 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "給与から預かった源泉所得税は原則として支払った月の翌月10日までに納め（b）、申告や納税を怠ると加算税や延滞税が追加でかかる（c）ので2が正しい。法人税と所得税は所得（もうけ）に対してかかる税で、個人の確定申告は翌年2月16日から3月15日までである。",
+        "perChoice": [
+          "bは正しいが、aが誤り。",
+          "bもcも正しい。",
+          "cは正しいが、dが誤り。",
+          "aもdも誤り。"
+        ],
+        "perStatement": [
+          "誤り。法人税も所得税も所得に対して課される税（法人税法第5条、所得税法第7条）。利益が出ず所得がなければ課されない。",
+          "正しい。給与を支払う者は支払の際に所得税を徴収し、翌月10日までに国に納める（所得税法第183条）。",
+          "正しい。期限までに申告しないと無申告加算税、納付が遅れると延滞税が、本来の税に加えて課される（国税通則法第60条・第66条）。",
+          "誤り。1月15日ではない。所得税の確定申告は翌年2月16日から3月15日までの間に行う（所得税法第120条）。"
+        ],
+        "traps": [
+          "利益が出ていなくても",
+          "1月15日"
+        ],
+        "keyPoint": "源泉所得税は翌月10日まで。所得税の確定申告は2月16日から3月15日まで。",
+        "sources": [
+          {
+            "title": "所得税法 第7条・第22条・第120条・第183条",
+            "url": "https://laws.e-gov.go.jp/law/340AC0000000033",
+            "type": "law"
+          },
+          {
+            "title": "法人税法 第5条・第21条",
+            "url": "https://laws.e-gov.go.jp/law/340AC0000000034",
+            "type": "law"
+          },
+          {
+            "title": "国税通則法 第60条・第65条・第66条",
+            "url": "https://laws.e-gov.go.jp/law/337AC0000000066",
+            "type": "law"
+          },
+          {
+            "title": "国税庁 タックスアンサー No.2505『源泉所得税及び復興特別所得税の納付期限と納期の特例』",
+            "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2505.htm",
+            "type": "gov"
+          },
+          {
+            "title": "国税庁 タックスアンサー No.2024『確定申告を忘れたとき』",
+            "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2024.htm",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": "翌月10日と2月16日から3月15日という期限は、出題時も現在も同じ。給与の支給人員が常時10人未満の事業者には、半年分をまとめて納める納期の特例がある（7月10日と翌年1月20日）。"
+      },
       "caution": null,
       "ocrChecked": true,
       "textbookRefs": [
@@ -231,7 +513,42 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "年次有給休暇は、6か月継続して勤務し全労働日の8割以上出勤すれば、パートタイムの労働者にも与えなければならないので3が誤り（労働基準法第39条）。所定労働日数が少ない労働者には、日数に応じた休暇が比例して与えられる。",
+        "perChoice": [
+          "正しい。適用されないのは同居の親族のみを使用する事業と家事使用人（第116条第2項）。別居の親族は対象外ではない。",
+          "正しい。労働契約の締結に際し、賃金、労働時間などの労働条件を明示する（第15条）。契約期間も明示事項（施行規則第5条）。",
+          "誤り。パートタイムでも要件を満たせば年次有給休暇を与える。週の所定労働日数が少ない者は比例付与（第39条第3項）。",
+          "正しい。労働時間が8時間を超える場合は少なくとも1時間の休憩を、労働時間の途中に与える（第34条第1項）。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "与えなくてもよい"
+        ],
+        "keyPoint": "休憩は6時間超で45分、8時間超で1時間。年次有給休暇は6か月継続勤務と8割以上の出勤で発生し、通常の労働者は10日。",
+        "sources": [
+          {
+            "title": "労働基準法 第15条・第34条・第39条・第116条",
+            "url": "https://laws.e-gov.go.jp/law/322AC0000000049",
+            "type": "law"
+          },
+          {
+            "title": "労働基準法施行規則 第5条",
+            "url": "https://laws.e-gov.go.jp/law/322M40000100023",
+            "type": "law"
+          },
+          {
+            "title": "厚生労働省・都道府県労働局・労働基準監督署『年次有給休暇の付与日数は法律で決まっています』",
+            "url": "https://www.mhlw.go.jp/new-info/kobetu/roudou/gyousei/dl/140811-3.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": "労働条件の明示事項は、出題の翌月（令和6年4月1日）から増えた。現在は、就業の場所と業務の変更の範囲、有期労働契約の更新の上限なども明示する（労働基準法施行規則第5条）。選択肢の正誤は変わらない。"
+      },
       "caution": null,
       "ocrChecked": true,
       "textbookRefs": [
@@ -279,7 +596,53 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "被用者保険にも後期高齢者医療制度にも入っていない者は国民健康保険の対象となり（a）、高額療養費制度は健康保険にも国民健康保険にもある（d）ので4が正しい。後期高齢者医療制度の対象は原則75歳以上で、一部負担金の割合は年齢などで変わる。",
+        "perChoice": [
+          "aは正しいが、bが誤り。",
+          "bもcも誤り。",
+          "dは正しいが、cが誤り。",
+          "aもdも正しい。"
+        ],
+        "perStatement": [
+          "正しい。住所を有する者は国民健康保険の被保険者となり、健康保険の被保険者や後期高齢者医療の被保険者などが除かれる（国民健康保険法第5条・第6条）。",
+          "誤り。後期高齢者医療の被保険者は75歳以上の者と、65歳以上75歳未満で一定の障害があると認定された者（高齢者医療確保法第50条）。",
+          "誤り。70歳に達する月までは3割、その翌月以後は2割（一定以上の報酬がある者は3割）と、年齢で変わる（健康保険法第74条）。",
+          "正しい。高額療養費は健康保険法第115条と国民健康保険法第57条の2の両方に定めがある。"
+        ],
+        "traps": [
+          "70歳以上の者はすべて",
+          "年齢にかかわらず"
+        ],
+        "keyPoint": "後期高齢者医療制度は75歳以上（一定の障害がある人は65歳以上）。健康保険の一部負担金は70歳を境に3割から2割（一定以上の報酬がある人は3割）。",
+        "sources": [
+          {
+            "title": "国民健康保険法 第5条・第6条・第57条の2",
+            "url": "https://laws.e-gov.go.jp/law/333AC0000000192",
+            "type": "law"
+          },
+          {
+            "title": "高齢者の医療の確保に関する法律 第50条",
+            "url": "https://laws.e-gov.go.jp/law/357AC0000000080",
+            "type": "law"
+          },
+          {
+            "title": "健康保険法 第74条・第115条",
+            "url": "https://laws.e-gov.go.jp/law/211AC0000000070",
+            "type": "law"
+          },
+          {
+            "title": "厚生労働省『高額療養費制度を利用される皆さまへ』",
+            "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryouhoken/juuyou/kougakuiryou/index.html",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true,
       "textbookRefs": [
@@ -310,7 +673,52 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "妊婦の健康診査は病気のある妊婦だけでなく、妊婦全般が定期的に受けるものなので、(3)が誤りで正答。母体と胎児の健康状態を定期的に確かめ、貧血や妊娠高血圧症候群などを早く見つけることが目的である。",
+        "perChoice": [
+          "正しい。妊娠した者は市町村長に届け出るようにし、市町村は届出をした者に母子健康手帳を交付する（母子保健法第15条・第16条）。",
+          "正しい。低出生体重児は新生児死亡に至りやすく、その要因に妊娠前・妊娠中の不十分な健康管理が挙げられている。",
+          "誤り。病気の有無にかかわらず妊婦が受ける。出産までに14回程度の受診が望ましいとされている。",
+          "正しい。市町村が行う義務のある健診で、診査項目に疾病や異常の有無、栄養状態、育児上問題となる事項がある。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "病気のある妊婦"
+        ],
+        "keyPoint": "妊娠の届出は市町村へ。母子健康手帳も市町村が交付。法律上の義務の健診は1歳6か月児と3歳児。",
+        "sources": [
+          {
+            "title": "母子保健法 第12条・第13条・第15条・第16条",
+            "url": "https://laws.e-gov.go.jp/law/340AC0000000141",
+            "type": "law"
+          },
+          {
+            "title": "母子保健法施行規則 第2条（健康診査の項目）",
+            "url": "https://laws.e-gov.go.jp/law/340M50000100055",
+            "type": "law"
+          },
+          {
+            "title": "こども家庭庁『妊婦健診に関する取組み』",
+            "url": "https://www.cfa.go.jp/policies/boshihoken/nimpukenshin",
+            "type": "gov"
+          },
+          {
+            "title": "こども家庭庁『乳幼児健診に関する取組み』",
+            "url": "https://www.cfa.go.jp/policies/boshihoken/nyuyojikenshin",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省『医療機能調査事業報告書』8 周産期医療（「指標」の概要。平成18年度医療制度改革関連資料）",
+            "url": "https://www.mhlw.go.jp/bunya/shakaihosho/iryouseido01/pdf/kanrenjigyou-s.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": "出題時（2024年3月）も現在（2026年11月）も、母子保健法が市町村に義務づけている健診は1歳6か月児と3歳児で、変わっていない。現在は、1か月児と5歳児の健診にも国の補助があり、実施が進められている。母子保健は2023年4月からこども家庭庁が担当している。"
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -330,7 +738,47 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "特定健診・特定保健指導の対象は30歳以上60歳未満ではなく40歳から74歳なので、(2)が誤りで正答。メタボリック症候群（内臓脂肪の蓄積に高血圧・高血糖などが重なった状態）に着目して、生活習慣病を予防するための健診である。",
+        "perChoice": [
+          "正しい。健康日本21は、栄養・食生活、身体活動・運動、休養、飲酒、喫煙などを生活習慣として挙げている。",
+          "誤り。対象は40歳から74歳。法律でも40歳以上の加入者に行うと定めている。",
+          "正しい。心疾患などの循環器疾患は生活習慣病の一つとされ、高血圧などが発症の危険因子になる。",
+          "正しい。第2次の基本的な方向の1番目が「健康寿命の延伸と健康格差の縮小」である。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "30歳以上60歳未満"
+        ],
+        "keyPoint": "特定健診・特定保健指導は40〜74歳。健康日本21の柱は健康寿命の延伸と健康格差の縮小。",
+        "sources": [
+          {
+            "title": "厚生労働省『特定健診・特定保健指導について』",
+            "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000161103.html",
+            "type": "gov"
+          },
+          {
+            "title": "高齢者の医療の確保に関する法律 第20条",
+            "url": "https://laws.e-gov.go.jp/law/357AC0000000080",
+            "type": "law"
+          },
+          {
+            "title": "厚生労働省告示第430号『国民の健康の増進の総合的な推進を図るための基本的な方針』（平成24年7月10日。健康日本21（第二次））",
+            "url": "https://www.mhlw.go.jp/bunya/kenkou/dl/kenkounippon21_01.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省『国民の健康の増進の総合的な推進を図るための基本的な方針』（健康日本21（第三次））",
+            "url": "https://www.mhlw.go.jp/content/001102474.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": "出題時（2024年3月）は健康日本21（第2次）の期間中だった。現在は2024年度（令和6年度）から2035年度（令和17年度）までの「健康日本21（第三次）」に移っている。第三次も「健康寿命の延伸と健康格差の縮小」を基本的な方向の1番目に掲げている。特定健診の対象年齢（40〜74歳）は変わっていない。"
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -350,7 +798,42 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "1型糖尿病は、膵臓（すいぞう）からインスリンがほとんど出なくなることで起こり、生活習慣が主な原因ではないので、(1)が誤りで正答。食べ過ぎや運動不足などが関わるのは2型糖尿病である。",
+        "perChoice": [
+          "誤り。1型はインスリンがほとんど出なくなることで起こる。食べ過ぎ・運動不足・肥満などが関わるのは2型。",
+          "正しい。細い血管が傷む合併症として、神経障害、網膜症、腎症などがある。",
+          "正しい。高血糖は動脈硬化を進め、心筋梗塞などの大血管症（太い血管の合併症）を起こす原因になる。",
+          "正しい。健康日本21は、糖尿病の発症予防と重症化予防を健康寿命の延伸のための課題としている。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "食事や運動などの生活習慣"
+        ],
+        "keyPoint": "1型＝インスリンがほとんど出ない。2型＝遺伝に食べ過ぎ・運動不足・肥満などが加わる。",
+        "sources": [
+          {
+            "title": "国立健康危機管理研究機構 糖尿病情報センター『糖尿病とは』",
+            "url": "https://dmic.jihs.go.jp/general/about-dm/010/010/01.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 糖尿病情報センター『糖尿病の慢性合併症について知っておきましょう』",
+            "url": "https://dmic.jihs.go.jp/general/about-dm/060/020/02.html",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省『国民の健康の増進の総合的な推進を図るための基本的な方針』（健康日本21（第三次））",
+            "url": "https://www.mhlw.go.jp/content/001102474.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -370,7 +853,52 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "20〜30ルクスは日常生活には暗すぎるので、(2)が誤りで正答。美容師法施行規則が作業面に求める最低の明るさでも100ルクス以上で、衛生管理要領は300ルクス以上が望ましいとしている。",
+        "perChoice": [
+          "正しいとされる。照度不足は眼精疲労などの健康障害を招く（厚生労働省）。近視・頭痛を挙げた公的資料は要確認。",
+          "誤り。厚生労働省の資料は70ルクスを夜間路上の街灯下程度としており、20〜30ルクスはさらに暗い。教科書の数値は要確認。",
+          "正しい。衛生管理要領は、作業中の作業面の照度は300ルクス以上が望ましいとしている。",
+          "正しい。ある場所だけを高照度にするのが局部（局所）照明、作業場全体を明るくするのが全般照明。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "20〜30ルクス"
+        ],
+        "keyPoint": "作業面の照度：施行規則は100ルクス以上（義務）、衛生管理要領は300ルクス以上（望ましい）。",
+        "sources": [
+          {
+            "title": "厚生労働省『理容所及び美容所における衛生管理要領について』（昭和56年6月1日 環指第95号）第4の4",
+            "url": "https://www.mhlw.go.jp/content/11130500/001403692.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "美容師法施行規則 第27条",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          },
+          {
+            "title": "厚生労働省『照度及び作業環境測定に関する見直しの方向性（案）』（事務所衛生基準の検討資料）",
+            "url": "https://www.mhlw.go.jp/content/11201000/000710712.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省・都道府県労働局・労働基準監督署『ご存知ですか？職場における労働衛生基準が変わりました』",
+            "url": "https://www.mhlw.go.jp/content/11300000/000905329.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "岩崎電気『照明技術資料 屋内照明（IWASAKI LIGHTING HANDBOOK）』",
+            "url": "https://www.iwasaki.co.jp/documents/jp/lighting/support/tech-data/plan/indoor.pdf",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": "2026年11月時点の衛生管理要領と美容師法施行規則でも、作業面の照度は300ルクス以上が望ましい、100ルクス以上が義務で、出題時から数値の変更はない。"
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -390,7 +918,47 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "アタマジラミは卵を頭皮ではなく毛髪に産みつけるので、(1)が誤りで正答。卵はセメントのような物質で毛の根元近くにしっかり固着し、耳の後ろやえりあしに多い。",
+        "perChoice": [
+          "誤り。卵を産みつける場所は頭皮ではなく毛髪（毛の根元近く）。",
+          "正しい。人の頭髪の中で過ごし、幼虫から成虫にかけて頭皮から吸血する。",
+          "正しい。頭を寄せ合って遊ぶ幼稚園、保育園、小学校低学年などの集団生活の場でうつりやすい。",
+          "正しい。頭どうしの接触が主だが、くしやタオル、帽子を一緒に使ってうつることもある。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "頭皮に卵を産む"
+        ],
+        "keyPoint": "卵は毛髪に固着、吸血は頭皮から。清潔・不潔に関係なくうつる。",
+        "sources": [
+          {
+            "title": "川崎市『アタマジラミ』（リーフレット）",
+            "url": "https://www.city.kawasaki.jp/350/cmsfiles/contents/0000006/6005/atamazirami.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "中野区保健所『アタマジラミ Q&A』",
+            "url": "https://www.city.tokyo-nakano.lg.jp/kenko_hukushi/kansen/sonota/atamajirami.files/d11100033_1.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "大田区『アタマジラミ』",
+            "url": "https://www.city.ota.tokyo.jp/seikatsu/hoken/eisei/sumai_soudan/other/atamajirami.html",
+            "type": "gov"
+          },
+          {
+            "title": "さいたま市健康科学研究センター『髪の毛に寄生して血を吸う害虫「アタマジラミ」』",
+            "url": "https://www.city.saitama.lg.jp/sciencenavi/kenkou/003/p068417.html",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -410,7 +978,40 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "感染症法の就業制限は、一類・二類・三類感染症と新型インフルエンザ等感染症が対象で、二類の結核がこれに当たるので(4)が正答。結核で制限されるのは接客業など多数の人に接する業務で、美容の仕事も当てはまり得る。",
+        "perChoice": [
+          "対象外。風しんは五類感染症で、就業制限の対象ではない。",
+          "対象外。日本脳炎は四類感染症で、就業制限の対象ではない。",
+          "対象外。破傷風は五類感染症で、就業制限の対象ではない。",
+          "対象となる。結核は二類感染症で、接客業その他の多数の者に接触する業務が制限される。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "就業制限（感染症法第18条）は一類・二類・三類と新型インフルエンザ等感染症。結核は二類。",
+        "sources": [
+          {
+            "title": "感染症の予防及び感染症の患者に対する医療に関する法律 第6条・第18条",
+            "url": "https://laws.e-gov.go.jp/law/410AC0000000114",
+            "type": "law"
+          },
+          {
+            "title": "感染症の予防及び感染症の患者に対する医療に関する法律施行令 第1条の2（四類感染症）",
+            "url": "https://laws.e-gov.go.jp/law/410CO0000000420",
+            "type": "law"
+          },
+          {
+            "title": "感染症の予防及び感染症の患者に対する医療に関する法律施行規則 第1条・第11条",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100099",
+            "type": "law"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": "2026年11月時点の条文で確認した。結核が二類、日本脳炎が四類、風しんと破傷風が五類という分類は、出題時（2024年3月）から変わっていない。"
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -430,7 +1031,47 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "百日せきの病原体はウイルスではなく細菌（百日せき菌）なので、(1)が誤りで正答。コレラはコレラ菌、マラリアはマラリア原虫、ツツガムシ病はリケッチアの一種が原因で、(2)から(4)の組合せは正しい。",
+        "perChoice": [
+          "誤り。百日せきの病原体は百日せき菌という細菌で、ウイルスではない。",
+          "正しい。コレラの病原体はコレラ菌（細菌）。汚染された水や食品から経口感染する。",
+          "正しい。マラリアの病原体はマラリア原虫（プラスモジウム属の原虫）。ハマダラカが媒介する。",
+          "正しい。ツツガムシ病はリケッチアの一種が病原体。ツツガムシ（ダニの一種）の幼虫が媒介する。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "ウイルス"
+        ],
+        "keyPoint": "細菌＝百日せき・コレラ。原虫＝マラリア。リケッチア＝ツツガムシ病。",
+        "sources": [
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『百日咳』",
+            "url": "https://id-info.jihs.go.jp/diseases/ha/pertussis/010/index.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『コレラ』",
+            "url": "https://id-info.jihs.go.jp/diseases/ka/cholera/index.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『マラリア（詳細版）』",
+            "url": "https://id-info.jihs.go.jp/diseases/ma/malaria/010/index.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『つつが虫病（詳細版）』",
+            "url": "https://id-info.jihs.go.jp/diseases/ta/Scrub-Typhus/010/tsutsugamushi.html",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -450,7 +1091,42 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "慢性化しないのはC型肝炎ではなくA型肝炎なので、(4)が誤りで正答。C型肝炎は感染した年齢に関係なく慢性化しやすく、B型肝炎も出産時や乳幼児期に感染すると慢性化しやすい。",
+        "perChoice": [
+          "正しい。A型肝炎は、ウイルスに汚染された水や食物を口にしてうつる経口感染。",
+          "正しい。B型肝炎は、出産時に母親から子どもへうつる垂直感染（母子感染）がある。",
+          "正しい。C型肝炎ウイルスは、感染している人の血液を介してうつる。",
+          "誤り。慢性化しないのはA型肝炎。C型肝炎は感染者の60〜80%が持続感染になり、慢性肝炎に進む。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "C型肝炎だけ"
+        ],
+        "keyPoint": "A型＝経口感染、慢性化しない。B型・C型＝血液・体液でうつり、慢性化することがある。",
+        "sources": [
+          {
+            "title": "国立健康危機管理研究機構 肝炎情報センター『急性肝炎』",
+            "url": "https://www.kanen.jihs.go.jp/sick/kinds/kyuusei.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 肝炎情報センター『B型肝炎』",
+            "url": "https://www.kanen.jihs.go.jp/sick/kinds/b_gata.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 肝炎情報センター『C型肝炎』",
+            "url": "https://www.kanen.jihs.go.jp/sick/kinds/c_gata.html",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -487,7 +1163,60 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "血液や体液を介してうつるのはB型肝炎とエイズなので、bとcの(2)が正答。腸チフスと腸管出血性大腸菌感染症は、菌に汚染された飲食物を口にしてうつる経口感染である。",
+        "perChoice": [
+          "bは正しいが、aは誤り。",
+          "bもcも正しい。",
+          "cは正しいが、dは誤り。",
+          "aもdも誤り。"
+        ],
+        "perStatement": [
+          "誤り。腸チフスは、チフス菌を含む便で汚染された食物や水を口にしてうつる経口感染。",
+          "正しい。B型肝炎ウイルスは血液や体液を介してうつる。母子感染や性行為、不衛生な器具などが経路になる。",
+          "正しい。HIVは血液、精液、腟分泌液などに多く含まれ、性的接触、血液、母子感染でうつる。",
+          "誤り。腸管出血性大腸菌は、飲食物を介した経口感染。患者の便で汚染されたものを口にしてもうつる。"
+        ],
+        "traps": [],
+        "keyPoint": "血液・体液＝B型肝炎、C型肝炎、エイズ。経口感染＝腸チフス、腸管出血性大腸菌、コレラ、A型肝炎。",
+        "sources": [
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『腸チフス・パラチフス（詳細版）』",
+            "url": "https://id-info.jihs.go.jp/diseases/ta/typhi/010/typhi-intro.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 肝炎情報センター『B型肝炎』",
+            "url": "https://www.kanen.jihs.go.jp/sick/kinds/b_gata.html",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省『HIVとエイズ』",
+            "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/kekkaku-kansenshou/aids/index.html",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省『腸管出血性大腸菌Q&A』",
+            "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000177609.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 肝炎情報センター『急性肝炎』",
+            "url": "https://www.kanen.jihs.go.jp/sick/kinds/kyuusei.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『コレラ』",
+            "url": "https://id-info.jihs.go.jp/diseases/ka/cholera/index.html",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -510,7 +1239,50 @@
         4
       ],
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "梅毒は、妊娠中の母体から胎盤を通じて胎児にうつること（先天梅毒）があるので(2)が正答。麻しんも胎盤を介した感染の可能性を排除できないとして、公式に(2)と(4)のどちらも正解とされた。",
+        "perChoice": [
+          "誤り。ジフテリアは主に飛まつ感染と接触感染でうつる。",
+          "正答。妊娠中の人が梅毒に感染すると、胎盤を通じて胎児にも感染し、死産や早産などの原因になる。",
+          "誤り。細菌性赤痢は、患者や保菌者の便で汚染された手指、食品、水などを介してうつる。",
+          "正答。公式の注記のとおり。東京都の母子感染の資料も、妊娠中に感染し胎児に感染すると流産や早産の原因になるとしている。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "胎盤を介して胎児にうつる代表は梅毒（先天梅毒）。この問題は麻しんも正解扱い。",
+        "sources": [
+          {
+            "title": "理容師美容師試験研修センター『第49回美容師国家試験 筆記試験問題』（問題20の注意事項）",
+            "url": "https://www.rbc.or.jp/wp-content/uploads/2024/03/49bhikki.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "厚生労働省『梅毒』",
+            "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/kekkaku-kansenshou/seikansenshou/syphilis.html",
+            "type": "gov"
+          },
+          {
+            "title": "東京都福祉局『母子感染について～妊娠中・これから妊娠を考えている方へ～』",
+            "url": "https://www.fukushi.metro.tokyo.lg.jp/kodomo/shussan/kenkou/boshikansen",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『ジフテリア』",
+            "url": "https://id-info.jihs.go.jp/diseases/sa/diphteria/index.html",
+            "type": "gov"
+          },
+          {
+            "title": "国立健康危機管理研究機構 感染症情報提供サイト『細菌性赤痢（詳細版）』",
+            "url": "https://id-info.jihs.go.jp/diseases/sa/dysentery/010/dysentery-intro.html",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": "公式の注意事項：梅毒トレポネーマは経胎盤感染を引きおこすことがあり、麻しんウイルスについても経胎盤感染を引きおこす可能性を排除できないため、(2)と(4)のいずれも正解として採点された。",
       "ocrChecked": true
     },
@@ -530,7 +1302,39 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "血液の付いていないヘアブラシは、逆性石けん0.1%以上の水溶液に10分間以上浸す方法で消毒できるので3が正しい（美容師法施行規則第25条第2号ヘ）。かみそりと血液の付いた器具は第1号の扱いで、煮沸、エタノールに浸す、0.1%以上の次亜塩素酸ナトリウムに浸す、の3つに限られる。",
+        "perChoice": [
+          "誤り。かみそりは血液の有無にかかわらず第1号の扱い。次亜塩素酸ナトリウムは0.01%ではなく0.1%以上が必要。",
+          "誤り。80℃を超える湿熱（蒸気）は、血液の付いていない器具にだけ使える方法。血液の付いた器具には使えない。",
+          "正しい。かみそり以外で血液の付いていない器具は、逆性石けん0.1%以上の水溶液に10分間以上浸せばよい。",
+          "誤り。血液の付いた器具は、ふく方法では足りない。エタノール水溶液なら10分間以上浸す。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "0.01%以上",
+          "80℃を超える湿熱",
+          "綿又はガーゼで拭く"
+        ],
+        "keyPoint": "かみそり・血液付着＝煮沸2分、エタノール10分浸す、次亜塩素酸ナトリウム0.1%で10分。紫外線・蒸気・ふく・逆性石けんなどは血液なしの器具だけ。",
+        "sources": [
+          {
+            "title": "美容師法施行規則 第25条（消毒の方法）",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          },
+          {
+            "title": "厚生労働省『理容所及び美容所における衛生管理要領について』（昭和56年6月1日 環指第95号）第5 消毒",
+            "url": "https://www.mhlw.go.jp/content/11130500/001403692.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -550,7 +1354,37 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "薬液消毒の殺菌効果の3要素は温度・濃度・時間とされ、湿度は入らないので、4が誤りで正答。消毒薬は温度が高いほど、濃いほど、長く作用させるほどよく効く。",
+        "perChoice": [
+          "正しい。美容師法施行規則では、煮沸は沸騰後2分間以上、蒸気（80℃を超える湿熱）は10分間以上。",
+          "正しい。消毒薬は温度が高いほど反応が速く、作用時間が短くてすむ。温度が低ければ時間は長くかかる。",
+          "正しい。水分が多いほうが微生物のタンパク質が熱で変化しやすいので、乾熱より湿熱のほうがよく効くとされる。",
+          "誤り。3要素は温度・濃度・時間。湿度ではなく時間が入る。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "湿度"
+        ],
+        "keyPoint": "薬液消毒の3要素＝温度・濃度・時間。加熱消毒は煮沸2分、蒸気10分で、乾熱より湿熱が効く。",
+        "sources": [
+          {
+            "title": "美容師法施行規則 第25条（消毒の方法）",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          },
+          {
+            "title": "小出美容専門学校『衛生管理（衛生管理技術）まとめ』",
+            "url": "https://koide-beauty.ac.jp/_src/113282/2025eisei.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -570,7 +1404,42 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "紫外線殺菌灯は光っていても、長く使うと紫外線の出力が落ちて殺菌力が下がるので、3が誤りで正答。衛生管理要領は、2,000から3,000時間の照射で出力が低下するため取替えが必要としている。",
+        "perChoice": [
+          "正しい。殺菌灯は、殺菌力の強い253.7ナノメートル付近の紫外線を出すように作られているとされる。",
+          "正しい。かみそり以外で血液の付いていない器具は、1cm²当たり85マイクロワット以上を20分間以上照射する方法でよい。",
+          "誤り。使用時間が長くなると出力が下がる。2,000から3,000時間の照射で取替えが必要。",
+          "正しい。紫外線は直接当たった面にしか効かない。陰にならないように並べて照射する。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "使用時間にかかわらず"
+        ],
+        "keyPoint": "紫外線消毒＝85マイクロワット以上を20分間以上。効くのは光が当たる表面だけ。殺菌灯は2,000から3,000時間で交換。",
+        "sources": [
+          {
+            "title": "美容師法施行規則 第25条（消毒の方法）",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          },
+          {
+            "title": "厚生労働省『理容所及び美容所における衛生管理要領について』（昭和56年6月1日 環指第95号）第3の1(13)・第5の2",
+            "url": "https://www.mhlw.go.jp/content/11130500/001403692.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "小出美容専門学校『衛生管理（衛生管理技術）まとめ』",
+            "url": "https://koide-beauty.ac.jp/_src/113282/2025eisei.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -607,7 +1476,48 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "aとbが正しいので1が正答。次亜塩素酸ナトリウムには漂白作用があり、酸性のものが混ざると有害な塩素ガスが出る。10分間程度では芽胞（熱や薬に強い、細菌の休眠した形）に十分効かず、有機物の汚れがあると効力が下がる。",
+        "perChoice": [
+          "aもbも正しい。",
+          "bは正しいが、cは誤り。10分間程度では芽胞は不活化されない。",
+          "cもdも誤り。",
+          "aは正しいが、dは誤り。有機物の汚れで効力が下がる。"
+        ],
+        "perStatement": [
+          "正しい。漂白作用があり、色物の布は色落ちすることがあるとされる。",
+          "正しい。酸性のものが混ざると塩素ガスが発生する。酸性の洗剤と一緒に使わない。",
+          "誤り。細菌の芽胞には十分な効果が得られないことがあり、10分間程度の作用では不活化されないとされる。",
+          "誤り。血液や汚れなどの有機物は殺菌作用を弱める。汚れを十分に洗い落としてから消毒する。"
+        ],
+        "traps": [
+          "芽胞は不活化する",
+          "消毒効果は低下しない"
+        ],
+        "keyPoint": "次亜塩素酸ナトリウム＝漂白作用あり、金属を腐食、酸性のものと混ぜない、汚れで効力低下、冷暗所に保存。",
+        "sources": [
+          {
+            "title": "PMDA 医療用医薬品情報『ハイポライト消毒液10%』（次亜塩素酸ナトリウム。適用上の注意・取扱い上の注意・殺菌作用）",
+            "url": "https://www.pmda.go.jp/PmdaSearch/iyakuDetail/300506_2611700Q2034_1_04",
+            "type": "gov"
+          },
+          {
+            "title": "小出美容専門学校『衛生管理（衛生管理技術）まとめ』",
+            "url": "https://koide-beauty.ac.jp/_src/113282/2025eisei.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "厚生労働省『理容所及び美容所における衛生管理要領について』（昭和56年6月1日 環指第95号）第5 消毒",
+            "url": "https://www.mhlw.go.jp/content/11130500/001403692.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -627,7 +1537,35 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "4だけ計算が合うので4が正答。できあがりの濃度は「原液の濃度 × 原液の量 ÷ 全体の量」で求める。4は 5% × 10mL ÷ 1,000mL = 50 ÷ 1,000 = 0.05%。水990mLと原液10mLで全体は 990 + 10 = 1,000mL。1から3は、どれも全体は1,000mLになるが、濃度が問題文の数値と合わない。",
+        "perChoice": [
+          "誤り。10% × 10mL ÷ 1,000mL = 0.1%で、0.2%にならない。0.2%には原液20mLと水980mLが必要。",
+          "誤り。10% × 20mL ÷ 1,000mL = 0.2%で、0.1%にならない。0.1%には原液10mLと水990mLが必要。",
+          "誤り。20% × 5mL ÷ 1,000mL = 0.1%で、0.05%にならない。0.05%には原液2.5mLと水997.5mLが必要。",
+          "正しい。5% × 10mL ÷ 1,000mL = 0.05%。水は 1,000 − 10 = 990mL。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "原液の濃度 × 原液の量 ＝ 作りたい濃度 × 作りたい量。水の量は、作りたい量から原液の量を引く。",
+        "sources": [
+          {
+            "title": "美容師法施行規則 第25条（消毒の方法。各消毒薬の濃度）",
+            "url": "https://laws.e-gov.go.jp/law/410M50000100007",
+            "type": "law"
+          },
+          {
+            "title": "厚生労働省『理容所及び美容所における衛生管理要領について』（昭和56年6月1日 環指第95号）第5 消毒",
+            "url": "https://www.mhlw.go.jp/content/11130500/001403692.pdf",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -647,7 +1585,30 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "上腕二頭筋は自分の意志で動かす骨格筋で、脳や脊髄からの指令を筋肉に伝えて収縮させるのは運動神経なので、1が正答。知覚神経は感覚を脳へ伝え、交感神経と副交感神経は内臓の働きを調節する。",
+        "perChoice": [
+          "正しい。運動神経は脳と脊髄からの指令を骨格筋に伝え、筋肉を動かす。",
+          "誤り。知覚神経（感覚神経）は、触った感じ、温度、痛みなどの情報を体から脳へ伝える神経。",
+          "誤り。交感神経は自律神経の一つ。緊張時や緊急時に内臓の働きを調節する神経で、骨格筋を収縮させる神経ではない。",
+          "誤り。副交感神経も自律神経の一つ。ふだんの状態で内臓の働きを保つ神経で、骨格筋を収縮させる神経ではない。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "骨格筋を動かす＝運動神経。感覚を伝える＝知覚神経。内臓を調節＝自律神経（交感神経・副交感神経）。",
+        "sources": [
+          {
+            "title": "MSDマニュアル家庭版『神経』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/09-%E8%84%B3-%E8%84%8A%E9%AB%84-%E6%9C%AB%E6%A2%A2%E7%A5%9E%E7%B5%8C%E3%81%AE%E7%97%85%E6%B0%97/%E7%A5%9E%E7%B5%8C%E7%B3%BB%E3%81%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E7%A5%9E%E7%B5%8C",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -667,7 +1628,34 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "網膜の視細胞が光を電気信号に変え、その信号が視神経を通って脳に送られるので、4が正しい。光は角膜から入り、水晶体で焦点を合わせ、網膜で感じ取られる。",
+        "perChoice": [
+          "誤り。光が入るのは眼球結膜ではなく角膜。結膜は白目（強膜）の前面とまぶたの裏を覆う薄い膜。",
+          "誤り。焦点を調節するレンズは硝子体ではなく水晶体。硝子体は水晶体の後ろを満たすゼリー状のもの。",
+          "誤り。杆体細胞と錐体細胞があるのは角膜ではなく網膜。",
+          "正しい。視細胞が光を信号に変え、視神経が脳へ伝える。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "眼球結膜",
+          "硝子体",
+          "角膜には"
+        ],
+        "keyPoint": "光の道すじ：角膜→瞳孔→水晶体（レンズ）→硝子体→網膜（杆体・錐体）→視神経→脳。",
+        "sources": [
+          {
+            "title": "MSDマニュアル家庭版『目の構造と機能』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/20-%E7%9C%BC%E3%81%AE%E7%97%85%E6%B0%97/%E7%9C%BC%E3%81%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E7%9B%AE%E3%81%AE%E6%A7%8B%E9%80%A0%E3%81%A8%E6%A9%9F%E8%83%BD",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -687,7 +1675,40 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "ヒトの赤血球は中央がくぼんだ円盤形で、核がないので2が正答。好中球・単球・リンパ球はどれも白血球の仲間で、白血球は核をもつ細胞である。",
+        "perChoice": [
+          "核がある。好中球は白血球の一種で、白血球の中で最も数が多い。",
+          "正答。哺乳類の赤血球は無核。ヘモグロビンを含み、酸素を運ぶ。",
+          "核がある。単球は白血球の一種。",
+          "核がある。リンパ球は白血球の一種。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "核がない＝赤血球（血小板も細胞ではない小さな粒子）。白血球（好中球・好酸球・好塩基球・単球・リンパ球）は核がある。",
+        "sources": [
+          {
+            "title": "コトバンク『赤血球』（デジタル大辞泉ほか）",
+            "url": "https://kotobank.jp/word/%E8%B5%A4%E8%A1%80%E7%90%83",
+            "type": "academic"
+          },
+          {
+            "title": "コトバンク『白血球』（精選版 日本国語大辞典、百科事典マイペディアほか）",
+            "url": "https://kotobank.jp/word/%E7%99%BD%E8%A1%80%E7%90%83",
+            "type": "academic"
+          },
+          {
+            "title": "MSDマニュアル家庭版『血液の成分』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/13-%E8%A1%80%E6%B6%B2%E3%81%AE%E7%97%85%E6%B0%97/%E8%A1%80%E6%B6%B2%E3%81%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E8%A1%80%E6%B6%B2%E3%81%AE%E6%88%90%E5%88%86",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -707,7 +1728,35 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "ガス交換（酸素と二酸化炭素のやり取り）が行われるのは肺胞なので3が正答。肺胞は細い気管支の先にある小さな袋で、ごく薄い壁に毛細血管が集まり、酸素が血液へ、二酸化炭素が肺胞へ移る。",
+        "perChoice": [
+          "誤り。気管は空気の通り道（最も太い気道）で、ガス交換は行わない。",
+          "誤り。喉頭は空気の通り道で、声を出す働きがある。飲み込むときは喉頭蓋が閉じて食べ物が気道に入るのを防ぐ。",
+          "正しい。肺胞と毛細血管の間で酸素と二酸化炭素が交換される。",
+          "誤り。鼻腔は空気の入り口で、においを感じる働きを助ける。ガス交換は行わない。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "空気の通り道＝鼻腔・喉頭・気管・気管支。ガス交換の場＝肺胞。",
+        "sources": [
+          {
+            "title": "MSDマニュアル家庭版『呼吸器系の概要』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/07-%E8%82%BA%E3%81%A8%E6%B0%97%E9%81%93%E3%81%AE%E7%97%85%E6%B0%97/%E8%82%BA%E3%81%A8%E6%B0%97%E9%81%93%E3%81%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E5%91%BC%E5%90%B8%E5%99%A8%E7%B3%BB%E3%81%AE%E6%A6%82%E8%A6%81",
+            "type": "academic"
+          },
+          {
+            "title": "MSDマニュアル家庭版『酸素と二酸化炭素の交換』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/07-%E8%82%BA%E3%81%A8%E6%B0%97%E9%81%93%E3%81%AE%E7%97%85%E6%B0%97/%E8%82%BA%E3%81%A8%E6%B0%97%E9%81%93%E3%81%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E9%85%B8%E7%B4%A0%E3%81%A8%E4%BA%8C%E9%85%B8%E5%8C%96%E7%82%AD%E7%B4%A0%E3%81%AE%E4%BA%A4%E6%8F%9B",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -727,7 +1776,40 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "蠕動運動は、腸の輪状のくびれが口側から肛門側へ波のように伝わり、内容物を先へ送る運動なので3が正答。分節運動と振子運動は内容物を消化液と混ぜる局所的な動きで、送る働きはない。",
+        "perChoice": [
+          "誤り。分節運動は腸が一定の間隔でくびれ、内容物を消化液と混ぜ合わせる運動。一方向には送らない。",
+          "誤り。振子運動は縦方向の筋肉（縦走筋）の収縮による局所的な運動で、内容物の移送には関与しないとされる。",
+          "正しい。収縮の波が肛門側へ伝わり、内容物もその方向へ送られる。",
+          "誤り。嚥下は食べ物を飲み込む動きで、口からのど、食道へ送る働き。小腸の運動ではない。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "送る＝蠕動運動。混ぜる＝分節運動・振子運動。嚥下は飲み込むこと。",
+        "sources": [
+          {
+            "title": "コトバンク『小腸』（日本大百科全書（ニッポニカ）ほか）",
+            "url": "https://kotobank.jp/word/%E5%B0%8F%E8%85%B8",
+            "type": "academic"
+          },
+          {
+            "title": "コトバンク『分節運動』（デジタル大辞泉、日本大百科全書（ニッポニカ）ほか）",
+            "url": "https://kotobank.jp/word/%E5%88%86%E7%AF%80%E9%81%8B%E5%8B%95",
+            "type": "academic"
+          },
+          {
+            "title": "MSDマニュアル家庭版『のどと食道』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/03-%E6%B6%88%E5%8C%96%E5%99%A8%E7%B3%BB%E3%81%AE%E7%97%85%E6%B0%97/%E6%B6%88%E5%8C%96%E5%99%A8%E7%B3%BB%E3%81%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E3%81%AE%E3%81%A9%E3%81%A8%E9%A3%9F%E9%81%93",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -747,7 +1829,35 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "表皮を構成する細胞の95%は角化細胞（ケラチノサイト）なので、2が正答。色素細胞やランゲルハンス細胞などは残りの5%に含まれる。線維芽細胞は表皮ではなく真皮の細胞である。",
+        "perChoice": [
+          "最多ではない。色素細胞はメラニンを作る細胞で、角化細胞以外の約5%の中に含まれる。",
+          "正しい。表皮の細胞の95%を占め、基底層で分裂して上の層へ移りながら角質になっていく。",
+          "該当しない。線維芽細胞は真皮にあり、膠原線維（コラーゲン）や弾性線維を作る細胞。",
+          "最多ではない。ランゲルハンス細胞は免疫に関わる細胞で、角化細胞以外の約5%の中に含まれる。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "表皮の95%は角化細胞。残り5%が色素細胞・ランゲルハンス細胞・メルケル細胞。線維芽細胞は真皮。",
+        "sources": [
+          {
+            "title": "北海道大学皮膚科『あたらしい皮膚科学』1章 表皮（構成する細胞の95%は角化細胞）",
+            "url": "https://www.derm-hokudai.jp/wp/wp-content/uploads/2021/12/1-02.pdf",
+            "type": "academic"
+          },
+          {
+            "title": "北海道大学皮膚科『あたらしい皮膚科学』1章 真皮（線維芽細胞）",
+            "url": "https://www.derm-hokudai.jp/wp/wp-content/uploads/2021/12/1-05.pdf",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -767,7 +1877,32 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "脂腺は手掌（手のひら）と足底（足の裏）にはないので、3が誤り。独立脂腺は毛のない部位で皮膚の表面に直接開く脂腺のことで、口唇や乳輪などにある。",
+        "perChoice": [
+          "正しい。毛母には、毛にメラニンを渡す色素細胞（メラノサイト）が混ざって存在する。",
+          "正しいとされる。立毛筋は毛を立てる筋肉で、教科書ではすべての毛にあるわけではないとされる（要確認）。",
+          "誤り。手掌と足底には脂腺がない。独立脂腺があるのは口唇、頬の粘膜、乳輪など。",
+          "正しいとされる。エクリン腺は口唇など一部を除く全身にあり、手掌・足底に多い。出生時の状態は要確認。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "手掌や足底"
+        ],
+        "keyPoint": "手掌・足底は、脂腺と毛がなく、エクリン腺が多い。独立脂腺は口唇・乳輪など毛のない部位。",
+        "sources": [
+          {
+            "title": "北海道大学皮膚科『あたらしい皮膚科学』1章 付属器（毛器官・立毛筋・脂腺・汗腺）",
+            "url": "https://www.derm-hokudai.jp/wp/wp-content/uploads/2021/12/1-08.pdf",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -788,7 +1923,40 @@
       "answer": 0,
       "scoringExcluded": true,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "公式に「正解となる選択肢がない」とされ、採点から除外された問題。誤りと言い切れる記述が4つの中にないと判断されたことになる。どの記述が問題になったかの詳しい理由は、資料で確認できていない（要確認）。",
+        "perChoice": [
+          "公式には誤りとされなかった。大学の皮膚科教科書では、皮表の膜の働きは殺菌・有害物質の侵入防止・保湿で、外力のクッションは皮下脂肪の役目とされる（要確認）。",
+          "正しい。メラニンの最も重要な役割は紫外線からの防御とされる。",
+          "正しいとされる。角質層のケラチンは化学的な刺激に強いタンパク質とされる（一次資料は要確認）。",
+          "正しいとされる。常在菌がすみつくことで病原菌が増えにくくなるとされる（一次資料は要確認）。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "この問題は採点対象外。メラニン＝光線（紫外線）からの保護は確実に覚える。",
+        "sources": [
+          {
+            "title": "北海道大学皮膚科『あたらしい皮膚科学』1章 付属器（脂腺・皮表膜の働き）",
+            "url": "https://www.derm-hokudai.jp/wp/wp-content/uploads/2021/12/1-08.pdf",
+            "type": "academic"
+          },
+          {
+            "title": "北海道大学皮膚科『あたらしい皮膚科学』1章 表皮（メラニンの役割）",
+            "url": "https://www.derm-hokudai.jp/wp/wp-content/uploads/2021/12/1-04.pdf",
+            "type": "academic"
+          },
+          {
+            "title": "北海道大学皮膚科『あたらしい皮膚科学』1章 皮下脂肪組織（物理的外力に対するクッション）",
+            "url": "https://www.derm-hokudai.jp/wp/wp-content/uploads/2021/12/1-07.pdf",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 0,
+        "confidence": "low",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": "公式の注意事項：問題33は、正解となる選択肢がないため採点対象から除外された。",
       "ocrChecked": true
     },
@@ -808,7 +1976,52 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "蕁麻疹は心臓疾患に特有の皮膚の状態ではないので、1が誤り。蕁麻疹の主な原因は食物、薬、感染、こすれや寒さなどの刺激で、関係することがある内臓の病気にも心臓病は挙げられていない。心臓の病気で出やすいのはむくみである。",
+        "perChoice": [
+          "誤り。蕁麻疹は食物・薬・感染・物理的な刺激などで起こる。心臓疾患ではむくみなどがみられる。",
+          "正しい。肝臓の働きが落ちると血液中にビリルビン（黄色い色素）が増え、皮膚や白目が黄色くなる。",
+          "正しい。腎臓の病気では体に水分がたまり、広い範囲にむくみが出る。",
+          "正しい。糖尿病では血流や神経の働きが落ち、細菌や真菌（水虫など）の感染が起こりやすい。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "蕁麻疹"
+        ],
+        "keyPoint": "肝臓＝黄疸、腎臓・心臓＝むくみ、糖尿病＝細菌や真菌の感染。",
+        "sources": [
+          {
+            "title": "日本皮膚科学会 皮膚科Q&A『蕁麻疹』Q7 その他どんなことで起きるのでしょう？",
+            "url": "https://qa.dermatol.or.jp/qa9/q07.html",
+            "type": "academic"
+          },
+          {
+            "title": "日本皮膚科学会 皮膚科Q&A『蕁麻疹』Q10 内蔵の病気と関係ありますか？",
+            "url": "https://qa.dermatol.or.jp/qa9/q10.html",
+            "type": "academic"
+          },
+          {
+            "title": "MSDマニュアル家庭版『大人の黄疸』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/04-%E8%82%9D%E8%87%93%E3%81%A8%E8%83%86%E5%9A%A2%E3%81%AE%E7%97%85%E6%B0%97/%E8%82%9D%E7%96%BE%E6%82%A3%E3%81%AE%E7%97%87%E7%8A%B6%E3%81%A8%E5%BE%B4%E5%80%99/%E6%88%90%E4%BA%BA%E3%81%AE%E9%BB%84%E7%96%B8",
+            "type": "academic"
+          },
+          {
+            "title": "MSDマニュアル家庭版『腫れ（浮腫）』",
+            "url": "https://www.msdmanuals.com/ja-jp/home/06-%E5%BF%83%E8%87%93%E3%81%A8%E8%A1%80%E7%AE%A1%E3%81%AE%E7%97%85%E6%B0%97/%E5%BF%83%E8%87%93%E3%81%A8%E8%A1%80%E7%AE%A1%E3%81%AE%E7%97%85%E6%B0%97%E3%81%AE%E7%97%87%E7%8A%B6/%E3%82%80%E3%81%8F%E3%81%BF",
+            "type": "academic"
+          },
+          {
+            "title": "国立健康危機管理研究機構 糖尿病情報センター『糖尿病足病変』",
+            "url": "https://dmic.jihs.go.jp/general/about-dm/060/040/01.html",
+            "type": "gov"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -828,7 +2041,50 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "頭部白癬（しらくも）は、白癬菌というカビ（真菌）が髪の毛に寄生して起こる感染症なので、4が正答。ほかの3つは病原体がうつって起こる病気ではない。",
+        "perChoice": [
+          "感染性ではない。皮膚の乾燥とバリア機能の弱さに、刺激やアレルギー反応が加わって起こる湿疹。",
+          "感染性ではない。日本皮膚科学会は、乾癬は決してうつらないと説明している。白癬と字が似ているので注意。",
+          "感染性とはされていない。色素細胞が減ったり消えたりして皮膚が白く抜ける後天性の病気。",
+          "正しい。白癬菌による感染症で、人のほかイヌやネコからうつることもある。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "白癬（はくせん）＝真菌の感染症。乾癬（かんせん）＝うつらない。字と読みが似ているので区別する。",
+        "sources": [
+          {
+            "title": "日本皮膚科学会 皮膚科Q&A『白癬』Q31 シラクモ（頭部白癬）とは何ですか？",
+            "url": "https://qa.dermatol.or.jp/qa10/q31.html",
+            "type": "academic"
+          },
+          {
+            "title": "日本皮膚科学会 皮膚科Q&A『白癬』Q8 白癬はどのようにしてうつるのですか？",
+            "url": "https://qa.dermatol.or.jp/qa10/q08.html",
+            "type": "academic"
+          },
+          {
+            "title": "日本皮膚科学会 皮膚科Q&A『乾癬』Q4 うつりませんか？",
+            "url": "https://qa.dermatol.or.jp/qa14/q04.html",
+            "type": "academic"
+          },
+          {
+            "title": "日本皮膚科学会 皮膚科Q&A『アトピー性皮膚炎』Q2 アトピー性皮膚炎とはどのような病気ですか？",
+            "url": "https://qa.dermatol.or.jp/qa1/q02.html",
+            "type": "academic"
+          },
+          {
+            "title": "日本皮膚科学会 皮膚科Q&A『白斑』Q1",
+            "url": "https://qa.dermatol.or.jp/qa20/s1_q01.html",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -848,7 +2104,54 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "リンスに使う陽イオン界面活性剤は、マイナスに帯電した毛髪の表面に吸着して静電気を抑えるので、4が正しい。1はミセルの向きが逆、2は乳化ではなく分散、3の石けんは陰イオン界面活性剤である。",
+        "perChoice": [
+          "誤り。水中のミセル（界面活性剤の集まり）は、油になじむ疎水性の部分を内側、親水性の部分を外側に向ける。",
+          "誤り。固体の粒子を液体に散らばらせるのは分散。乳化は、混ざらない液体どうし（水と油）で行う。",
+          "誤り。石けん（脂肪酸ナトリウムなど）は陰イオン界面活性剤に分類される。",
+          "正しい。塩化アルキルトリメチルアンモニウムなどが毛髪に吸着し、静電気を抑えてくし通りをよくする。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "疎水性の部分を外側",
+          "乳化",
+          "陽イオン界面活性剤である"
+        ],
+        "keyPoint": "石けん＝陰イオン（洗浄）。第四級アンモニウム塩＝陽イオン（リンス・帯電防止）。液体と液体＝乳化、固体と液体＝分散。",
+        "sources": [
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『ミセル』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1704",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『乳化』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1209",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『分散』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1560",
+            "type": "academic"
+          },
+          {
+            "title": "消費者庁 家庭用品品質表示法『界面活性剤の区分・種類の名称』（雑貨工業品）",
+            "url": "https://www.caa.go.jp/policies/policy/representation/household_goods/guide/zakka/zakka_06.html",
+            "type": "gov"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『ヘアリンス（ヘアトリートメント剤）』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1588",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -871,7 +2174,52 @@
         3
       ],
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "公式に2と3の両方が正答とされた。3は、タール色素は光で色が変わることがあるので誤り。2は、酸化チタンは白色顔料の代表だが「酸化チタン＝白色顔料」とは限らないとして、これも正答として採点された。",
+        "perChoice": [
+          "正しい。酸化鉄は無機の着色顔料で、黄酸化鉄・べんがら（赤）・黒酸化鉄がある。",
+          "公式に正答扱い。酸化チタンは代表的な白色顔料だが、日焼け止めに使う超微粒子のものは透明性があり、白色顔料と言い切れない。",
+          "誤り（正答）。有機合成色素は光で変色・退色することがある。耐光性に優れるのは無機顔料のほう。",
+          "正しい。雲母チタン（酸化チタンで覆った雲母）は、真珠のような光沢を出すパール剤の主流。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "受けることはない"
+        ],
+        "keyPoint": "無機顔料（酸化鉄・酸化チタン）は光や熱に強い。有機合成色素（タール色素）は色が鮮やかだが光で変化しうる。",
+        "sources": [
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『無機着色顔料』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1719",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『白色顔料』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1269",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『二酸化チタン』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1196",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『有機合成色素』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1799",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『パール剤』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1318",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": "公式の注意事項：酸化チタンは白色顔料の代表的な物質であって酸化チタン＝白色顔料ではなく、有機合成色素(タール色素)は光による経時変化を受けることがあるため、(2)と(3)のいずれも正解として採点された。",
       "ocrChecked": true
     },
@@ -891,7 +2239,44 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "微生物による変質を防ぐのは防腐剤、酸化の原因は空気中の酸素、金属イオン封鎖剤の代表はエデト酸（EDTA）なので、2が正しい。金属イオンは微量でも油脂の酸化を早めるため、封鎖剤で金属イオンをつかまえて働けなくする。",
+        "perChoice": [
+          "BとCが誤り。酸化を起こすのは窒素ではなく酸素。Cにはエデト酸が入る。",
+          "正しい。パラベンは最もよく使われる防腐剤。酸化は酸素で進み、EDTAは金属イオンと結合して劣化を防ぐ。",
+          "AとCが誤り。パラベンは抗酸化剤ではなく防腐剤。Cにはエデト酸が入る。",
+          "AとBが誤り。Aは防腐剤、Bは酸素が入る。Cのエデト酸だけ合っている。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "窒素",
+          "抗酸化剤",
+          "イソプロピルメチルフェノール"
+        ],
+        "keyPoint": "防腐剤＝パラベン（微生物対策）。酸化防止剤＝トコフェロール（酸素対策）。金属イオン封鎖剤＝エデト酸（EDTA）。",
+        "sources": [
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『防腐剤』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1632",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『酸化防止剤』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/676",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『金属封鎖剤』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/438",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -911,7 +2296,47 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "ジメチルエーテル（DME）は保湿剤ではなく、スプレーなどのエアゾール製品で中身を霧状に押し出すためのガス（噴射剤）なので、1が誤り。同じ目的で液化石油ガス（LPG）も使われる。",
+        "perChoice": [
+          "誤り。DMEはエアゾール製品に詰める加圧用のガス（噴射剤）。保湿剤ではない。",
+          "正しい。PVPは水にも有機溶媒にも溶け、乾くと皮膜が残る高分子。皮膜で髪型を保つ。",
+          "正しいとされる。ヘアリキッドは透明な液状の整髪剤。エタノールを溶剤に使う点は教科書で要確認。",
+          "正しい。植物性ポマードは、ヒマシ油を木ろう（モクロウ）で固めてゲル状にしたもの。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "保湿剤"
+        ],
+        "keyPoint": "DME・LPG＝噴射剤。PVP＝皮膜形成剤。植物性ポマード＝ヒマシ油＋木ろう。",
+        "sources": [
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『エアゾール製品』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/149",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『ポリビニルピロリドン』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1663",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『ポマード』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1653",
+            "type": "academic"
+          },
+          {
+            "title": "日本化粧品技術者会 化粧品用語集『ヘアスタイリング剤』",
+            "url": "https://www.sccj-ifscc.com/library/glossary_detail/1580",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -931,7 +2356,35 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "二浴式パーマ剤の第1剤はチオグリコール酸などの還元剤、第2剤は臭素酸ナトリウムなどの酸化剤が有効成分なので、3が正しい。第1剤が毛髪のシスチン結合を切り、第2剤が結合をつなぎ直す。",
+        "perChoice": [
+          "AとCが逆。臭素酸ナトリウムは第2剤の酸化剤、チオグリコール酸は第1剤の還元剤。",
+          "4つとも合っていない。成分の順番も、還元剤と酸化剤の順番も逆になっている。",
+          "正しい。第1剤＝チオグリコール酸（還元剤）、第2剤＝臭素酸ナトリウム（酸化剤）。",
+          "BとDが逆。チオグリコール酸は還元剤、臭素酸ナトリウムは酸化剤。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "第1剤＝還元剤（チオグリコール酸・システイン）で切る。第2剤＝酸化剤（臭素酸塩・過酸化水素）でつなぐ。",
+        "sources": [
+          {
+            "title": "日本パーマネントウェーブ液工業組合『パーマのメカニズム』",
+            "url": "https://www.perm.or.jp/about-perm/mechanism/",
+            "type": "academic"
+          },
+          {
+            "title": "パーマネント・ウェーブ用剤品質規格（日本パーマネントウェーブ液工業組合掲載）",
+            "url": "https://www.perm.or.jp/i4zzkldg1tez/wp-content/themes/permtheme/about-perm/approval/pdf/hinshitu.pdf",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": "2026-11",
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -951,7 +2404,57 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "唐人髷（とうじんまげ）と結綿（ゆいわた）は束髪ではなく日本髪なので1が誤り。束髪は明治18年に婦人束髪会が広めた洋風の簡便な髪型で、上げ巻やマガレイト（まがれいと）などがある。",
+        "perChoice": [
+          "誤り。唐人髷は少女の髪形、結綿は島田髷の一種で未婚女性の髪形。どちらも日本髪で、束髪ではない。",
+          "正しい。明治時代も、既婚女性は丸髷を結った。",
+          "正しい。婦人束髪会は、手入れが大変で不便・不経済な日本髪に替わる髪型として束髪を広めた。",
+          "正しい。女性の断髪は社会から非難を浴び、東京府は女性の断髪を禁止した。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "代表的な束髪"
+        ],
+        "keyPoint": "束髪＝上げ巻・下げ巻・イギリス結び・まがれいと・ひさし髪。日本髪＝桃割れ・唐人髷・結綿・丸髷など。",
+        "sources": [
+          {
+            "title": "コトバンク「唐人髷」（デジタル大辞泉・精選版 日本国語大辞典ほか）",
+            "url": "https://kotobank.jp/word/%E5%94%90%E4%BA%BA%E9%AB%B7-580670",
+            "type": "academic"
+          },
+          {
+            "title": "コトバンク「結綿」（デジタル大辞泉・ブリタニカ国際大百科事典ほか）",
+            "url": "https://kotobank.jp/word/%E7%B5%90%E7%B6%BF-144578",
+            "type": "academic"
+          },
+          {
+            "title": "コトバンク「束髪」（デジタル大辞泉・日本大百科全書・世界大百科事典ほか）",
+            "url": "https://kotobank.jp/word/%E6%9D%9F%E9%AB%AA",
+            "type": "academic"
+          },
+          {
+            "title": "ポーラ文化研究所『もっと知りたい日本髪 021 束髪』",
+            "url": "https://www.cosmetic-culture.po-holdings.co.jp/culture/nihongami/21.html",
+            "type": "academic"
+          },
+          {
+            "title": "ポーラ文化研究所『もっと知りたい日本髪 020 文明開化と日本髪』",
+            "url": "https://www.cosmetic-culture.po-holdings.co.jp/culture/nihongami/20.html",
+            "type": "academic"
+          },
+          {
+            "title": "小出美容専門学校『文化論 まとめ』（明治時代の髪型）",
+            "url": "https://www.koide-beauty.ac.jp/_src/112909/2025bunkaron.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -971,7 +2474,30 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "1958年のパリ・コレクションで多くのデザイナーが採用し、日本で大流行した筒形のシルエットの服はサックドレスなので2が正答。日本では作りやすく着やすい服として紹介された。ほかの3つは流行した時期やきっかけが違う。",
+        "perChoice": [
+          "誤り。マンボズボンは、マンボの流行期に若い男性の間で流行したズボン。",
+          "正しい。サックドレスは1958年のパリコレで採用された筒形のドレスで、日本で大流行した。",
+          "誤り。ミニスカートは1960年代。1965年のパリコレで話題になり、ツイッギーの来日を契機に流行のピークを迎えた。",
+          "誤り。ロングスカートは、第2次大戦後にアメリカンファッションの影響で流行した膝丈より長めのスカート。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "戦後のロングスカート→マンボズボン・落下傘スカート→1958年サックドレス→1960年代ミニスカート。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『文化論 まとめ』（1950年代・1960年代の服装）",
+            "url": "https://www.koide-beauty.ac.jp/_src/112909/2025bunkaron.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -991,7 +2517,34 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "花嫁の色直しは大振袖の二枚重ねが正式とされるので4が正答。懐剣は帯の左胸下にさし、小袖（掛下）の身丈は引き裾になる丈に仕立て、掛下帯は丸帯を文庫結びにする。",
+        "perChoice": [
+          "誤り。「右胸下」ではなく、懐剣（かいけん）は帯の左胸下にさす。",
+          "誤り。「かかとの位置」ではなく、裾を引く「引き裾」になる丈に仕立てる。",
+          "誤り。掛下帯は「半幅帯を二重太鼓」ではなく、丸帯を文庫結びにする。",
+          "正しい。色直しは大振袖の二枚重ねが正式とされる。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "右胸下",
+          "かかとの位置",
+          "半幅帯を二重太鼓"
+        ],
+        "keyPoint": "懐剣＝左胸下。小袖の身丈＝引き裾。掛下帯＝丸帯の文庫結び。色直し＝大振袖の二枚重ね。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『文化論 まとめ』（花嫁の礼装：小袖・掛下帯・小物・色直し）",
+            "url": "https://www.koide-beauty.ac.jp/_src/112909/2025bunkaron.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1013,7 +2566,45 @@
       "images": [
         "images/49/49-44.webp"
       ],
-      "explanation": null,
+      "explanation": {
+        "summary": "図のAは親指のつけ根のふくらみで母指球、Bは指の腹側の面をさしているので指腹、Cはまん中の指で中指なので2が正答。小指球は小指側のつけ根のふくらみ、環指は薬指のこと。",
+        "perChoice": [
+          "誤り。Aは親指側なので小指球ではない。Bも指の先端ではなく腹の面をさしている。",
+          "正しい。A＝母指球、B＝指腹、C＝中指。",
+          "誤り。Aは小指球ではなく母指球。Cは環指（薬指）ではなく中指。",
+          "誤り。Bは指先ではなく指腹。Cは環指（薬指）ではなく中指。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "母指球＝親指のつけ根のふくらみ。小指球＝小指側のふくらみ。指腹＝指の腹。環指＝薬指、示指＝人さし指。",
+        "sources": [
+          {
+            "title": "コトバンク「母指球」（世界大百科事典 旧版：手掌の母指側・小指側の盛りあがりを母指球・小指球と呼ぶ）",
+            "url": "https://kotobank.jp/word/%E6%AF%8D%E6%8C%87%E7%90%83",
+            "type": "academic"
+          },
+          {
+            "title": "コトバンク「環指」（世界大百科事典 旧版：薬指のこと）",
+            "url": "https://kotobank.jp/word/%E7%92%B0%E6%8C%87",
+            "type": "academic"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題』（序章 問題22）",
+            "url": "https://www.koide-beauty.ac.jp/_src/113294/2024giriron1-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題回答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/113302/2024giriron1-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1033,7 +2624,35 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "コームの目（歯と歯の間）に入った毛髪を一線にそろえるのは歯元の働きなので3が正答。歯先は毛髪を引き起こすきっかけをつくり、歯は起こした毛髪を垂直に立てて支えるとされる。",
+        "perChoice": [
+          "誤り。歯は、引き起こした毛髪を垂直に立てて両側から支える部分とされる。",
+          "誤り。肩はコームの角の部分で、毛髪を一線にそろえる働きはないとされる。",
+          "正しい。歯元（歯のつけ根）は、コームの目に入った毛髪を一線にそろえる。",
+          "誤り。歯先は頭皮に接し、毛髪を引き起こす手引きをする。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "歯先＝引き起こす手引き／歯＝立てて支える／歯元＝一線にそろえる。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題』（第1章 美容用具 問題3・7・8・17・25・34）",
+            "url": "https://www.koide-beauty.ac.jp/_src/113294/2024giriron1-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題回答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/113302/2024giriron1-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1053,7 +2672,26 @@
       ],
       "answer": 3,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "ヘッドスパは頭皮のケアだけでなく毛髪のケアも目的に含み、髪質改善のトリートメントを同時に行うこともあるので3が誤り。毛穴の老廃物の除去、マッサージによる血行促進、リラクゼーションはいずれもヘッドスパの内容。",
+        "perChoice": [
+          "正しい。シャンプーだけでは落としきれない毛穴の老廃物を取り除き、頭皮をケアする。",
+          "正しい。頭部のマッサージで血行を促し、新陳代謝を高める。",
+          "誤り。「同時に行わない」が誤り。髪質改善のトリートメントを併せて行うこともある。",
+          "正しい。音やアロマなどでリラックスしてもらうのもヘッドスパの要素。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "同時に行わない"
+        ],
+        "keyPoint": "ヘッドスパ＝頭皮ケア＋マッサージ＋リラクゼーション。毛髪のトリートメントも併せて行える。",
+        "sources": [],
+        "crossChecked": 1,
+        "confidence": "low",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1075,7 +2713,45 @@
       "images": [
         "images/49/49-47.webp"
       ],
-      "explanation": null,
+      "explanation": {
+        "summary": "図は、平行な縦線に短い斜線を交差させると縦線が傾いて見える錯視で、角度・方向の錯視にあたるので3が正答。一般にツェルナー錯視と呼ばれる図形とされる。長さや大きさが違って見える錯視ではない。",
+        "perChoice": [
+          "誤り。分割距離錯視は、同じ長さでも間を区切ると長さが違って見える錯視。図は傾きの錯視。",
+          "誤り。距離・大きさの錯視は、長さや大きさが実際と違って見えるもの。図の線は傾いて見えている。",
+          "正しい。4本の縦線は平行だが、斜線の向きにつられて互いに傾いて見える。",
+          "誤り。大きさの対比は、まわりの図形の大小で中の図形の大きさが違って見える現象。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "平行線が傾いて見える＝角度・方向の錯視。長さ・大きさが違って見える＝距離・大きさの錯視。",
+        "sources": [
+          {
+            "title": "コトバンク「錯視」（世界大百科事典・日本大百科全書：ツェルナーの錯視は角度方向錯視）",
+            "url": "https://kotobank.jp/word/%E9%8C%AF%E8%A6%96",
+            "type": "academic"
+          },
+          {
+            "title": "コトバンク「幾何学的錯視」（ブリタニカ国際大百科事典 小項目事典・世界大百科事典 旧版）",
+            "url": "https://kotobank.jp/word/%E5%B9%BE%E4%BD%95%E5%AD%A6%E7%9A%84%E9%8C%AF%E8%A6%96",
+            "type": "academic"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題』（第3章 ヘアデザイン 問題1・4・5・7・8）",
+            "url": "https://www.koide-beauty.ac.jp/_src/113294/2024giriron1-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題回答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/113302/2024giriron1-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1095,7 +2771,38 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "パネル（カットのために引き出した毛束の面）を頭皮面に対して90度に引くことをオンベースというので1が正答。カットラインの長さの誤差は、パネルが短いほど、また幅が広いほど大きくなるとされる。",
+        "perChoice": [
+          "正しい。頭皮面に対して90度に引き出すのがオンベース。",
+          "誤り。幅が同じなら、パネルが短いほうが誤差は大きくなるとされる。",
+          "誤り。長さが同じなら、パネルの幅が広いほうが誤差は大きくなるとされる。",
+          "誤り。セイムレングスカット（全体を同じ長さに切る）は、アップステムではなくオンベースでシェープする。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "誤差が小さくなる",
+          "アップステム"
+        ],
+        "keyPoint": "オンベース＝頭皮面に90度。誤差が大きくなるのは「短いパネル」「幅の広いパネル」。セイムレングス＝オンベース。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題』（第4章 カッティング 問題8・9・24・44）",
+            "url": "https://www.koide-beauty.ac.jp/_src/113294/2024giriron1-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題回答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/113302/2024giriron1-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1115,7 +2822,35 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "フルウェーブをつくるにはロッド3回転分の毛髪の長さが必要とされるので、2の約9.4cmが正答。1回転分＝直径×円周率＝10mm×3.14＝31.4mm。3回転分＝31.4mm×3＝94.2mm＝9.42cmで、約9.4cm。",
+        "perChoice": [
+          "誤り。約11.3cmは、直径12mmのロッドの3回転分（12×3.14×3＝113.04mm）にあたる長さ。",
+          "正しい。10mm×3.14×3＝94.2mmで、約9.4cm。",
+          "誤り。約8.5cmは、直径9mmのロッドの3回転分（9×3.14×3＝84.78mm）にあたる長さ。",
+          "誤り。約7.5cmは、直径8mmのロッドの3回転分（8×3.14×3＝75.36mm）にあたる長さ。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "フルウェーブに必要な長さ＝ロッドの直径×3.14×3回転。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題』（第5章 パーマネントウェービング 問題3・8・9・11・31・35）",
+            "url": "https://www.koide-beauty.ac.jp/_src/113294/2024giriron1-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題回答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/113302/2024giriron1-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1135,7 +2870,39 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "テストカール（ロッドを外してウェーブの出かたを確かめること）では、カールの直径が使ったロッドの直径の2.5倍になっていれば適正とされるので4が正答。ほかは「のみ」などの言い切りや用語の取り違えが誤り。",
+        "perChoice": [
+          "誤り。毛髪診断は乾いた状態だけでなく、ぬれた状態でも行う。",
+          "誤り。つけ巻きは第1剤をつけて巻く方法。ぬらして巻いた後に第1剤を塗るのは水巻き。",
+          "誤り。「放置タイムのみ」ではない。ウェーブの大小は主にロッドの太さで決まる。",
+          "正しい。適正なカールの直径はロッドの直径の2.5倍とされる。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "乾いた状態のみ",
+          "つけ巻き",
+          "放置タイムのみ"
+        ],
+        "keyPoint": "テストカールの適正＝ロッドの直径の2.5倍。つけ巻き＝第1剤をつけて巻く／水巻き＝巻いた後に塗る。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題』（第5章 パーマネントウェービング 問題5・11・12・24・27・28・29・34・36）",
+            "url": "https://www.koide-beauty.ac.jp/_src/113294/2024giriron1-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題回答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/113302/2024giriron1-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1155,7 +2922,44 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "ダウンステム（毛束を下げぎみに引いて巻く）でボリュームを抑えるときは、ベースを厚めにとるとローラーがおさまりやすいので4が正答。最もボリュームが出るのは、90度ではなく135度に引いて巻いたときとされる。",
+        "perChoice": [
+          "誤り。毛先を中心に集めて巻くと、ウェーブは平行な広がりにはならないとされる。",
+          "誤り。生え際で立ち上がりを求めるときは、ベースを厚くではなく薄めにとるとされる（要確認）。",
+          "誤り。最もボリュームが出るのは、90度ではなく135度にシェープして巻いたときとされる。",
+          "正しい。ダウンステムで巻くときは、ベースを厚めにとるとローラーがおさまる。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "平行な広がり",
+          "ベースを厚くとる",
+          "90度の角度"
+        ],
+        "keyPoint": "ボリューム最大＝135度。ダウンステムで抑えるとき＝ベースは厚め。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『美容技術理論1 6章・7章まとめ』（ローラーカーリング：ストランドの角度によるボリュームの変化）",
+            "url": "https://www.koide-beauty.ac.jp/_src/117185/2026gi1.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題』（第6章 ヘアセッティング 問題13・49）",
+            "url": "https://www.koide-beauty.ac.jp/_src/113294/2024giriron1-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論1 過去問題回答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/113302/2024giriron1-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "low",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1175,7 +2979,37 @@
       ],
       "answer": 2,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "一時染毛料（ヘアマスカラ、ヘアカラースプレーなど）は毛髪の表面に色をつけるだけで、一度のシャンプーで洗い流せるので2が誤り。永久染毛剤は医薬部外品で、酸化染毛剤と非酸化染毛剤がある。",
+        "perChoice": [
+          "正しい。永久染毛剤は、酸化染毛剤と非酸化染毛剤に分けられる。",
+          "誤り。「色落ちしない」が誤り。一時染毛料は一度のシャンプーで洗い流せる。",
+          "正しい。半永久染毛料のうちヘアマニキュアの色持ちは約2〜4週間。",
+          "正しい。脱色剤でもかぶれることがあり、使用上の注意に、かぶれたことのある人は使わないよう書かれている。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "色落ちしない"
+        ],
+        "keyPoint": "色持ち：酸化染毛剤2〜3か月、非酸化染毛剤約1か月、ヘアマニキュア約2〜4週間、一時染毛料は1回のシャンプーまで。",
+        "sources": [
+          {
+            "title": "日本ヘアカラー工業会『ヘアカラーリング製品の分類（詳細）』",
+            "url": "https://jhcia.org/information/1_classification.html",
+            "type": "academic"
+          },
+          {
+            "title": "PMDA掲載『染毛剤等に添付する文書に記載する使用上の注意事項自主基準』（別記2 脱色剤・脱染剤）",
+            "url": "https://www.pmda.go.jp/files/000213042.pdf",
+            "type": "academic"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1195,7 +3029,44 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "グルー（接着剤）が目に入ったときは、流水で目を洗い、ただちに眼科医の診察を受けてもらうので1が正答。施術の前にはかならずカウンセリングを行い、マスカラなどの化粧は落として清潔にしてから施術する。",
+        "perChoice": [
+          "正しい。グルーが目に入ったら流水で洗い、ただちに眼科医の診察を受けるよう伝える。",
+          "誤り。コンタクトレンズの使用をすすめるのが誤り。使用の有無はカウンセリングで確かめる項目で、過去の試験でも「装着をすすめる」は誤りとされている。",
+          "誤り。「省略してもよい」が誤り。カウンセリングはかならず行い、施術できるかを判断する。",
+          "誤り。「落とさずに」が誤り。事前にマスカラなどの化粧を落とし、清潔にしてから施術する。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "コンタクトレンズを使用",
+          "省略してもよい",
+          "落とさずに施術"
+        ],
+        "keyPoint": "目に入った＝流水で洗い、ただちに眼科医へ。カウンセリングは毎回。アイメイクは落としてから。",
+        "sources": [
+          {
+            "title": "厚生労働省 平成25年度 第1回生活衛生関係営業等衛生問題検討会 参考資料2（まつ毛エクステンションの解説ページ）",
+            "url": "https://www.mhlw.go.jp/file/05-Shingikai-10901000-Kenkoukyoku-Soumuka/0000025134.pdf",
+            "type": "gov"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論2 過去問題』（第10章 メイクアップ 問題18・20・25・26・28）",
+            "url": "https://www.koide-beauty.ac.jp/_src/108351/2024giriron2-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論2 解答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/108349/2024giriron2-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "high",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1215,7 +3086,24 @@
       ],
       "answer": 1,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "鬼歯（おにば）は、仕上げに表面の毛の流れを整えるために使う櫛とされるので1が正答。ほかの選択肢は、日本髪の結髪に使う別の櫛の説明とされる。",
+        "perChoice": [
+          "正しい。鬼歯は、仕上げに表面の毛流れを整えるのに使うとされる。",
+          "誤り。鬢（びん：顔の横の髪）を裏からふくらませ、形を整えるのは鬢出しとされる。",
+          "誤り。前髷などを広げるのに使うのは、毛筋（けすじ）の抜き歯とされる。",
+          "誤り。おおまかに髪をとかすのは、荒歯（あらば）のとかし櫛とされる。"
+        ],
+        "perStatement": null,
+        "traps": [],
+        "keyPoint": "鬼歯＝仕上げに表面の毛流れ／鬢出し＝鬢をふくらませる／毛筋の抜き歯＝広げる／荒歯＝おおまかにとかす。",
+        "sources": [],
+        "crossChecked": 1,
+        "confidence": "low",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     },
@@ -1235,7 +3123,44 @@
       ],
       "answer": 4,
       "images": [],
-      "explanation": null,
+      "explanation": {
+        "summary": "帯幅は年齢や体格に合わせて加減し、若い人は広めにするとされるので4が正答。ひもは体の中心を避けて結び、留袖の小物は白を用い、大柄な人の帯幅は広めにするとされる。",
+        "perChoice": [
+          "誤り。「必ず体の中心」が誤り。ひもの結び目は体の中心を避けるとされる。",
+          "誤り。「華やかな色物」が誤り。第一礼装の留袖には白の半襟を用い、ほかの小物も白とされる。",
+          "誤り。大柄な人の帯幅は、狭くするのではなく広めにするとされる。",
+          "正しい。若い人は帯幅を広めにするとされる。"
+        ],
+        "perStatement": null,
+        "traps": [
+          "必ず体の中心",
+          "華やかな色物",
+          "狭くする"
+        ],
+        "keyPoint": "帯幅：若い人・大柄な人は広め。ひもは体の中心を避ける。留袖の小物は白。",
+        "sources": [
+          {
+            "title": "小出美容専門学校『文化論 まとめ』（留袖：第一礼装には白の半襟）",
+            "url": "https://www.koide-beauty.ac.jp/_src/112909/2025bunkaron.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論2 過去問題』（第12章 着付けの理論と技術 問題18・19・22・30）",
+            "url": "https://www.koide-beauty.ac.jp/_src/108351/2024giriron2-toi.pdf",
+            "type": "edu"
+          },
+          {
+            "title": "小出美容専門学校『美容技術理論2 解答』",
+            "url": "https://www.koide-beauty.ac.jp/_src/108349/2024giriron2-kotae.pdf",
+            "type": "edu"
+          }
+        ],
+        "crossChecked": 1,
+        "confidence": "medium",
+        "status": "published",
+        "asOf": null,
+        "caution": null
+      },
       "caution": null,
       "ocrChecked": true
     }
