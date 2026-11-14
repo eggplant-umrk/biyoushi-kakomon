@@ -2098,3 +2098,7 @@ fieldset.card > legend + * {
   color: rgb(255 255 255 / 0.55);
   border-color: rgb(255 255 255 / 0.2);
 }
+/* 問題を切り替えるときの横の動きで、横スクロールが出ないようにする（sticky を壊さない clip を使う） */
+.screen.quiz {
+  overflow-x: clip;
+}
