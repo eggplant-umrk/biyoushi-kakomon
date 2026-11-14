@@ -99,21 +99,41 @@
 | 第41回 | `feature/phase6c-explanations-41` | 55問 | 34・16・5 | 21問 | 1件（問25）。対応済み | `docs/review-6c-第41回.md` |
 <!-- phase6c-log -->
 
-#### 途中で止めた（2026-11-14、理由：モデルの切り替え）
+#### 状況（第51〜41回はすべてPRまで完了。どれも未マージ）
 
-**PRの状況（どれも未マージ。マージの順番は上から）**
+2026-11-14 に一度、モデルの切り替えのために止めた（第46回の途中）。再開後、第46回の機械検証から続けて、第41回まで終えた。
 
-| PR | 回 | 土台 | CI |
-|---|---|---|---|
-| #14 | 第51回 | `main` | 通過 |
-| #15 | 第50回 | `feature/phase6c-explanations-51` | 通過 |
-| #16 | 第49回 | `feature/phase6c-explanations-50` | 通過 |
-| #17 | 第48回 | `feature/phase6c-explanations-49` | 通過 |
-| #18 | 第47回 | `feature/phase6c-explanations-48` | 通過 |
+**PRとマージの順番（上から順にマージする）**
 
-`main` は PR #13 まで マージ済み。第46〜41回の PR はまだない。
+| 順 | PR | 回 | 土台 | CI |
+|---|---|---|---|---|
+| 1 | #14 | 第51回 | `main` | 通過 |
+| 2 | #15 | 第50回 | `feature/phase6c-explanations-51` | 通過 |
+| 3 | #16 | 第49回 | `feature/phase6c-explanations-50` | 通過 |
+| 4 | #17 | 第48回 | `feature/phase6c-explanations-49` | 通過 |
+| 5 | #18 | 第47回 | `feature/phase6c-explanations-48` | 通過 |
+| 6 | #19 | 第46回 | `feature/phase6c-explanations-47` | 通過 |
+| 7 | #20 | 第45回 | `feature/phase6c-explanations-46` | 通過 |
+| 8 | #21 | 第44回 | `feature/phase6c-explanations-45` | 通過 |
+| 9 | #22 | 第43回 | `feature/phase6c-explanations-44` | 通過 |
+| 10 | #23 | 第42回 | `feature/phase6c-explanations-43` | この記録を書いた時点では未確認 |
+| 11 | #24 | 第41回 | `feature/phase6c-explanations-42` | この記録を書いた時点では未確認 |
 
-**回ごとの状態**
+`main` は PR #13 までマージ済み。squash マージなので、1つマージするたびに、次のPRの土台を `main` に変え、`git merge -X ours origin/main` で取り込んでから（差分が自分の回のファイルだけになっていることを確かめて）CIを待ってマージする。
+
+**気づいたこと**
+
+- 出典のURLの確認は「開けるか」だけを見ている。e-Gov は法令IDが間違っていても開けてしまうので、別に法令APIで、引用している法令ID 53種（第54〜41回の全部）がすべて実在することを確かめた
+- 第48回 問7 の政府広報のページ1件は、自動の確認では403が返る（ブラウザでは未確認）
+- 解説サイトの文章の流用の確認は、過去問ドットコムの全文を取得できず、要約と短い抜き出しとの比較にとどまった回が多い（各回の review-6c に記載）
+- 途中から、エージェントの Web 検索が使用量の上限で使えなくなり、既知の公的資料のURLを直接開いて確かめる方法に切り替えた。第49回以降で「中」が多めなのはそのため
+
+**次にやること**：上の順番でのマージ（梅澤さんの判断）。確認待ちの一覧（`docs/explanation-review.md`）を教科書で確かめる。作業用のファイル（範囲ごとの解説、レビューの結果、作業用スクリプト）は、作業したPCの一時フォルダ `C:\Users\v25025vv\AppData\Local\Temp\claude\f6777386558b0076\e7c5f1ff-6b7b-479a-a84c-e8e55369352d\scratchpad\` と `data-src/explanations/parts/`（コミットしない）にある。
+
+<!-- 以下は、途中で止めた時点の記録（再開後にすべて終えた） -->
+
+<details><summary>途中で止めた時点の回ごとの状態（2026-11-14）</summary>
+
 
 | 回 | 状態 | 次にやること |
 |---|---|---|
@@ -125,9 +145,7 @@
 
 作業用のファイルの場所（コミットしない）：範囲ごとの解説は `data-src/explanations/parts/`（`merged-46.json`・`merged-45.json`・`merged-44.json`、`43-*.json`）。レビューの結果（`rv46-*`・`rv45-*`・`rv44-*`）と作業用のスクリプト（`brief-6c.md`・`brief-review-6c.md`・`stage.mjs`・`p1.sh`・`p2.sh`・`mech.mjs`・`gen-review6c.mjs`）は、作業したPCの一時フォルダ `C:\Users\v25025vv\AppData\Local\Temp\claude\f6777386558b0076\e7c5f1ff-6b7b-479a-a84c-e8e55369352d\scratchpad\`。
 
-気づいたこと：出典のURLの確認は「開けるか」だけを見ている。e-Gov は法令IDが間違っていても開けてしまうので、別に法令APIで、引用している法令ID 48種がすべて実在することを確かめた（第44回までの分）。第48回 問7 の政府広報のページ1件は、自動の確認では403が返る（ブラウザでは未確認）。
-
-**次はここから**：第46回の機械検証とPR。そのあとは上の「回ごとの状態」の順。作業用のファイル（範囲ごとの解説、レビューの結果）は、作業したPCの一時フォルダと `data-src/explanations/parts/`（コミットしない）にある。
+</details>
 
 ### 解説の作り方（残りの回に広げるとき）
 
