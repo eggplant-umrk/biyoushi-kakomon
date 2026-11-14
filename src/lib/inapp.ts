@@ -25,3 +25,13 @@ export function isInAppBrowser(userAgent: string): boolean {
 export function externalUrl(loc: { origin: string; pathname: string }): string {
   return `${loc.origin}${loc.pathname}?openExternalBrowser=1`;
 }
+
+/**
+ * iPhone・iPad で、ホーム画面に追加したアプリ（PWA）として開いているか。
+ * この場合、Firebase のログインはポップアップを開けず、ログイン用のページを Safari 側に開くので、ログインを終えてもアプリに戻れない
+ * （Safari とホーム画面のアプリは保存領域も別）。そのため、ログインの代わりに Safari で開く案内を出す（SPEC §14 #63）。
+ */
+export function isIOSStandalone(nav: { userAgent: string; standalone?: boolean; maxTouchPoints?: number }): boolean {
+  const ios = /iPhone|iPad|iPod/i.test(nav.userAgent) || (/Macintosh/.test(nav.userAgent) && (nav.maxTouchPoints ?? 0) > 1);
+  return ios && nav.standalone === true;
+}

@@ -72,8 +72,13 @@ export function useAuth(): AuthState {
 
 type Cloud = typeof import('./cloud');
 let cloudPromise: Promise<Cloud> | null = null;
+/** 読み込み済みの cloud.ts（ログインのタップの処理の中で、await を挟まずにポップアップを開くために使う） */
+let cloudLoaded: Cloud | null = null;
 function loadCloud(): Promise<Cloud> {
-  cloudPromise ??= import('./cloud');
+  cloudPromise ??= import('./cloud').then((c) => {
+    cloudLoaded = c;
+    return c;
+  });
   return cloudPromise;
 }
 
@@ -91,15 +96,18 @@ let signedInWaiters: (() => void)[] = [];
 let lastRefreshAt = 0;
 let answersSinceFlush = 0;
 
+function watchWith(cloud: Cloud): void {
+  if (watching) return;
+  watching = true;
+  cloud.watchAuth((user) => {
+    if (user) void onSignedIn(cloud, user.uid, user.googleName);
+    else onSignedOut();
+  });
+}
+
 async function startWatching(): Promise<Cloud> {
   const cloud = await loadCloud();
-  if (!watching) {
-    watching = true;
-    cloud.watchAuth((user) => {
-      if (user) void onSignedIn(cloud, user.uid, user.googleName);
-      else onSignedOut();
-    });
-  }
+  watchWith(cloud);
   return cloud;
 }
 
@@ -182,25 +190,39 @@ async function refresh(force = false): Promise<void> {
   await sync(await loadCloud());
 }
 
-export type LoginResult = 'ok' | 'cancelled' | 'blocked' | 'error';
+export type LoginResult = 'ok' | 'cancelled' | 'blocked' | 'storage' | 'error';
 
-/** Google ログイン。ボタンのタップから直接呼ぶ */
-export async function login(): Promise<LoginResult> {
-  if (!LOGIN_ENABLED) return 'error';
-  try {
-    const cloud = await startWatching();
-    const done = new Promise<void>((resolve) => signedInWaiters.push(resolve));
-    await cloud.signIn();
-    await done;
-    return 'ok';
-  } catch (e) {
-    const code = (e as { code?: string }).code ?? '';
-    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request' || code === 'auth/user-cancelled') {
-      return 'cancelled';
-    }
-    if (code === 'auth/popup-blocked') return 'blocked';
-    return 'error';
+function loginResultOf(e: unknown): LoginResult {
+  const code = (e as { code?: string }).code ?? '';
+  if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request' || code === 'auth/user-cancelled') {
+    return 'cancelled';
   }
+  if (code === 'auth/popup-blocked') return 'blocked';
+  // ブラウザの設定で、ログインに必要な保存領域が使えない
+  if (code === 'auth/web-storage-unsupported' || code === 'auth/operation-not-supported-in-this-environment') return 'storage';
+  return 'error';
+}
+
+/**
+ * Google ログイン。ボタンのタップから直接呼ぶ（SPEC §6.2）。
+ * ログイン用の部品を読み込み済みなら、await を挟まずにその場でポップアップを開く（iPhone の Safari は、タップから間が空くとブロックする）。
+ * まだ読み込んでいなければ読み込んでから開くので、ブロックされることがある（そのときは案内を出し、もう一度押してもらう）。
+ */
+export function login(): Promise<LoginResult> {
+  if (!LOGIN_ENABLED) return Promise.resolve('error');
+  const done = new Promise<void>((resolve) => signedInWaiters.push(resolve));
+  const cloud = cloudLoaded;
+  let started: Promise<void>;
+  if (cloud) {
+    watchWith(cloud);
+    started = cloud.signIn(); // タップと同じ処理の中で、すぐにポップアップを開く
+  } else {
+    started = startWatching().then((c) => c.signIn());
+  }
+  return started.then(
+    () => done.then(() => 'ok' as const),
+    (e: unknown) => loginResultOf(e),
+  );
 }
 
 /** 未送信分を送る（失敗しても次の機会にやり直す） */

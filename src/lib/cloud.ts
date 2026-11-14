@@ -4,7 +4,7 @@
  * ゲストで使っている間は読み込まれず、Firebase への通信も起きない。
  */
 import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
+import { getToken, initializeAppCheck, ReCaptchaEnterpriseProvider, type AppCheck } from 'firebase/app-check';
 import {
   connectAuthEmulator,
   deleteUser,
@@ -89,6 +89,7 @@ const PULL_DAYS = 60; // 日別の記録は直近60日分を取り込む
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let fs: Firestore | null = null;
+let appCheck: AppCheck | null = null;
 
 function init(): { auth: Auth; fs: Firestore } {
   if (!app) {
@@ -96,7 +97,7 @@ function init(): { auth: Auth; fs: Firestore } {
     if (!USE_EMULATOR) {
       // App Check（Fraud Defense＝reCAPTCHA Enterprise のスコアベースのキー）。
       // Firestore は App Check のトークンがない通信を拒否する設定にする（SPEC §8.2）
-      initializeAppCheck(app, {
+      appCheck = initializeAppCheck(app, {
         provider: new ReCaptchaEnterpriseProvider(RECAPTCHA_SITE_KEY),
         isTokenAutoRefreshEnabled: true,
       });
@@ -137,9 +138,12 @@ function e2eCredential() {
 /**
  * ログイン画面を開いたときに呼ぶ。Safari / iOS は、タップの直後でないとポップアップを開けないので、
  * ログイン用の部品を先に読み込んでおく（Firebase Auth が自動で行う）。
+ * App Check のトークンも先に取っておく：Firebase Auth はポップアップを開く直前に App Check のトークンを取るので、
+ * 初回の取得（reCAPTCHA Enterprise）を待つと、タップからポップアップまでの間が空いて、iPhone ではブロックされやすい
  */
 export function prepare(): void {
   init();
+  if (appCheck) void getToken(appCheck).catch(() => undefined);
 }
 
 export interface CloudUser {
@@ -151,11 +155,22 @@ export function watchAuth(cb: (user: CloudUser | null) => void): () => void {
   return onAuthStateChanged(init().auth, (u) => cb(u ? { uid: u.uid, googleName: u.displayName } : null));
 }
 
-/** Google ログイン（ポップアップ）。ボタンのタップから直接呼ぶこと（SPEC §6.2） */
-export async function signIn(): Promise<void> {
+/**
+ * Google ログイン（ポップアップ。リダイレクトは使わない。SPEC §6.2・§14 #63）。
+ * ボタンのタップの処理の中から、await を挟まずに呼ぶこと（ポップアップを開くまでの間が空くと、ブロックされる）
+ */
+export function signIn(): Promise<void> {
   const { auth } = init();
-  if (USE_EMULATOR) await signInWithCredential(auth, e2eCredential());
-  else await signInWithPopup(auth, googleProvider());
+  if (USE_EMULATOR) {
+    // E2E 用：ポップアップがブロックされた・閉じられたときの画面を確かめるため、結果を指定できる
+    const mode = localStorage.getItem('e2e-popup');
+    if (mode === 'blocked' || mode === 'closed') {
+      const code = mode === 'blocked' ? 'auth/popup-blocked' : 'auth/popup-closed-by-user';
+      return Promise.reject(Object.assign(new Error(code), { code }));
+    }
+    return signInWithCredential(auth, e2eCredential()).then(() => undefined);
+  }
+  return signInWithPopup(auth, googleProvider()).then(() => undefined);
 }
 
 function requireUid(): string {
