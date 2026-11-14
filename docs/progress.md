@@ -91,6 +91,7 @@
 | 第49回 | `feature/phase6c-explanations-49` | 55問 | 38・13・4 | 29問 | 0件 | `docs/review-6c-第49回.md` |
 | 第48回 | `feature/phase6c-explanations-48` | 55問 | 43・11・1 | 26問 | 0件 | `docs/review-6c-第48回.md` |
 | 第47回 | `feature/phase6c-explanations-47` | 55問 | 36・19・0 | 30問 | 0件 | `docs/review-6c-第47回.md` |
+| 第46回 | `feature/phase6c-explanations-46` | 55問 | 29・22・4 | 32問 | 0件 | `docs/review-6c-第46回.md` |
 <!-- phase6c-log -->
 
 #### 途中で止めた（2026-11-14、理由：モデルの切り替え）
