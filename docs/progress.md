@@ -94,6 +94,7 @@
 | 第46回 | `feature/phase6c-explanations-46` | 55問 | 29・22・4 | 32問 | 0件 | `docs/review-6c-第46回.md` |
 | 第45回 | `feature/phase6c-explanations-45` | 55問 | 40・15・0 | 24問 | 0件 | `docs/review-6c-第45回.md` |
 | 第44回 | `feature/phase6c-explanations-44` | 55問 | 39・15・1 | 24問 | 2件（問13・50）。対応済み | `docs/review-6c-第44回.md` |
+| 第43回 | `feature/phase6c-explanations-43` | 55問 | 35・20・0 | 19問 | 0件 | `docs/review-6c-第43回.md` |
 <!-- phase6c-log -->
 
 #### 途中で止めた（2026-11-14、理由：モデルの切り替え）
