@@ -803,7 +803,7 @@
           }
         ],
         "crossChecked": 0,
-        "confidence": "high",
+        "confidence": "medium",
         "status": "published",
         "asOf": "2026-11",
         "caution": null
@@ -981,7 +981,7 @@
           }
         ],
         "crossChecked": 0,
-        "confidence": "medium",
+        "confidence": "low",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -1464,7 +1464,7 @@
           }
         ],
         "crossChecked": 0,
-        "confidence": "medium",
+        "confidence": "low",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -2327,7 +2327,7 @@
           }
         ],
         "crossChecked": 2,
-        "confidence": "medium",
+        "confidence": "high",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -2519,7 +2519,7 @@
         "keyPoint": "歯先＝起こすきっかけ／歯＝立てて両側から支える／歯元＝横一線にそろえる／胴＝全体の支え。",
         "sources": [],
         "crossChecked": 2,
-        "confidence": "medium",
+        "confidence": "low",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -2646,7 +2646,7 @@
           }
         ],
         "crossChecked": 1,
-        "confidence": "medium",
+        "confidence": "low",
         "status": "published",
         "asOf": null,
         "caution": null
@@ -2683,7 +2683,7 @@
         "keyPoint": "フルウェーブ＝ロッド3回転分。長さ＝直径×3.14×3。mmをcmに直すのを忘れない。",
         "sources": [],
         "crossChecked": 2,
-        "confidence": "medium",
+        "confidence": "low",
         "status": "published",
         "asOf": null,
         "caution": null
