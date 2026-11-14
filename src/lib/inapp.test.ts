@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { externalUrl, isInAppBrowser } from './inapp';
+import { describe, expect, it, test } from 'vitest';
+import { externalUrl, isInAppBrowser, isIOSStandalone } from './inapp';
 
 const IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)';
 
@@ -43,5 +43,24 @@ describe('externalUrl', () => {
     expect(externalUrl({ origin: 'https://eggplant-umrk.github.io', pathname: '/biyoushi-kakomon/' })).toBe(
       'https://eggplant-umrk.github.io/biyoushi-kakomon/?openExternalBrowser=1',
     );
+  });
+});
+
+
+describe('ホーム画面に追加したアプリ（iPhone・iPad）', () => {
+  const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+  const IPAD_DESKTOP = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15';
+  const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
+  test('iPhone で standalone のときだけ true', () => {
+    expect(isIOSStandalone({ userAgent: IPHONE, standalone: true })).toBe(true);
+    expect(isIOSStandalone({ userAgent: IPHONE, standalone: false })).toBe(false);
+    expect(isIOSStandalone({ userAgent: IPHONE })).toBe(false);
+  });
+  test('iPad（デスクトップ表示の UA）も、タッチがあれば iOS とみなす', () => {
+    expect(isIOSStandalone({ userAgent: IPAD_DESKTOP, standalone: true, maxTouchPoints: 5 })).toBe(true);
+    expect(isIOSStandalone({ userAgent: IPAD_DESKTOP, standalone: true, maxTouchPoints: 0 })).toBe(false);
+  });
+  test('Android のホーム画面のアプリは対象外（ポップアップでログインできる）', () => {
+    expect(isIOSStandalone({ userAgent: ANDROID, standalone: true })).toBe(false);
   });
 });

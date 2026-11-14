@@ -2,33 +2,52 @@ import { useEffect, useState } from 'react';
 import { Footer } from '../components/common';
 import { login, preloadLogin } from '../lib/auth';
 import { LOGIN_ENABLED } from '../lib/config';
-import { externalUrl, isInAppBrowser } from '../lib/inapp';
+import { externalUrl, isInAppBrowser, isIOSStandalone } from '../lib/inapp';
 import { navigate } from '../lib/router';
 import { updateSettings } from '../lib/settings';
 
 const MESSAGES = {
-  blocked: 'ログイン用の画面がブロックされました。ブラウザのポップアップを許可して、もう一度お試しください。',
+  blocked:
+    'ログイン用の画面（ポップアップ）がブロックされました。ポップアップを許可してから、もう一度「Googleでログイン」を押してください。',
+  storage:
+    'ブラウザの設定で、ログインに必要な保存ができません。プライベートブラウズを使っていれば、ふつうの画面で開いてください。',
   error: 'ログインできませんでした。通信の状態を確認して、もう一度お試しください。',
 } as const;
 
+/** ポップアップの許可のしかた（ブロックされたときに出す） */
+function PopupHelp() {
+  return (
+    <ul className="small popup-help" data-testid="popup-help">
+      <li>iPhone の Safari：「設定」アプリ →「アプリ」→「Safari」→「ポップアップブロック」をオフ</li>
+      <li>iPhone の Chrome：Chrome の「設定」→「コンテンツの設定」→「ポップアップをブロック」をオフ</li>
+      <li>Android の Chrome：アドレスバーに出る「ポップアップがブロックされました」から「常に許可」</li>
+    </ul>
+  );
+}
+
 export function LoginScreen() {
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<keyof typeof MESSAGES | null>(null);
   const [copied, setCopied] = useState<'yes' | 'failed' | null>(null);
   const inApp = isInAppBrowser(navigator.userAgent);
+  // iPhone のホーム画面に追加したアプリ：Google ログインを終えてもアプリに戻れないので、Safari で開く案内を出す
+  const iosApp = !inApp && isIOSStandalone(navigator as Navigator & { standalone?: boolean });
   const url = externalUrl(window.location);
 
   useEffect(() => {
-    if (!inApp) preloadLogin();
-  }, [inApp]);
+    if (!inApp && !iosApp) preloadLogin();
+  }, [inApp, iosApp]);
 
-  async function onLogin() {
-    setBusy(true);
+  // login() は、await を挟まずにこのタップの処理の中で呼ぶ（ポップアップを開くため）
+  function onLogin() {
     setMessage(null);
-    const result = await login();
-    setBusy(false);
-    if (result === 'ok') navigate('/home');
-    else if (result !== 'cancelled') setMessage(MESSAGES[result]);
+    const pending = login();
+    setBusy(true);
+    void pending.then((result) => {
+      setBusy(false);
+      if (result === 'ok') navigate('/home');
+      else if (result !== 'cancelled') setMessage(result);
+    });
   }
 
   async function copyUrl() {
@@ -83,15 +102,40 @@ export function LoginScreen() {
               </p>
             )}
           </div>
+        ) : iosApp && LOGIN_ENABLED ? (
+          // ホーム画面に追加したアプリ（iPhone）。ポップアップが開けず、ログインを終えてもアプリに戻れない（SPEC §14 #63）
+          <div className="card inapp" role="note" data-testid="ios-app-note">
+            <p>
+              <strong>ログインは Safari で行ってください。</strong>
+            </p>
+            <p className="small">
+              ホーム画面に追加したアプリでは、iPhone の仕組みのため Googleログインができません。下のボタンで Safari
+              を開いてログインしてください。ホーム画面のアプリは、ログインせずにこのまま使えます（Safari
+              とホーム画面のアプリは、記録が別々に保存されます）。
+            </p>
+            <a className="btn btn-secondary" href={url} target="_blank" rel="noopener noreferrer">
+              Safari で開く
+            </a>
+            <p className="small">開かないときは、このURLを Safari に貼り付けてください。</p>
+            <input
+              className="url-box"
+              type="text"
+              readOnly
+              value={url}
+              aria-label="このアプリのURL"
+              onFocus={(e) => e.currentTarget.select()}
+            />
+          </div>
         ) : LOGIN_ENABLED ? (
           <>
-            <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void onLogin()}>
+            <button type="button" className="btn btn-primary" disabled={busy} onClick={onLogin}>
               {busy ? 'ログイン中…' : 'Googleでログイン'}
             </button>
             {message && (
-              <p className="small error-text" role="alert">
-                {message}
-              </p>
+              <div className="login-error" role="alert">
+                <p className="small error-text">{MESSAGES[message]}</p>
+                {message === 'blocked' && <PopupHelp />}
+              </div>
             )}
           </>
         ) : (
@@ -106,7 +150,7 @@ export function LoginScreen() {
         )}
         <button
           type="button"
-          className={`btn ${LOGIN_ENABLED && !inApp ? 'btn-secondary' : 'btn-primary'}`}
+          className={`btn ${LOGIN_ENABLED && !inApp && !iosApp ? 'btn-secondary' : 'btn-primary'}`}
           disabled={busy}
           onClick={() => {
             updateSettings({ guest: true });
