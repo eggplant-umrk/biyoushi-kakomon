@@ -143,7 +143,15 @@ function onSignedOut(): void {
 }
 
 /** users/{uid} を読む → 未送信分を送る → 変更があれば取り込む */
-async function sync(cloud: Cloud, googleName: string | null = null): Promise<void> {
+/** いま動いている同期（ログイン直後は、users/{uid} の作成もここで行う） */
+let syncing: Promise<void> = Promise.resolve();
+
+function sync(cloud: Cloud, googleName: string | null = null): Promise<void> {
+  syncing = doSync(cloud, googleName);
+  return syncing;
+}
+
+async function doSync(cloud: Cloud, googleName: string | null = null): Promise<void> {
   lastRefreshAt = Date.now();
   if (!navigator.onLine) {
     set({ syncError: true });
@@ -254,6 +262,8 @@ export function declineImport(): void {
 }
 
 export async function changeDisplayName(name: string): Promise<void> {
+  // 初めてログインした直後は、users/{uid} の作成（同期）が終わってから変える（まだ文書がないと、更新は拒否される）
+  await syncing.catch(() => undefined);
   const clean = await (await loadCloud()).updateDisplayName(name);
   updateSettings({ displayName: clean });
   set({ displayName: clean });

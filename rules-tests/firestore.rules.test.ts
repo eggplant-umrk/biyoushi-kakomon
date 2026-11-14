@@ -893,3 +893,144 @@ describe('メモ（users/{uid}/memos/{問題ID}）', () => {
     await assertFails(deleteDoc(memoRef(adminDb())));
   });
 });
+
+// ---- ルールの評価回数（Firestore の上限：1回の書き込みで評価できる式は1000まで） ----
+// users/{uid} の更新は、検査が多く上限に近かった（表示名の変更が、記録の送信と重なると拒否されることがあった）。
+// 上限に余裕があることを、Emulator の評価の記録（rule coverage）で確かめる。数え方は本番の上限の数え方と同じではないので、
+// ここでは「以前より大きく減っていること」の目安として使う。
+
+async function coverageTotal(): Promise<number> {
+  const res = await fetch('http://127.0.0.1:8080/emulator/v1/projects/demo-kakomon:ruleCoverage');
+  const body = (await res.json()) as { report?: unknown };
+  let total = 0;
+  const walk = (n: unknown): void => {
+    if (Array.isArray(n)) n.forEach(walk);
+    else if (n && typeof n === 'object') {
+      const o = n as { values?: { count?: number }[]; children?: unknown };
+      if (Array.isArray(o.values)) for (const v of o.values) total += Number(v.count ?? 0);
+      if (o.children) walk(o.children);
+    }
+  };
+  walk(body.report);
+  return total;
+}
+async function costOf(op: () => Promise<unknown>): Promise<number> {
+  const before = await coverageTotal();
+  await op();
+  return (await coverageTotal()) - before;
+}
+
+describe('users/{uid} の更新は、ルールの評価回数の上限に余裕がある', () => {
+  const fields = ['law', 'public_health', 'infection', 'hygiene', 'anatomy', 'skin', 'cosmetics', 'theory'];
+  const fullByField = Object.fromEntries(fields.map((f) => [f, { answered: 100, correct: 50 }]));
+  const fullBest = Object.fromEntries(Array.from({ length: 14 }, (_, i) => [String(41 + i), 30]));
+  const seedFull = () =>
+    seed(async (db) => {
+      await setDoc(doc(db, 'users', ALICE), {
+        ...user(),
+        createdAt: past,
+        lastActiveAt: past,
+        syncSeq: 7,
+        syncAt: past,
+        totals: { answered: 800, correct: 400 },
+        byField: fullByField,
+        examBest: fullBest,
+      });
+    });
+
+  test('表示名の変更（8分野・14回の記録がある利用者）：通り、評価は300以下', async () => {
+    await seedFull();
+    const cost = await costOf(() =>
+      assertSucceeds(updateDoc(doc(userDb(ALICE), 'users', ALICE), { displayName: '改名', lastActiveAt: serverTimestamp() })),
+    );
+    expect(cost).toBeLessThanOrEqual(300);
+  });
+
+  test('記録の送信（8分野と回別の最高点が同時に変わる）：上限に当たらずに通る', async () => {
+    await seedFull();
+    const upd: Record<string, unknown> = {
+      syncSeq: 8,
+      syncAt: serverTimestamp(),
+      lastActiveAt: serverTimestamp(),
+      'totals.answered': increment(8),
+      'totals.correct': increment(8),
+      'examBest.54': 40,
+      'examBest.53': 35,
+    };
+    for (const f of fields) {
+      upd[`byField.${f}.answered`] = increment(1);
+      upd[`byField.${f}.correct`] = increment(1);
+    }
+    const cost = await costOf(() => assertSucceeds(updateDoc(doc(userDb(ALICE), 'users', ALICE), upd)));
+    expect(cost).toBeLessThanOrEqual(900);
+  });
+
+  test('いちばん重い送信（8分野・14回の最高点・表示名がすべて同時に変わる）も、上限に当たらずに通る', async () => {
+    await seedFull();
+    const upd: Record<string, unknown> = {
+      syncSeq: 8,
+      syncAt: serverTimestamp(),
+      lastActiveAt: serverTimestamp(),
+      displayName: '改名',
+      'totals.answered': increment(55),
+      'totals.correct': increment(55),
+    };
+    for (const f of fields) {
+      upd[`byField.${f}.answered`] = increment(7);
+      upd[`byField.${f}.correct`] = increment(6);
+    }
+    for (let i = 41; i <= 54; i++) upd[`examBest.${i}`] = 40;
+    await assertSucceeds(updateDoc(doc(userDb(ALICE), 'users', ALICE), upd));
+  });
+
+  test('アプリの記録の送信（users のみ、8分野が変わる）：評価は700以下', async () => {
+    await seedFull();
+    const upd: Record<string, unknown> = {
+      syncSeq: 8,
+      syncAt: serverTimestamp(),
+      lastActiveAt: serverTimestamp(),
+      'totals.answered': increment(8),
+      'totals.correct': increment(8),
+    };
+    for (const f of fields) {
+      upd[`byField.${f}.answered`] = increment(1);
+      upd[`byField.${f}.correct`] = increment(1);
+    }
+    const cost = await costOf(() => assertSucceeds(updateDoc(doc(userDb(ALICE), 'users', ALICE), upd)));
+    expect(cost).toBeLessThanOrEqual(700);
+  });
+
+  // 簡略化しても、許す範囲は変えない（表示名の変更の形で、ほかの項目を変えることはできない）
+  test('表示名の変更に見せかけて、記録・作成日時・送信の連番を変えることはできない', async () => {
+    await seedFull();
+    const db = userDb(ALICE);
+    const ref = doc(db, 'users', ALICE);
+    await assertFails(updateDoc(ref, { displayName: '改名', lastActiveAt: serverTimestamp(), 'totals.answered': 900 }));
+    await assertFails(updateDoc(ref, { displayName: '改名', lastActiveAt: serverTimestamp(), 'byField.law.answered': 999 }));
+    await assertFails(updateDoc(ref, { displayName: '改名', lastActiveAt: serverTimestamp(), 'examBest.54': 50 }));
+    await assertFails(updateDoc(ref, { displayName: '改名', lastActiveAt: serverTimestamp(), syncAt: serverTimestamp() }));
+    await assertFails(updateDoc(ref, { displayName: '改名', lastActiveAt: serverTimestamp(), createdAt: serverTimestamp() }));
+    await assertFails(updateDoc(ref, { displayName: '改名', lastActiveAt: serverTimestamp(), extra: 1 }));
+    await assertFails(updateDoc(ref, { displayName: '改名', lastActiveAt: Timestamp.fromMillis(0) }));
+    await assertFails(updateDoc(ref, { displayName: '', lastActiveAt: serverTimestamp() }));
+    await assertFails(updateDoc(ref, { displayName: 'a'.repeat(31), lastActiveAt: serverTimestamp() }));
+    await assertFails(updateDoc(ref, { displayName: '改\u0007名', lastActiveAt: serverTimestamp() }));
+    await assertFails(updateDoc(ref, { displayName: 123, lastActiveAt: serverTimestamp() }));
+    // 他人は変えられない
+    await assertFails(updateDoc(doc(userDb(BOB), 'users', ALICE), { displayName: '改名', lastActiveAt: serverTimestamp() }));
+  });
+
+  test('記録の送信で、変わった分野・回の値も検査される（不正な値・上限を超える値は拒否）', async () => {
+    await seedFull();
+    const ref = doc(userDb(ALICE), 'users', ALICE);
+    const base = { syncSeq: 8, syncAt: serverTimestamp(), lastActiveAt: serverTimestamp() };
+    await assertFails(updateDoc(ref, { ...base, 'byField.law.correct': 200 })); // 正解数 > 解答数
+    await assertFails(updateDoc(ref, { ...base, 'byField.law.answered': 'x' }));
+    await assertFails(updateDoc(ref, { ...base, 'byField.law.extra': 1 }));
+    await assertFails(updateDoc(ref, { ...base, 'byField.unknown': { answered: 1, correct: 0 } }));
+    await assertFails(updateDoc(ref, { ...base, 'examBest.54': 56 }));
+    await assertFails(updateDoc(ref, { ...base, 'examBest.40': 10 }));
+    await assertFails(updateDoc(ref, { ...base, displayName: '改\u0007名' }));
+    await assertSucceeds(updateDoc(ref, { ...base, 'examBest.54': 55 }));
+  });
+});
