@@ -49,6 +49,7 @@ python scripts/pdf-to-png.py raw/pdf/54.pdf    # raw/pages/（200dpi）
 python scripts/data/crop-pages.py 54           # raw/crops/（読み取り用。余白を除く）
 python scripts/data/check-strips.py 54         # raw/check/（二重チェック用）
 python scripts/data/crop-figure.py 54 22 440 590 800 925 --name 54-47   # 図を WebP で切り出す
+python scripts/data/check-figure-marks.py          # 図の中の〇印を消した跡が残っていないか調べる（--fix で直す。結果は data-src/figure-marks.json と docs/ocr-review.html）
 node scripts/build-data.ts && node scripts/validate.ts
 ```
 

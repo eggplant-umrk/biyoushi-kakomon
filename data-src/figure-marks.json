@@ -1,0 +1,361 @@
+[
+  {
+    "id": "41-43",
+    "exam": 41,
+    "no": 43,
+    "image": "public/images/41/41-43.webp",
+    "match": 0.986,
+    "scale": 0.534,
+    "markPixels": 702,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      479,
+      1,
+      522,
+      44
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -3.75,
+      "darkRatio": 0.0179
+    }
+  },
+  {
+    "id": "41-49",
+    "exam": 41,
+    "no": 49,
+    "image": "public/images/41/41-49.webp",
+    "match": 0.994,
+    "scale": 0.592,
+    "markPixels": 822,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      543,
+      478,
+      590,
+      525
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -3.66,
+      "darkRatio": 0.0042
+    }
+  },
+  {
+    "id": "42-42",
+    "exam": 42,
+    "no": 42,
+    "image": "public/images/42/42-42.webp",
+    "match": 0.975,
+    "scale": 0.534,
+    "markPixels": 686,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      698,
+      3,
+      741,
+      46
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -4.07,
+      "darkRatio": 0.0165
+    }
+  },
+  {
+    "id": "43-53",
+    "exam": 43,
+    "no": 53,
+    "image": "public/images/43/43-53.webp",
+    "match": 0.853,
+    "scale": 0.616,
+    "markPixels": 819,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      533,
+      5,
+      582,
+      54
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -3.94,
+      "darkRatio": 0.0049
+    }
+  },
+  {
+    "id": "44-49",
+    "exam": 44,
+    "no": 49,
+    "image": "public/images/44/44-49.webp",
+    "match": 0.996,
+    "scale": 1.0,
+    "markPixels": 1858,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      30,
+      65,
+      106,
+      144
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -3.39,
+      "darkRatio": 0.0139
+    }
+  },
+  {
+    "id": "45-43",
+    "exam": 45,
+    "no": 43,
+    "image": "public/images/45/45-43.webp",
+    "match": 0.997,
+    "scale": 0.664,
+    "markPixels": 1189,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      14,
+      0,
+      69,
+      51
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -6.27,
+      "darkRatio": 0.0255
+    }
+  },
+  {
+    "id": "46-48",
+    "exam": 46,
+    "no": 48,
+    "image": "public/images/46/46-48.webp",
+    "match": 0.982,
+    "scale": 0.774,
+    "markPixels": 1222,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      741,
+      455,
+      802,
+      516
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -3.48,
+      "darkRatio": 0.0294
+    }
+  },
+  {
+    "id": "48-43",
+    "exam": 48,
+    "no": 43,
+    "image": "public/images/48/48-43.webp",
+    "match": 0.983,
+    "scale": 0.524,
+    "markPixels": 603,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      16,
+      6,
+      57,
+      48
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -1.86,
+      "darkRatio": 0.0023
+    }
+  },
+  {
+    "id": "48-51",
+    "exam": 48,
+    "no": 51,
+    "image": "public/images/48/48-51.webp",
+    "match": 0.972,
+    "scale": 1.0,
+    "markPixels": 0,
+    "status": "nomark",
+    "fixed": false
+  },
+  {
+    "id": "48-51-2",
+    "exam": 48,
+    "no": 51,
+    "image": "public/images/48/48-51-2.webp",
+    "match": 0.982,
+    "scale": 0.62,
+    "markPixels": 744,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      14,
+      7,
+      63,
+      56
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -0.98,
+      "darkRatio": -0.0092
+    }
+  },
+  {
+    "id": "51-50",
+    "exam": 51,
+    "no": 50,
+    "image": "public/images/51/51-50.webp",
+    "match": 0.974,
+    "scale": 0.976,
+    "markPixels": 1786,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      575,
+      385,
+      653,
+      463
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -5.34,
+      "darkRatio": 0.0381
+    }
+  },
+  {
+    "id": "51-51",
+    "exam": 51,
+    "no": 51,
+    "image": "public/images/51/51-51.webp",
+    "match": 0.989,
+    "scale": 0.534,
+    "markPixels": 693,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      503,
+      0,
+      546,
+      43
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -4.55,
+      "darkRatio": 0.0146
+    }
+  },
+  {
+    "id": "51-53",
+    "exam": 51,
+    "no": 53,
+    "image": "public/images/51/51-53.webp",
+    "match": 0.914,
+    "scale": 0.778,
+    "markPixels": 1326,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      661,
+      9,
+      723,
+      71
+    ],
+    "fixed": true,
+    "before": {
+      "brightDiff": -3.46,
+      "darkRatio": 0.0118
+    }
+  },
+  {
+    "id": "52-41",
+    "exam": 52,
+    "no": 41,
+    "image": "public/images/52/52-41.webp",
+    "match": 0.983,
+    "scale": 0.532,
+    "markPixels": 637,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": 0.0,
+    "markBox": [
+      256,
+      3,
+      298,
+      46
+    ],
+    "fixed": false
+  },
+  {
+    "id": "52-53",
+    "exam": 52,
+    "no": 53,
+    "image": "public/images/52/52-53.webp",
+    "match": 0.922,
+    "scale": 1.0,
+    "markPixels": 1743,
+    "status": "clean",
+    "mode": "plain",
+    "brightDiff": 0.0,
+    "darkRatio": -0.0005,
+    "markBox": [
+      376,
+      401,
+      453,
+      479
+    ],
+    "fixed": false
+  },
+  {
+    "id": "54-50",
+    "exam": 54,
+    "no": 50,
+    "image": "public/images/54/54-50.webp",
+    "match": 0.971,
+    "scale": 0.93,
+    "markPixels": 1770,
+    "status": "clean",
+    "mode": "texture",
+    "brightDiff": 10.44,
+    "roughDiff": -6.67,
+    "markBox": [
+      159,
+      358,
+      233,
+      433
+    ],
+    "fixed": false
+  }
+]
