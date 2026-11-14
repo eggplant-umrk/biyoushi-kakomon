@@ -7,10 +7,12 @@ import {
   answerQuestions,
   fakeUser,
   findUserDoc,
+  idTokenOf,
   isConnectionNoise,
   isReloadNoise,
   login,
   newDevice,
+  readAs,
   startDefaultSet,
   type FakeUser,
 } from './helpers';
@@ -186,6 +188,25 @@ test('管理者以外には管理タブが出ず、/admin を開いても何も�
     await page.reload();
     await expect(page).toHaveURL(/#\/home$/);
     await expect(page.getByText(target.name)).toHaveCount(0);
+
+    // 画面を通さず、この人の権限で Firestore を直接読んでも、他人の記録・管理用データは読めない（403）
+    const token = await idTokenOf(page);
+    expect(token).not.toBe('');
+    for (const path of [
+      `users/${targetUid}`,
+      `users/${targetUid}/progress`,
+      `users/${targetUid}/days`,
+      `users/${targetUid}/assignments`,
+      'users',
+      'reports',
+      'admin/ping',
+    ]) {
+      expect.soft(await readAs(token, path), `${who.sub} が ${path} を読む`).toBe(403);
+    }
+    // 管理画面と同じ「利用者の一覧」「報告の一覧」の問い合わせも拒否される
+    for (const collectionId of ['users', 'reports']) {
+      expect.soft(await readAs(token, '', { structuredQuery: { from: [{ collectionId }] } }), `${collectionId} の一覧`).toBe(403);
+    }
     await context.close();
   }
 

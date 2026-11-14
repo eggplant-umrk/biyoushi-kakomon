@@ -761,6 +761,41 @@ describe('admin/ping（管理者判定）', () => {
   });
 });
 
+// 公開前の確認：管理者ではない一般の利用者（ログイン済み・メール確認済み・Googleログイン）が読めないものを、1か所にまとめて確かめる
+describe('管理者ではない一般の利用者', () => {
+  beforeEach(async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'users', ALICE), { ...user(), createdAt: past, lastActiveAt: past });
+      await setDoc(doc(db, 'users', ALICE, 'progress', '54-01'), { ...progress(), lastAnsweredAt: past });
+      await setDoc(doc(db, 'users', ALICE, 'days', jstDate(Date.now())), day());
+      await setDoc(doc(db, 'users', ALICE, 'assignments', 'a1'), { ...assignment(), createdAt: past });
+      await setDoc(doc(db, 'reports', `${ALICE}_54-01`), { ...report(ALICE), createdAt: past });
+    });
+  });
+  test('他人の記録・報告と、管理用のデータ（利用者の一覧・報告の一覧・管理者判定）を読めない', async () => {
+    const db = userDb(BOB);
+    const reads: [string, () => Promise<unknown>][] = [
+      ['users/alice', () => getDoc(doc(db, 'users', ALICE))],
+      ['users/alice/progress', () => getDocs(collection(db, 'users', ALICE, 'progress'))],
+      ['users/alice/days', () => getDocs(collection(db, 'users', ALICE, 'days'))],
+      ['users/alice/assignments', () => getDocs(collection(db, 'users', ALICE, 'assignments'))],
+      ['reports/alice_54-01', () => getDoc(doc(db, 'reports', `${ALICE}_54-01`))],
+      ['users（一覧）', () => getDocs(collection(db, 'users'))],
+      ['reports（一覧）', () => getDocs(collection(db, 'reports'))],
+      ['reports（alice の分）', () => getDocs(query(collection(db, 'reports'), where('uid', '==', ALICE)))],
+      ['admin/ping', () => getDoc(doc(db, 'admin', 'ping'))],
+    ];
+    for (const [, read] of reads) await assertFails(read());
+  });
+  test('自分の記録は読める（比較のため）', async () => {
+    const db = userDb(ALICE);
+    await assertSucceeds(getDoc(doc(db, 'users', ALICE)));
+    await assertSucceeds(getDocs(collection(db, 'users', ALICE, 'progress')));
+    await assertSucceeds(getDocs(query(collection(db, 'reports'), where('uid', '==', ALICE))));
+    await assertFails(getDoc(doc(db, 'admin', 'ping')));
+  });
+});
+
 describe('ルールに書いていないパス', () => {
   test('ログインしていても、管理者でも拒否される', async () => {
     await assertFails(getDoc(doc(userDb(ALICE), 'secrets', 'x')));

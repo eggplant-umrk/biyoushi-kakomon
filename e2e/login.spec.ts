@@ -1,5 +1,18 @@
 import { expect, test } from '@playwright/test';
-import { answeredOf, answerQuestions, fakeUser, findUserDoc, isReloadNoise, login, newDevice, startDefaultSet } from './helpers';
+import {
+  answeredOf,
+  answerQuestions,
+  authUids,
+  countDocs,
+  fakeUser,
+  findUserDoc,
+  isReloadNoise,
+  localLeftovers,
+  login,
+  newDevice,
+  seedDoc,
+  startDefaultSet,
+} from './helpers';
 
 /**
  * ログイン・記録の E2E（SPEC §6.2〜§6.5 / §8.4）。Firebase Emulator（Auth・Firestore）に対して動かす。
@@ -168,6 +181,62 @@ test('表示名の変更・ログアウト時のキャッシュ消去・アカ�
     const body = (await res.json()) as { documents?: unknown[] };
     expect(body.documents ?? []).toEqual([]);
   }
+  await context.close();
+});
+
+test('アカウント削除で、記録・報告・おすすめ復習・ログイン情報・端末内の写しがすべて消える', async ({ browser }, info) => {
+  const user = fakeUser(info, 'del');
+  const { context, page } = await newDevice(browser, info, user);
+  await login(page);
+  await startDefaultSet(page);
+  await answerQuestions(page, 3);
+  await page.goto('./#/home');
+  await expect.poll(async () => answeredOf(await findUserDoc(user.name)), { timeout: 20_000 }).toBeGreaterThan(0);
+  const uid = String((await findUserDoc(user.name))?.path ?? '').split('/').pop() ?? '';
+  expect(uid).not.toBe('');
+
+  // 管理者が作ったおすすめ復習と、本人が送った報告がある状態にする（Emulator に直接書く）
+  await seedDoc(`users/${uid}/assignments/a1`, { title: 'テスト用のおすすめ復習' });
+  await seedDoc(`reports/${uid}_54-01`, { uid, questionId: '54-01', comment: 'テスト' });
+  // 別の人の報告は消えないこと（比べるため）
+  const otherUid = `other-${uid}`;
+  await seedDoc(`reports/${otherUid}_54-01`, { uid: otherUid, questionId: '54-01', comment: '別の人' });
+
+  expect(await countDocs(`users/${uid}/progress`)).toBeGreaterThan(0);
+  expect(await countDocs(`users/${uid}/days`)).toBeGreaterThan(0);
+  expect(await authUids()).toContain(uid);
+  expect((await localLeftovers(page)).records).toBeGreaterThan(0);
+  expect((await localLeftovers(page)).auth).toBeGreaterThan(0);
+
+  // 設定 → アカウントを削除する（2段階）
+  await page.goto('./#/settings');
+  await page.getByRole('button', { name: 'アカウントを削除する' }).click();
+  await page.getByRole('button', { name: '本当に削除する' }).click();
+  // ログアウトした状態（ログイン画面）に戻る
+  await expect(page.getByRole('button', { name: 'Googleでログイン' })).toBeVisible({ timeout: 20_000 });
+
+  // クラウドの記録（users と、その下の progress・days・assignments）と、本人の報告が消えている
+  expect(await findUserDoc(user.name)).toBeNull();
+  for (const sub of ['progress', 'days', 'assignments']) expect.soft(await countDocs(`users/${uid}/${sub}`), sub).toBe(0);
+  const reportIds = async () => {
+    const res = await fetch(`http://localhost:8080/v1/projects/demo-kakomon/databases/(default)/documents/reports?pageSize=300`, {
+      headers: { Authorization: 'Bearer owner' },
+    });
+    const body = (await res.json()) as { documents?: { name: string }[] };
+    return (body.documents ?? []).map((d) => d.name.split('/').pop());
+  };
+  expect(await reportIds()).not.toContain(`${uid}_54-01`);
+  expect(await reportIds()).toContain(`${otherUid}_54-01`);
+  // Firebase Auth のアカウントも消えている
+  expect(await authUids()).not.toContain(uid);
+  // 端末内の学習記録の写しと、ログイン情報が残っていない（読み込み直しの途中で調べて失敗したらやり直す）
+  await expect.poll(async () => localLeftovers(page).catch(() => ({ records: -1, auth: -1 })), { timeout: 10_000 }).toEqual({
+    records: 0,
+    auth: 0,
+  });
+  // 読み込み直しても、ログインした状態には戻らない
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Googleでログイン' })).toBeVisible();
   await context.close();
 });
 
