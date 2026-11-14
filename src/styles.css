@@ -2559,3 +2559,22 @@ mark.hit {
   margin: 0 0 8px;
   font-weight: 700;
 }
+
+/* ログイン：ポップアップがブロックされたときの案内（SPEC §14 #63） */
+.login-error .error-text {
+  margin-bottom: 4px;
+}
+.popup-help {
+  margin: 0 0 8px;
+  padding-left: 1.2em;
+  color: var(--muted);
+}
+.popup-help li {
+  margin-bottom: 4px;
+}
+a.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
