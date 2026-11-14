@@ -69,7 +69,98 @@ export async function findUserDoc(name: string): Promise<Record<string, any> | n
   const hit = (body.documents ?? []).find((d) => d.fields.displayName?.stringValue === name);
   return hit ? { path: hit.name, ...hit.fields } : null;
 }
-export const answeredOf = (doc: Record<string, any> | null) => Number(doc?.totals?.mapValue?.fields?.answered?.integerValue ?? -1);
+/** ページでログインしている人の ID トークン（Firebase Auth が IndexedDB に保存しているもの）。テストの確認用 */
+export async function idTokenOf(page: Page): Promise<string> {
+  return page.evaluate(
+    () =>
+      new Promise<string>((resolve, reject) => {
+        const open = indexedDB.open('firebaseLocalStorageDb');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const names = Array.from(open.result.objectStoreNames);
+          if (!names.includes('firebaseLocalStorage')) return resolve('');
+          const req = open.result.transaction('firebaseLocalStorage').objectStore('firebaseLocalStorage').getAll();
+          req.onsuccess = () => {
+            const hit = (req.result as { value?: { stsTokenManager?: { accessToken?: string } } }[]).find(
+              (r) => r.value?.stsTokenManager?.accessToken,
+            );
+            resolve(hit?.value?.stsTokenManager?.accessToken ?? '');
+          };
+          req.onerror = () => reject(req.error);
+        };
+      }),
+  );
+}
+
+/** Emulator の Firestore を、指定したトークン（＝その人の権限。ルールを通す）で読み、HTTP の状態コードを返す。body があれば問い合わせ（runQuery） */
+export async function readAs(token: string, path: string, body?: unknown): Promise<number> {
+  const res = await fetch(body ? `${FIRESTORE}:runQuery` : `${FIRESTORE}/${path}`, {
+    method: body ? 'POST' : 'GET',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  return res.status;
+}
+
+/** Emulator の Firestore に、ルールを通さずに書く（テストの準備用）。値は文字列だけ */
+export async function seedDoc(path: string, fields: Record<string, string>): Promise<void> {
+  const res = await fetch(`${FIRESTORE}/${path}`, {
+    method: 'PATCH',
+    headers: { Authorization: 'Bearer owner', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, { stringValue: v }])) }),
+  });
+  if (!res.ok) throw new Error(`seedDoc ${path}: ${res.status}`);
+}
+
+/** Emulator の Firestore のコレクションの件数（ルールを通さない） */
+export async function countDocs(path: string): Promise<number> {
+  const res = await fetch(`${FIRESTORE}/${path}?pageSize=300`, { headers: { Authorization: 'Bearer owner' } });
+  const body = (await res.json()) as { documents?: unknown[] };
+  return (body.documents ?? []).length;
+}
+
+/** Auth Emulator に残っているアカウントの uid の一覧 */
+export async function authUids(): Promise<string[]> {
+  const res = await fetch('http://localhost:9099/identitytoolkit.googleapis.com/v1/projects/demo-kakomon/accounts:query', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer owner', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ returnUserInfo: true }),
+  });
+  const body = (await res.json()) as { userInfo?: { localId: string }[] };
+  return (body.userInfo ?? []).map((u) => u.localId);
+}
+
+/** 端末内（IndexedDB）に残っている、学習記録の写しの件数（progress・days・kv の合計）と、Firebase Auth のログイン情報の件数 */
+export async function localLeftovers(page: Page): Promise<{ records: number; auth: number }> {
+  return page.evaluate(async () => {
+    const count = (dbName: string, stores: string[]) =>
+      new Promise<number>((resolve, reject) => {
+        const open = indexedDB.open(dbName);
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const have = stores.filter((s) => Array.from(open.result.objectStoreNames).includes(s));
+          if (!have.length) return resolve(0);
+          const tx = open.result.transaction(have);
+          Promise.all(
+            have.map(
+              (s) =>
+                new Promise<number>((res, rej) => {
+                  const r = tx.objectStore(s).count();
+                  r.onsuccess = () => res(r.result);
+                  r.onerror = () => rej(r.error);
+                }),
+            ),
+          ).then((n) => resolve(n.reduce((a, b) => a + b, 0)), reject);
+        };
+      });
+    return {
+      records: await count('kakomon-user', ['progress', 'days', 'kv']),
+      auth: await count('firebaseLocalStorageDb', ['firebaseLocalStorage']),
+    };
+  });
+}
+
+export const answeredOf =(doc: Record<string, any> | null) => Number(doc?.totals?.mapValue?.fields?.answered?.integerValue ?? -1);
 
 export async function answerQuestions(page: Page, count: number): Promise<void> {
   for (let i = 0; i < count; i++) {
