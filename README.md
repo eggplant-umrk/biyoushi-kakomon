@@ -9,7 +9,7 @@
 
 ```sh
 npm ci
-npm run dev          # 開発サーバー
+npm run dev          # 開発サーバー（本番の Firebase は localhost からは使えないので、ゲストとして動く。ログインは E2E の Emulator か公開中のサイトで確かめる）
 npm run typecheck    # 型チェック
 npm test             # 単体テスト（Vitest）
 npm run test:e2e     # E2E（Playwright：iPhone・Pixel エミュレーション。初回は npx playwright install chromium webkit）
