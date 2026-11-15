@@ -17,6 +17,44 @@
 | 5. 管理画面 | 利用者一覧・利用者の詳細・「この人の苦手問題で出題」まで実装。残りは下の「フェーズ5の残り」 |
 | 6. 解説 | 全14回770問に解説あり。本番反映済み（PR #8〜#10・#14〜#24） |
 
+## 本番の設定の整理（2026-11-15。梅澤さんの承認を得て実行。SPEC §14 #68）
+
+### 変えたこと
+- **アプリが使っていない API キー**（表示名「Browser key (auto created by Firebase)」、ID `b772a183-7507-4e65-9e28-faab41647226`。2026-11-10 に Firebase が自動で作ったもの）に、アプリ用のキーと同じ制限を付けた。削除はしていない
+  - 使われている形跡はなかった：Firebase に登録したアプリは Web アプリ1つで、その設定のキーはアプリ用のキー（ID `16d0be95-…`）。リポジトリ（履歴を含む）、`.env.local`・`.env.e2e`、firebase の設定ファイル、ビルド結果、firebase CLI・gcloud の設定、GitHub Secrets のどれにも入っていない。API の利用回数は、読むための API（Cloud Monitoring）に課金が必要なため読めていない
+- **localhost を外した**：承認済みドメインと、2つの API キーのリファラーから
+- **このリポジトリのコミットの作者メール**：`git config --local user.email` を GitHub の noreply アドレスにした（過去のコミットは書き換えていない）
+- `scripts/setup/firebase.sh` を、実行し直しても localhost が戻らないように直した
+
+### 変更前の設定（キーの値は書かない）
+| 項目 | 変更前 | 変更後 |
+|---|---|---|
+| 承認済みドメイン | `eggplant-umrk.github.io`・`localhost`・`biyoushi-kakomon.firebaseapp.com` | `eggplant-umrk.github.io`・`biyoushi-kakomon.firebaseapp.com` |
+| アプリ用のキー（`16d0be95-…`）のリファラー | `https://eggplant-umrk.github.io/*`・`http://localhost:*`・`https://biyoushi-kakomon.firebaseapp.com/*` | `https://eggplant-umrk.github.io/*`・`https://biyoushi-kakomon.firebaseapp.com/*` |
+| アプリ用のキーの API | Identity Toolkit・Secure Token・Firestore・App Check | 変えていない |
+| 使っていないキー（`b772a183-…`）のリファラー | 制限なし | アプリ用のキーと同じ2つ |
+| 使っていないキーの API | 27個（Firebase が自動で付けたもの：firebasedatabase・firebasehosting・firebaserules・sqladmin・cloudconfig・datastore・fcmregistrations・firebase・firebaseappcheck・firebaseappdistribution・firebaseapphosting・firebaseapptesters・firebasedataconnect・firebaseinappmessaging・firebaseinstallations・firebaseml・firebaseremoteconfig・firebaseremoteconfigrealtime・firebasestorage・firebasevertexai・firestore・identitytoolkit・logging・mlkit・play・securetoken・fpnv（いずれも `.googleapis.com`）） | アプリ用のキーと同じ4つ |
+| reCAPTCHA（App Check）のキーのドメイン | `eggplant-umrk.github.io`・`localhost` | 変えていない |
+
+### 確認したこと（読み取りだけ）
+- 2つのキーの制限（リファラー・API）が完全に同じになった。App Check は Firestore・Authentication とも強制のまま
+- 本番サイト（ログイン画面）で、App Check のトークンの取得が成功（200）。同じページから、Authentication の設定の取得が成功（200）、Firestore はルールの「権限がない」（API キーの検査は通っている）
+- `localhost` からのリファラーでは、アプリ用のキーが拒否される（API_KEY_HTTP_REFERRER_BLOCKED）
+- Google ログインそのもの（アカウントの選択からアプリに戻るまで）は、梅澤さんの実機での確認待ち
+
+### 戻す手順
+- 承認済みドメインに localhost を戻す：`scripts/setup/firebase.sh` の承認済みドメインの行に `\"localhost\"` を足して実行する。または、Firebase コンソールの「Authentication」→「設定」→「承認済みドメイン」で `localhost` を追加する
+- アプリ用のキーのリファラーに localhost を戻す：
+  `gcloud services api-keys update projects/142738617711/locations/global/keys/16d0be95-2db1-47a0-999e-ee7922c18553 --project biyoushi-kakomon --allowed-referrers="https://eggplant-umrk.github.io/*,http://localhost:*,https://biyoushi-kakomon.firebaseapp.com/*" --api-target=service=identitytoolkit.googleapis.com --api-target=service=securetoken.googleapis.com --api-target=service=firestore.googleapis.com --api-target=service=firebaseappcheck.googleapis.com`
+- 使っていないキーの制限を外す（変更前に戻す）：
+  `gcloud services api-keys update projects/142738617711/locations/global/keys/b772a183-7507-4e65-9e28-faab41647226 --project biyoushi-kakomon --clear-restrictions`
+  （変更前は、API の制限も27個付いていた。正確に戻すなら、上の27個を `--api-target=service=…` で付け直す）
+- コミットの作者メール：`git -C C:/biyoushi-kakomon config --local --unset user.email`（全体の設定に戻る）
+
+### 開発・テストへの影響
+- `npm run dev`・`npm run preview` を `.env.local`（本番の Firebase）で開くと、Google ログイン・同期・管理画面は使えない（ゲストとしては使える）
+- ログインを使う確認は、Emulator（`npm run test:e2e`）か、公開中のサイトで行う。ルールのテスト・E2E・CI は Emulator を使うので影響しない
+
 ## セキュリティレビューの対応（2026-11-15。ブランチ `fix/security-review`）
 
 - Firestore ルール：日別の記録のセットの結果を、後ろに足すことだけにし、1回5件まで・足した分をすべて検査・1日100件までにした。要復習マークのキーとおすすめ復習の問題IDを、全770問の問題IDの一覧と照らすようにした。表示名の見えない文字を拒否、分野別の解答数は合計以下にした（SPEC §14 #64）。テストを先に書き、変更前に失敗し、変更後に通ることを確かめた（ルールのテスト161件）
@@ -32,7 +70,7 @@
 - 公開中の Firestore ルールは、main のテンプレートから作ったものと一致（2026-11-14 に公開したもの）
 - App Check：Firestore・Authentication とも強制（ENFORCED）
 - Authentication：承認済みドメインは `eggplant-umrk.github.io`・`localhost`・`biyoushi-kakomon.firebaseapp.com`。ログイン方法は Google だけ（メール／パスワード・匿名は無効）。メール列挙保護は有効
-- API キー：アプリが使うキーは、リファラー（github.io・localhost・firebaseapp.com）と4つの API（Identity Toolkit・Secure Token・Firestore・App Check）に制限済み。**アプリが使っていない「Browser key (auto created by Firebase)」がもう1つあり、リファラーの制限がなく、27の API が使える**（梅澤さんの確認待ち）
+- API キー：アプリが使うキーは、リファラー（github.io・localhost・firebaseapp.com）と4つの API（Identity Toolkit・Secure Token・Firestore・App Check）に制限済み。アプリが使っていない「Browser key (auto created by Firebase)」がもう1つあり、リファラーの制限がなく、27の API が使えた（→ 下の「本番の設定の整理」で制限を付けた）
 - GitHub：公開リポジトリ。main の保護（必須チェック test・strict、管理者にも適用、強制 push・削除の禁止。PR の承認は必須にしていない）、secret scanning・push protection・Dependabot（脆弱性の通知と自動の修正）は有効。開いている Dependabot の通知は2件（開発用の minimatch・deepmerge）。action のコミット SHA での固定は、強制の設定（sha_pinning_required）が無効
 
 ## スマホでの Google ログイン（2026-11-15。PR #29 でマージ・本番反映済み）

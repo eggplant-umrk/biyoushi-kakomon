@@ -53,16 +53,17 @@ if ! api GET "$IDP/admin/v2/projects/$PROJECT/config" >/dev/null 2>&1; then
   echo "!! Authentication がまだ初期化されていません。コンソールで Google ログインを有効にしてから、もう一度実行してください。"
   echo "   （承認済みドメイン・メール列挙保護の設定を飛ばして続けます）"
 else
-# 承認済みドメインは GitHub Pages・localhost と、Google ログインのポップアップが使う {project}.firebaseapp.com。
+# 承認済みドメインは GitHub Pages と、Google ログインのポップアップが使う {project}.firebaseapp.com だけ。
+# localhost は入れない（手元から本番の Firebase を呼べないようにする。開発・テストは Emulator を使う。SPEC §14 #68）。
 # 既定で入っている {project}.web.app は使わないので外す。
 # メール列挙保護を有効にし、メール／パスワード・匿名ログインは無効のままにする
 api PATCH "$IDP/admin/v2/projects/$PROJECT/config?updateMask=authorizedDomains,emailPrivacyConfig.enableImprovedEmailPrivacy,signIn.email.enabled,signIn.anonymous.enabled" \
-  "{\"authorizedDomains\":[\"$PAGES_HOST\",\"localhost\",\"$PROJECT.firebaseapp.com\"],\"emailPrivacyConfig\":{\"enableImprovedEmailPrivacy\":true},\"signIn\":{\"email\":{\"enabled\":false},\"anonymous\":{\"enabled\":false}}}" \
+  "{\"authorizedDomains\":[\"$PAGES_HOST\",\"$PROJECT.firebaseapp.com\"],\"emailPrivacyConfig\":{\"enableImprovedEmailPrivacy\":true},\"signIn\":{\"email\":{\"enabled\":false},\"anonymous\":{\"enabled\":false}}}" \
   | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const c=JSON.parse(s);console.log("== auth:",JSON.stringify({authorizedDomains:c.authorizedDomains,emailPrivacy:c.emailPrivacyConfig,signIn:c.signIn}))})'
 fi
 
 # --- 5. ブラウザ用 API キーの制限 --------------------------------------------
-# リファラー：本番・localhost と、Google ログインのポップアップ（{project}.firebaseapp.com の
+# リファラー：本番と、Google ログインのポップアップ（{project}.firebaseapp.com の
 # 認証ハンドラーがこのキーで Identity Toolkit を呼ぶ）だけ。API：使う4つだけ
 SDK="$(firebase apps:sdkconfig WEB "$APP_ID" --project "$PROJECT" --json)"
 cfg() { node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const r=JSON.parse(s).result;console.log((r.sdkConfig||r)[process.argv[1]]||"")})' "$1" <<<"$SDK"; }
@@ -73,7 +74,7 @@ KEY_NAME="$(gcloud services api-keys list --project "$PROJECT" --format=json \
       if [ "$(gcloud services api-keys get-key-string "$name" --format='value(keyString)')" = "$API_KEY" ]; then echo "$name"; fi
     done)"
 gcloud services api-keys update "$KEY_NAME" \
-  --allowed-referrers="https://$PAGES_HOST/*,http://localhost:*,https://$PROJECT.firebaseapp.com/*" \
+  --allowed-referrers="https://$PAGES_HOST/*,https://$PROJECT.firebaseapp.com/*" \
   --api-target=service=identitytoolkit.googleapis.com \
   --api-target=service=securetoken.googleapis.com \
   --api-target=service=firestore.googleapis.com \
