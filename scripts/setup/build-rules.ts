@@ -20,8 +20,21 @@ export function renderRules(template: string, adminEmail: string): string {
   if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(adminEmail)) {
     throw new Error('ADMIN_EMAIL がメールアドレスの形になっていません');
   }
-  if (!template.includes('__ADMIN_EMAIL__')) throw new Error('テンプレートに __ADMIN_EMAIL__ がありません');
-  return template.replaceAll('__ADMIN_EMAIL__', adminEmail);
+  if (!template.includes("'__ADMIN_EMAIL__'")) throw new Error('テンプレートに管理者メールの印がありません');
+  if (!template.includes('[__QUESTION_IDS__]')) throw new Error('テンプレートに問題IDの一覧の印がありません');
+  // 置き換えるのは、ルールの中の文字列の印だけ（コメントには入れない）
+  return template
+    .replaceAll("'__ADMIN_EMAIL__'", `'${adminEmail}'`)
+    .replace('[__QUESTION_IDS__]', `[${allQuestionIds().map((q) => `'${q}'`).join(', ')}]`);
+}
+
+/** 全770問の問題ID（第41〜54回 × 問1〜55）。ルールの isValidQid と同じ範囲 */
+export function allQuestionIds(): string[] {
+  const ids: string[] = [];
+  for (let exam = 41; exam <= 54; exam++) {
+    for (let no = 1; no <= 55; no++) ids.push(`${exam}-${String(no).padStart(2, '0')}`);
+  }
+  return ids;
 }
 
 function adminEmailFromEnv(): string {

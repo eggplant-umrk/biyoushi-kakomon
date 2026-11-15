@@ -570,6 +570,10 @@ export interface AdminUserData {
   displayName: string;
   /** users/{uid}.lastActiveAt（epoch ms） */
   lastActiveAt: number;
+  /** users/{uid}.createdAt（epoch ms。読めなければ 0） */
+  createdAt: number;
+  /** users/{uid}.syncSeq：記録の送信の回数（ルールで、送信のたびに1ずつしか増やせない） */
+  syncSeq: number;
   answered: number;
   correct: number;
   byField: Partial<Record<FieldId, { answered: number; correct: number }>>;
@@ -607,6 +611,8 @@ export async function adminLoadUsers(): Promise<AdminUserData[]> {
         uid: d.id,
         displayName: cleanDisplayName(typeof x.displayName === 'string' ? x.displayName : '') || DEFAULT_DISPLAY_NAME,
         lastActiveAt: x.lastActiveAt instanceof Timestamp ? x.lastActiveAt.toMillis() : 0,
+        createdAt: x.createdAt instanceof Timestamp ? x.createdAt.toMillis() : 0,
+        syncSeq: typeof x.syncSeq === 'number' ? x.syncSeq : 0,
         answered: totals.answered,
         correct: totals.correct,
         byField,

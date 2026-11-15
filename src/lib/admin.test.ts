@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { dailySeries, fieldRates, lastActiveLabel, lastDates, recentAnswered, sortUsers, weakQuestions, type AdminUserData } from './admin';
+import {
+  activityAlerts,
+  ALERT_ANSWERS_PER_DAY,
+  dailySeries,
+  fieldRates,
+  lastActiveLabel,
+  lastDates,
+  recentAnswered,
+  shortUid,
+  sortUsers,
+  weakQuestions,
+  type AdminUserData,
+} from './admin';
 import type { ProgressRec } from './db';
 
 // 日本時間 2026-11-13 12:00
@@ -53,18 +65,48 @@ describe('lastActiveLabel', () => {
   });
 });
 
+const member = (uid: string, lastActiveAt: number, o: Partial<AdminUserData> = {}): AdminUserData => ({
+  uid,
+  displayName: uid,
+  lastActiveAt,
+  createdAt: NOW - 30 * DAY,
+  syncSeq: 0,
+  answered: 0,
+  correct: 0,
+  byField: {},
+  days: [],
+  ...o,
+});
+
 describe('sortUsers', () => {
   it('最終学習日の新しい順に並べる', () => {
-    const u = (uid: string, lastActiveAt: number): AdminUserData => ({
-      uid,
-      displayName: uid,
-      lastActiveAt,
-      answered: 0,
-      correct: 0,
-      byField: {},
-      days: [],
-    });
-    expect(sortUsers([u('a', 1), u('b', 3), u('c', 2)]).map((x) => x.uid)).toEqual(['b', 'c', 'a']);
+    expect(sortUsers([member('a', 1), member('b', 3), member('c', 2)], NOW).map((x) => x.uid)).toEqual(['b', 'c', 'a']);
+  });
+  it('更新回数が異常に多い人を先に並べる', () => {
+    const odd = member('z', 0, { syncSeq: 5000, answered: 10 });
+    expect(sortUsers([member('a', 2), odd, member('b', 3)], NOW).map((x) => x.uid)).toEqual(['z', 'b', 'a']);
+  });
+});
+
+describe('activityAlerts（更新回数が異常に多い利用者）', () => {
+  it('ふつうの使い方では出ない（10問ごとに送信、毎日100問を30日）', () => {
+    const days = [{ date: '2026-11-13', answered: 100, correct: 60 }];
+    expect(activityAlerts(member('a', NOW, { answered: 3000, syncSeq: 400, days }), NOW)).toEqual([]);
+    // 1問ずつ送っても（送信回数＝解答数）出ない
+    expect(activityAlerts(member('a', NOW, { answered: 500, syncSeq: 520 }), NOW)).toEqual([]);
+    // 作ったばかりの人
+    expect(activityAlerts(member('a', NOW, { createdAt: NOW, answered: 0, syncSeq: 0 }), NOW)).toEqual([]);
+  });
+  it('解答の伴わない送信が多い', () => {
+    expect(activityAlerts(member('a', NOW, { answered: 10, syncSeq: 5000 }), NOW)).toEqual(['sends']);
+  });
+  it('1日の解答数が多すぎる（日別の記録、または作ってからの平均）', () => {
+    const days = [{ date: '2026-11-13', answered: ALERT_ANSWERS_PER_DAY + 1, correct: 0 }];
+    expect(activityAlerts(member('a', NOW, { answered: 2000, syncSeq: 100, days }), NOW)).toEqual(['answers']);
+    expect(activityAlerts(member('a', NOW, { createdAt: NOW - DAY, answered: 50000, syncSeq: 1000 }), NOW)).toEqual(['answers']);
+  });
+  it('uid の先頭6文字', () => {
+    expect(shortUid('abcdefghij')).toBe('abcdef');
   });
 });
 

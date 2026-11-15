@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ErrorBox, Skeleton } from '../components/common';
 import {
+  activityAlerts,
+  ALERT_ANSWERS_PER_DAY,
   clearAdminCache,
   dailySeries,
   fieldRates,
@@ -9,10 +11,12 @@ import {
   loadAdminUsers,
   recentAnswered,
   RECENT_DAYS,
+  shortUid,
   SERIES_DAYS,
   WEAK_QUIZ_MAX,
   WEAK_SHOWN,
   weakQuestions,
+  type ActivityAlert,
   type AdminUserData,
 } from '../lib/admin';
 import { useAuth } from '../lib/auth';
@@ -93,6 +97,11 @@ function hhmm(ms: number): string {
   return new Date(ms).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
 }
 
+const ALERT_TEXT: Record<ActivityAlert, string> = {
+  sends: '解答の伴わない送信が多い',
+  answers: `1日の解答数が${ALERT_ANSWERS_PER_DAY}問を超えている`,
+};
+
 function UserList({
   users,
   fetchedAt,
@@ -107,6 +116,7 @@ function UserList({
   const { uid: myUid } = useAuth();
   const now = Date.now();
   const others = users.filter((u) => u.uid !== myUid).length;
+  const flagged = users.filter((u) => activityAlerts(u, now).length > 0).length;
 
   return (
     <div className="screen">
@@ -126,42 +136,57 @@ function UserList({
         </button>
       </div>
       <p className="small muted">{hhmm(fetchedAt)} 時点の記録です。新しい順（最終学習日）に並べています。</p>
+      {flagged > 0 && (
+        <p className="card admin-alert small" role="status" data-testid="admin-alert">
+          更新回数が異常に多い利用者が{flagged}人います（一覧の先頭に「要確認」を付けています）。無料枠の書き込みを使い切られるおそれがあります。
+          続くようなら、Firebase の管理画面の「使用量」で書き込みの回数を確かめてください。
+        </p>
+      )}
 
       {users.length === 0 ? (
         <p className="card muted">まだ利用者がいません。だれかがGoogleでログインすると、ここに表示されます。</p>
       ) : (
         <ul className="admin-users">
-          {users.map((u) => (
-            <li key={u.uid}>
-              <button
-                type="button"
-                className="card card-action admin-user"
-                onClick={() => navigate('/admin', { query: { u: u.uid } })}
-              >
-                <span className="admin-user-name">
-                  {u.displayName}
-                  {u.uid === myUid && <span className="badge">自分</span>}
-                </span>
-                <span className="admin-user-stats">
-                  <span>
-                    <span className="admin-label">最終学習日</span>
-                    {lastActiveLabel(u.answered > 0 ? u.lastActiveAt : 0, now)}
+          {users.map((u) => {
+            const alerts = activityAlerts(u, now);
+            return (
+              <li key={u.uid}>
+                <button
+                  type="button"
+                  className={`card card-action admin-user${alerts.length ? ' admin-user-alert' : ''}`}
+                  onClick={() => navigate('/admin', { query: { u: u.uid } })}
+                >
+                  <span className="admin-user-name">
+                    {u.displayName}
+                    <span className="admin-uid">ID {shortUid(u.uid)}</span>
+                    {u.uid === myUid && <span className="badge">自分</span>}
+                    {alerts.length > 0 && (
+                      <span className="badge badge-alert" title={alerts.map((a) => ALERT_TEXT[a]).join('・')}>
+                        要確認
+                      </span>
+                    )}
                   </span>
-                  <span>
-                    <span className="admin-label">直近{RECENT_DAYS}日</span>
-                    {recentAnswered(u.days, now)}問
+                  <span className="admin-user-stats">
+                    <span>
+                      <span className="admin-label">最終学習日</span>
+                      {lastActiveLabel(u.answered > 0 ? u.lastActiveAt : 0, now)}
+                    </span>
+                    <span>
+                      <span className="admin-label">直近{RECENT_DAYS}日</span>
+                      {recentAnswered(u.days, now)}問
+                    </span>
+                    <span>
+                      <span className="admin-label">累計</span>
+                      {u.answered}問・正答率 {pct(u.correct, u.answered)}
+                    </span>
                   </span>
-                  <span>
-                    <span className="admin-label">累計</span>
-                    {u.answered}問・正答率 {pct(u.correct, u.answered)}
+                  <span className="card-arrow" aria-hidden="true">
+                    ›
                   </span>
-                </span>
-                <span className="card-arrow" aria-hidden="true">
-                  ›
-                </span>
-              </button>
-            </li>
-          ))}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
       {users.length > 0 && others === 0 && (
@@ -183,6 +208,7 @@ function UserDetail({ user, reloadKey }: { user: AdminUserData; reloadKey: numbe
   const [error, setError] = useState(false);
   const [starting, setStarting] = useState(false);
   const now = Date.now();
+  const alerts = activityAlerts(user, now);
 
   useEffect(() => {
     let alive = true;
@@ -233,6 +259,12 @@ function UserDetail({ user, reloadKey }: { user: AdminUserData; reloadKey: numbe
       <h1 className="screen-title" data-testid="admin-detail-name">
         {user.displayName}
       </h1>
+      <p className="small muted">ID {shortUid(user.uid)}</p>
+      {alerts.length > 0 && (
+        <p className="card admin-alert small" role="status" data-testid="admin-detail-alert">
+          要確認：{alerts.map((a) => ALERT_TEXT[a]).join('・')}（送信 {user.syncSeq}回・解答 {user.answered}問）。
+        </p>
+      )}
 
       <section className="card" aria-labelledby="admin-summary">
         <h2 id="admin-summary" className="card-title">
@@ -253,6 +285,9 @@ function UserDetail({ user, reloadKey }: { user: AdminUserData; reloadKey: numbe
           </div>
         </dl>
         <p className="small muted">最終学習日：{lastActiveLabel(user.answered > 0 ? user.lastActiveAt : 0, now)}</p>
+        <p className="small muted">
+          記録の送信 {user.syncSeq}回。成績は利用者の端末が送る値（自己申告）です。ルールで上限は決めていますが、書き換えられることがあります。
+        </p>
       </section>
 
       <section className="card" aria-labelledby="admin-fields">

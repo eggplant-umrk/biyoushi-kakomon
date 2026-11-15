@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Footer } from '../components/common';
-import { login, preloadLogin } from '../lib/auth';
+import { login, preloadLogin, useAuth } from '../lib/auth';
 import { LOGIN_ENABLED } from '../lib/config';
 import { externalUrl, isInAppBrowser, isIOSStandalone } from '../lib/inapp';
 import { navigate } from '../lib/router';
@@ -33,6 +33,7 @@ export function LoginScreen() {
   // iPhone のホーム画面に追加したアプリ：Google ログインを終えてもアプリに戻れないので、Safari で開く案内を出す
   const iosApp = !inApp && isIOSStandalone(navigator as Navigator & { standalone?: boolean });
   const url = externalUrl(window.location);
+  const { endedLost } = useAuth();
 
   useEffect(() => {
     if (!inApp && !iosApp) preloadLogin();
@@ -70,6 +71,14 @@ export function LoginScreen() {
       </div>
 
       <div className="login-actions">
+        {endedLost !== null && (
+          <p className="card small" role="status" data-testid="session-ended">
+            ログインが切れたため、この端末に保存していた記録の写し（要復習マーク・メモを含む）を消しました。
+            {endedLost > 0
+              ? `送信できていなかった${endedLost}件の変更は保存されていません。`
+              : 'クラウドに保存した記録は、もう一度ログインすると表示されます。'}
+          </p>
+        )}
         {inApp ? (
           // アプリ内ブラウザ（LINE・Instagram など）では Google ログインが使えない（SPEC §6.2）
           <div className="card inapp" role="note">
@@ -161,6 +170,8 @@ export function LoginScreen() {
         </button>
         <p className="small notice">
           学習記録はクラウドに保存され、作成者が問題の改善や苦手分析に使います。
+          作成者の画面には、Googleの名前（あとで設定から変えられます）、問題ごとの記録、日ごとの解答数、最後に使った日時が表示されます。
+          メモと要復習マークは表示されませんが、作成者はFirebaseの管理画面から、メモやメールアドレスを見ることができます。
           ログインせずに使う場合、記録はこの端末の中だけに保存されます。
         </p>
       </div>

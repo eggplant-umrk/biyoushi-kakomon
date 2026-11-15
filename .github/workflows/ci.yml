@@ -58,7 +58,9 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          # PR のビルドでは、ブランチの設定やプラグインが動くので、本物の管理者メールは渡さない。
+          # 本物の値での検査は、main への push のとき（この job と、deploy の公開前の検査）に行う
+          ADMIN_EMAIL: ${{ github.event_name != 'pull_request' && secrets.ADMIN_EMAIL || '' }}
         run: |
           npm run build
           bash scripts/check-dist.sh dist

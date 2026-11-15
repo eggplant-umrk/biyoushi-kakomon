@@ -231,7 +231,7 @@ function DeleteAccountCard() {
     <section className="card">
       <h2 className="card-title">アカウントの削除</h2>
       <p className="small muted">
-        クラウドに保存した学習記録と、このアプリのアカウントをすべて削除します。元に戻せません。本人確認のため、もう一度Googleでログインする画面が出ます。
+        クラウドに保存した学習記録と、このアプリのアカウントをすべて削除します。元に戻せません。本人確認のため、もう一度Googleでログインする画面が出ます。ほかの端末に残っている記録の写しは、その端末で次にこのアプリを開いたときに消えます。
       </p>
       {step === 'idle' && (
         <button type="button" className="btn btn-secondary" onClick={() => setStep('confirm')}>
@@ -242,7 +242,7 @@ function DeleteAccountCard() {
         <div className="stack">
           {step === 'error' && (
             <p className="small error-text" role="alert">
-              削除できませんでした。同じGoogleアカウントでログインし直したか、通信の状態を確認して、もう一度お試しください。
+              削除できませんでした。同じGoogleアカウントでログインし直したか、通信の状態を確認して、もう一度お試しください。もう一度押すと、消えていない分から続けて消します。
             </p>
           )}
           <button type="button" className="btn btn-danger" disabled={step === 'working'} onClick={() => void run()}>

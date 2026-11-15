@@ -10,7 +10,7 @@ import {
   settleInflight,
   type Outbox,
 } from './db';
-import { chunkTotals, MAX_ANSWERS_PER_SEND, MAX_DOCS_PER_SEND, takeChunk } from './sendplan';
+import { chunkTotals, MAX_ANSWERS_PER_SEND, MAX_DOCS_PER_SEND, MAX_SESSIONS_PER_SEND, takeChunk } from './sendplan';
 
 const prog = (attempts: number, correct: number, rev = 1) => ({ attempts, correct, rev });
 
@@ -59,6 +59,18 @@ describe('takeChunk（1回の送信で送る分）', () => {
   it('correct は送る解答数を超えない', () => {
     const c = takeChunk({ progress: {}, days: { '2026-11-10': { answered: 80, correct: 70, sessions: [] } } });
     expect(c.days['2026-11-10']).toMatchObject({ answered: 55, correct: 55 });
+  });
+
+  it('セットの結果は、日付ごとに5件ずつ送る（ルールの上限）', () => {
+    const sessions = Array.from({ length: 12 }, (_, i) => ({
+      mode: 'practice' as const,
+      total: 10,
+      correct: i % 10,
+      endedAt: 1000 + i,
+    }));
+    const c = takeChunk({ progress: {}, days: { '2026-11-10': { answered: 3, correct: 1, sessions } } });
+    expect(c.days['2026-11-10']?.sessions).toEqual(sessions.slice(0, MAX_SESSIONS_PER_SEND));
+    expect(MAX_SESSIONS_PER_SEND).toBe(5);
   });
 });
 

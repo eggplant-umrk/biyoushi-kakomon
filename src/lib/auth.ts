@@ -34,6 +34,11 @@ export interface AuthState {
   syncError: boolean;
   /** 端末内の記録が Firestore から更新されるたびに増える。画面の再読み込みに使う */
   dataVersion: number;
+  /**
+   * ログアウト以外でログインが切れ、端末内の写しを消した（ほかの端末でのアカウント削除など）。
+   * 消した未送信の件数。null なら出していない（ログイン画面で知らせる）
+   */
+  endedLost: number | null;
 }
 
 const FLUSH_EVERY = 10; // 10問ごとに送信（SPEC §6.4）
@@ -47,6 +52,7 @@ let state: AuthState = {
   importCount: 0,
   syncError: false,
   dataVersion: 0,
+  endedLost: null,
 };
 const listeners = new Set<() => void>();
 
@@ -101,7 +107,7 @@ function watchWith(cloud: Cloud): void {
   watching = true;
   cloud.watchAuth((user) => {
     if (user) void onSignedIn(cloud, user.uid, user.googleName);
-    else onSignedOut();
+    else void onSignedOut(true);
   });
 }
 
@@ -125,17 +131,21 @@ export function initAuth(): void {
   if (!getSettings().signedIn) return;
   setLocalDb('user');
   set({ status: 'loading', displayName: getSettings().displayName });
-  void startWatching().catch(() => onSignedOut());
+  // Firebase を読み込めなかったときは、ログインが切れたとは限らない（通信できないなど）ので、端末内の写しは消さない
+  void startWatching().catch(() => void onSignedOut(false));
 }
 
 async function onSignedIn(cloud: Cloud, uid: string, googleName: string | null): Promise<void> {
-  setLocalDb('user');
-  // 端末内の写しが別のアカウントのものなら消す
+  // 端末内の写しが別のアカウントのものなら、画面が読む前に消す（消すまではゲストの記録を見せる）
   const st = await getSyncState();
   if (!st || st.uid !== uid) {
-    if (st) await clearAllLocal('user');
+    if (st) {
+      setLocalDb('guest');
+      await clearAllLocal('user');
+    }
     await setSyncState({ uid, lastPulledAt: 0 });
   }
+  setLocalDb('user');
   updateSettings({ signedIn: true, guest: false });
   const importCount = getSettings().guestImportDeclined ? 0 : await guestProgressCount();
   set({ status: 'signedIn', uid, displayName: getSettings().displayName, importCount });
@@ -144,10 +154,24 @@ async function onSignedIn(cloud: Cloud, uid: string, googleName: string | null):
   await sync(cloud, googleName);
 }
 
-function onSignedOut(): void {
+/**
+ * ログインしていない状態にする。ended は、Firebase が「ログインしていない」と知らせたとき（ログアウト・アカウント削除のほか、
+ * ほかの端末でのアカウント削除やログインの失効など）。ログイン中だった端末なら、端末内の写し（記録・要復習マーク・メモ・未送信分）を消す
+ * （共用の端末に残さないため。SPEC §8.4）
+ */
+async function onSignedOut(ended: boolean): Promise<void> {
+  const wasSignedIn = getSettings().signedIn;
   setLocalDb('guest');
-  if (getSettings().signedIn) updateSettings({ signedIn: false, displayName: '' });
+  if (wasSignedIn) updateSettings({ signedIn: false, displayName: '' });
   set({ status: 'off', uid: null, displayName: '', isAdmin: false, importCount: 0, syncError: false });
+  if (!ended || !wasSignedIn) return;
+  try {
+    const lost = outboxSize(await getOutbox()) + personalOutboxSize(await getPersonalOutbox());
+    await clearAllLocal('user');
+    set({ endedLost: lost });
+  } catch {
+    // 消せなかったときは、次にログインしたときに消える（別のアカウントなら onSignedIn で消す）
+  }
 }
 
 /** users/{uid} を読む → 未送信分を送る → 変更があれば取り込む */

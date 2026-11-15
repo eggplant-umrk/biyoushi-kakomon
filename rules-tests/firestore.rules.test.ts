@@ -10,7 +10,10 @@ import {
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
+  deleteField,
   deleteDoc,
   doc,
   documentId,
@@ -35,6 +38,8 @@ import { renderRules, TEST_ADMIN_EMAIL as ADMIN_EMAIL } from '../scripts/setup/b
 
 const ALICE = 'alice';
 const BOB = 'bob';
+/** 全770問の問題ID（第41〜54回 × 問1〜55） */
+const ALL_QIDS = Array.from({ length: 14 * 55 }, (_, i) => `${41 + Math.floor(i / 55)}-${String((i % 55) + 1).padStart(2, '0')}`);
 
 let env: RulesTestEnvironment;
 
@@ -406,8 +411,13 @@ describe('users/{uid}/days/{day}', () => {
     const db = userDb(ALICE);
     await assertSucceeds(sendSet(ref(db, today()), day()));
     await assertSucceeds(sendSet(ref(db, jstDate(Date.now() - DAY)), day({ sessions: [] })));
+    // アプリと同じ書き方（回数は increment、セットの結果は arrayUnion で後ろに足す）
     await assertSucceeds(
-      sendSet(ref(db, today()), { answered: increment(5), correct: increment(5), sessions: [session(), session({ mode: 'exam', total: 55, correct: 40 })] }, { merge: true }),
+      sendSet(
+        ref(db, today()),
+        { answered: increment(5), correct: increment(5), sessions: arrayUnion(session({ total: 8 }), session({ mode: 'exam', total: 55, correct: 40 })) },
+        { merge: true },
+      ),
     );
     await assertSucceeds(deleteDoc(ref(db, today())));
   });
@@ -436,7 +446,7 @@ describe('users/{uid}/days/{day}', () => {
     ['correct > answered', { answered: 1, correct: 2 }],
     ['answered が上限超え', { answered: 100001 }],
     ['answered が文字列', { answered: '10' }],
-    ['sessions が51件', { sessions: Array.from({ length: 51 }, () => session()) }],
+    ['sessions が6件', { sessions: Array.from({ length: 6 }, () => session()) }],
     ['sessions が配列でない', { sessions: 'x' }],
     ['末尾の session の mode が不正', { sessions: [session({ mode: 'hack' })] }],
     ['末尾の session に余分なキー', { sessions: [session({ payload: 'x'.repeat(1000) })] }],
@@ -448,9 +458,51 @@ describe('users/{uid}/days/{day}', () => {
     await assertFails(sendSet(ref(userDb(ALICE), today()), day(override)));
   });
 
-  test('sessions は50件まで書ける', async () => {
+  // ---- sessions の上限（中身をすべて検査し、文書が大きくならないようにする） ----
+  const sessions = (n: number, o: Record<string, unknown> = {}) =>
+    Array.from({ length: n }, (_, i) => session({ total: 1 + (i % 50), correct: 0, ...o }));
+  const seedDay = (list: unknown[]) =>
+    seed(async (db) => {
+      await setDoc(ref(db, today()), { answered: 10, correct: 7, sessions: list });
+    });
+  const append = (db: Firestore, items: unknown[]) =>
+    sendSet(ref(db, today()), { answered: increment(0), correct: increment(0), sessions: arrayUnion(...items) }, { merge: true });
+
+  test('作成で書けるセットの結果は5件まで（中身はすべて検査）', async () => {
+    const db = userDb(ALICE);
+    await assertSucceeds(sendSet(ref(db, today()), day({ sessions: sessions(5) })));
+    await assertSucceeds(deleteDoc(ref(db, today())));
+    await assertFails(sendSet(ref(db, today()), day({ sessions: sessions(6) })));
+    // 末尾以外の中身も検査する
+    await assertFails(sendSet(ref(db, today()), day({ sessions: [session({ payload: 'x'.repeat(1000) }), session()] })));
+    await assertFails(sendSet(ref(db, today()), day({ sessions: [session({ endedAt: 'now' }), session()] })));
+    await assertFails(sendSet(ref(db, today()), day({ sessions: ['x'.repeat(1000), session()] })));
+  });
+
+  test('更新では、後ろに足すことだけができる（1回5件まで、合計100件まで）', async () => {
+    const db = userDb(ALICE);
+    await seedDay(sessions(40));
+    await assertSucceeds(append(db, sessions(5, { mode: 'exam' })));
+    await assertFails(append(db, sessions(6, { mode: 'review' })));
+    // 足すものの中身も、すべて検査する
+    await assertFails(append(db, [session({ mode: 'review', total: 2 }), session({ extra: 'x'.repeat(1000) })]));
+    await assertFails(append(db, [{ big: 'x'.repeat(1000) }, session({ mode: 'review', total: 3 })]));
+    // 前からある分の書き換え・削除はできない
+    await assertFails(sendSet(ref(db, today()), { answered: increment(0), correct: increment(0), sessions: sessions(45, { mode: 'review' }) }, { merge: true }));
+    await assertFails(sendSet(ref(db, today()), { answered: increment(0), correct: increment(0), sessions: [] }, { merge: true }));
+  });
+
+  test('2台の端末の分を合わせて、1日100件まで書ける（101件目は拒否）', async () => {
+    const db = userDb(ALICE);
+    await seedDay(sessions(95));
+    await assertSucceeds(append(db, sessions(5, { mode: 'exam' })));
+    await assertFails(append(db, [session({ mode: 'review', total: 9 })]));
+  });
+
+  test('足すものがない送信（arrayRemove）は通る', async () => {
+    await seedDay(sessions(3));
     await assertSucceeds(
-      sendSet(ref(userDb(ALICE), today()), day({ sessions: Array.from({ length: 50 }, () => session()) })),
+      sendSet(ref(userDb(ALICE), today()), { answered: increment(1), correct: increment(1), sessions: arrayRemove('') }, { merge: true }),
     );
   });
 });
@@ -844,16 +896,24 @@ describe('要復習マーク（users/{uid}/review/marks）', () => {
     await assertFails(setDoc(marksRef(db), { ids: { '54-01': true }, updatedAt: Timestamp.fromMillis(0) }));
     await assertFails(setDoc(marksRef(db), { ids: ['54-01'], updatedAt: serverTimestamp() }));
   });
-  test('770件までは保存でき、771件は拒否。1回の更新で変えられるのは100件まで', async () => {
+  test('770件までは保存でき、1回の更新で変えられるのは100件まで', async () => {
     const db = userDb(ALICE);
-    const ids = (n: number, prefix = 'q') => Object.fromEntries(Array.from({ length: n }, (_, i) => [`${prefix}${i}`, true]));
-    await assertFails(setDoc(marksRef(db), marks(ids(771))));
+    const ids = (n: number) => Object.fromEntries(ALL_QIDS.slice(0, n).map((q) => [q, true]));
     await assertSucceeds(setDoc(marksRef(db), marks(ids(770))));
     // 作成済みの文書に、101件を一度に足す更新は拒否（100件までなら通る）
     await assertSucceeds(deleteDoc(marksRef(db)));
     await assertSucceeds(setDoc(marksRef(db), marks({})));
     await assertFails(setDoc(marksRef(db), marks(ids(101)), { merge: true }));
     await assertSucceeds(setDoc(marksRef(db), marks(ids(100)), { merge: true }));
+  });
+  test('キーは問題IDの形のものだけ（長いキー・形の違うキーは拒否）', async () => {
+    const db = userDb(ALICE);
+    for (const bad of ['q0', '55-01', '54-00', '54-56', '54-1', 'x'.repeat(1300), '54-01 ']) {
+      await assertFails(setDoc(marksRef(db), marks({ [bad]: true })));
+    }
+    await assertSucceeds(setDoc(marksRef(db), marks({ '54-01': true })));
+    await assertFails(setDoc(marksRef(db), marks({ ['y'.repeat(1300)]: true }), { merge: true }));
+    await assertSucceeds(setDoc(marksRef(db), marks({ '41-55': true }), { merge: true }));
   });
 });
 
@@ -1032,5 +1092,111 @@ describe('users/{uid} の更新は、ルールの評価回数の上限に余裕�
     await assertFails(updateDoc(ref, { ...base, 'examBest.40': 10 }));
     await assertFails(updateDoc(ref, { ...base, displayName: '改\u0007名' }));
     await assertSucceeds(updateDoc(ref, { ...base, 'examBest.54': 55 }));
+  });
+});
+
+// ---- 値の範囲をさらに絞る（セキュリティレビューの対応。正しい使い方で書く値は変えない） ----
+
+describe('表示名・分野別・おすすめ復習の問題ID', () => {
+  const seedWith = (o: Record<string, unknown> = {}) =>
+    seedAlice({
+      syncSeq: 3,
+      syncAt: past,
+      totals: { answered: 100, correct: 50 },
+      byField: { law: { answered: 60, correct: 30 }, skin: { answered: 40, correct: 20 } },
+      examBest: { '54': 40 },
+      ...o,
+    });
+  const send = (upd: Record<string, unknown>) =>
+    updateDoc(doc(userDb(ALICE), 'users', ALICE), {
+      syncSeq: 4,
+      syncAt: serverTimestamp(),
+      lastActiveAt: serverTimestamp(),
+      'totals.answered': increment(10),
+      'totals.correct': increment(5),
+      ...upd,
+    });
+
+  test('表示名に、見えない文字（ゼロ幅文字・文字の向きを変える文字）は使えない', async () => {
+    await seedWith();
+    const ref = doc(userDb(ALICE), 'users', ALICE);
+    for (const bad of ['​', 'あ​い', '‌', '‍', '﻿', '⁠', 'a‮b', '⁦x', '؜']) {
+      await assertFails(updateDoc(ref, { displayName: bad, lastActiveAt: serverTimestamp() }));
+    }
+    await assertSucceeds(updateDoc(ref, { displayName: 'アリス 2', lastActiveAt: serverTimestamp() }));
+  });
+
+  test('分野別の解答数は、合計の解答数を超えられない（分野を消すこともできない）', async () => {
+    // 合計は 100 → 110（send で +10）
+    await seedWith();
+    await assertFails(send({ 'byField.law.answered': 1000000, 'byField.law.correct': 0 }));
+    await assertFails(send({ 'byField.law.answered': increment(51) })); // 60 + 51 = 111 > 110
+    await assertFails(send({ 'byField.anatomy': { answered: 111, correct: 0 } }));
+    await assertFails(send({ 'byField.skin': deleteField() }));
+    await assertSucceeds(send({ 'byField.law.answered': increment(50) })); // 110 まで
+  });
+
+  test('アプリと同じ送信（分野別を、送った解答数だけ増やす）は通る', async () => {
+    await seedWith();
+    await assertSucceeds(
+      send({ 'byField.law.answered': increment(6), 'byField.law.correct': increment(3), 'byField.anatomy.answered': increment(4), 'byField.anatomy.correct': increment(2) }),
+    );
+  });
+
+  test('おすすめ復習の問題IDは、すべて問題IDの形で、重複しない', async () => {
+    await seedAlice();
+    const ref = doc(adminDb(), 'users', ALICE, 'assignments', 'a1');
+    await assertFails(setDoc(ref, assignment({ questionIds: ['54-01', '../../x'] })));
+    await assertFails(setDoc(ref, assignment({ questionIds: ['54-01', 5] })));
+    await assertFails(setDoc(ref, assignment({ questionIds: ['54-01', { a: 1 }] })));
+    await assertFails(setDoc(ref, assignment({ questionIds: ['54-01', '54-01'] })));
+    await assertSucceeds(setDoc(ref, assignment({ questionIds: ['54-01', '41-55'] })));
+  });
+});
+
+describe('days・要復習マークの書き込みも、ルールの評価回数の上限（1000）に当たらない', () => {
+  test('いちばん重い送信（問題10件＋今日・前日にセットの結果を5件ずつ＋8分野・14回の最高点・表示名）が通る', async () => {
+    const fields = ['law', 'public_health', 'infection', 'hygiene', 'anatomy', 'skin', 'cosmetics', 'theory'];
+    const byField = Object.fromEntries(fields.map((f) => [f, { answered: 100, correct: 50 }]));
+    const examBest = Object.fromEntries(Array.from({ length: 14 }, (_, i) => [String(41 + i), 30]));
+    await seedAlice({ syncSeq: 7, totals: { answered: 800, correct: 400 }, byField, examBest });
+    const today = jstDate(Date.now());
+    const yesterday = jstDate(Date.now() - DAY);
+    await seed(async (db) => {
+      for (const d of [today, yesterday]) {
+        await setDoc(doc(db, 'users', ALICE, 'days', d), { answered: 10, correct: 7, sessions: Array.from({ length: 45 }, (_, i) => session({ total: 1 + i, correct: 0 })) });
+      }
+    });
+    const db = userDb(ALICE);
+    const b = writeBatch(db);
+    for (let i = 1; i <= 10; i++) {
+      const qid = `54-${String(i).padStart(2, '0')}`;
+      b.set(doc(db, 'users', ALICE, 'progress', qid), { attempts: increment(5), correctCount: increment(5), history: '○○○○○', lastAnsweredAt: serverTimestamp(), checked: false, nextReviewAt: null }, { merge: true });
+    }
+    for (const d of [today, yesterday]) {
+      const items = Array.from({ length: 5 }, (_, i) => session({ mode: 'exam', total: 50 + i, correct: 1 }));
+      b.set(doc(db, 'users', ALICE, 'days', d), { answered: increment(25), correct: increment(25), sessions: arrayUnion(...items) }, { merge: true });
+    }
+    const upd: Record<string, unknown> = {
+      syncSeq: 8,
+      syncAt: serverTimestamp(),
+      lastActiveAt: serverTimestamp(),
+      displayName: '改名',
+      'totals.answered': increment(50),
+      'totals.correct': increment(50),
+    };
+    for (let i = 41; i <= 54; i++) upd[`examBest.${i}`] = 40;
+    for (const f of fields) {
+      upd[`byField.${f}.answered`] = increment(5);
+      upd[`byField.${f}.correct`] = increment(5);
+    }
+    b.update(doc(db, 'users', ALICE), upd);
+    await assertSucceeds(b.commit());
+  });
+
+  test('要復習マークの更新（770件の文書に100件を変える）が通る', async () => {
+    const db = userDb(ALICE);
+    await assertSucceeds(setDoc(marksRef(db), marks(Object.fromEntries(ALL_QIDS.slice(0, 670).map((q) => [q, true])))));
+    await assertSucceeds(setDoc(marksRef(db), marks(Object.fromEntries(ALL_QIDS.slice(670, 770).map((q) => [q, true]))), { merge: true }));
   });
 });
