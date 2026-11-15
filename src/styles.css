@@ -2578,3 +2578,23 @@ a.btn {
   justify-content: center;
   text-decoration: none;
 }
+
+/* 管理画面：更新回数が異常に多い利用者（SPEC §8.2）と、同じ表示名を見分けるための ID */
+.admin-uid {
+  margin-left: 6px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+.admin-user-alert {
+  border-color: var(--ng);
+}
+.badge-alert {
+  color: var(--ng);
+  border-color: var(--ng);
+  font-weight: 700;
+}
+.admin-alert {
+  border-color: var(--ng);
+  color: var(--text);
+}

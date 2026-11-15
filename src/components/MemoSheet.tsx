@@ -59,7 +59,7 @@ export function MemoSheet({
             <Icon name="close" />
           </button>
         </div>
-        <p className="small muted">自分だけが見られるメモです。管理者にも見えません。</p>
+        <p className="small muted">自分用のメモです。ほかの利用者や、アプリの管理画面には表示されません。</p>
         <label className="sr-only" htmlFor="memo-text">
           メモ
         </label>

@@ -11,6 +11,8 @@ const user = (uid: string, lastActiveAt: number) => ({
   uid,
   displayName: uid,
   lastActiveAt,
+  createdAt: 0,
+  syncSeq: 0,
   answered: 0,
   correct: 0,
   byField: {},

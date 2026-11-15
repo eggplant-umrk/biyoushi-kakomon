@@ -1,5 +1,6 @@
 // セキュリティルールのテンプレート（SPEC §8.1）。
-// __ADMIN_EMAIL__ は、デプロイ時に .env.local の ADMIN_EMAIL で置き換える（scripts/setup/build-rules.ts）。
+// isAdmin() の中の印は、デプロイ時に .env.local の ADMIN_EMAIL で置き換える（scripts/setup/build-rules.ts）。
+// allQids() の中の印は、全770問の問題IDの一覧に置き換える。
 // 管理者のメールアドレスをこのファイルに直接書かないこと。
 //
 // 方針：明示的に許可したもの以外はすべて拒否。書き込みは型・キー・値の範囲・サイズを全部検査する。
@@ -20,6 +21,8 @@ service cloud.firestore {
     function isValidQid(q) {
       return q is string && q.matches('^(4[1-9]|5[0-4])-(0[1-9]|[1-4][0-9]|5[0-5])$');
     }
+    // 全770問の問題ID（第41〜54回 × 問1〜55）。map のキーやリストの要素を1件ずつ調べられないので、hasOnly で一覧と照らす
+    function allQids() { return [__QUESTION_IDS__]; }
     function isNonNegInt(v, max) { return v is int && v >= 0 && v <= max; }
     function hasExactly(d, keys) { return d.keys().hasOnly(keys) && d.keys().hasAll(keys); }
 
@@ -43,25 +46,28 @@ service cloud.firestore {
     }
 
     // 更新で変わった分野・回だけを検査する（変わっていないものは、前回の書き込みで検査済み）。
-    // ルールの評価回数の上限（1回の書き込みで1000）に余裕を持たせるため（SPEC §14 #62）
-    function validFieldIfChanged(m, ch, key) { return !(key in ch) || !(key in m) || validCount(m[key], 1000000); }
-    function validByFieldUpdate(n, o) {
+    // ルールの評価回数の上限（1回の書き込みで1000）に余裕を持たせるため（SPEC §14 #62）。
+    // 変わった分野の解答数は、合計の解答数（totals.answered。1回の送信で55までしか増えない）以下。分野を消すことはできない
+    function validFieldIfChanged(m, ch, key, max) { return !(key in ch) || validCount(m[key], max); }
+    function validByFieldUpdate(n, o, max) {
       let ch = n.diff(o).affectedKeys();
       return n is map
         && n.keys().hasOnly(['law', 'public_health', 'infection', 'hygiene', 'anatomy', 'skin', 'cosmetics', 'theory'])
-        && validFieldIfChanged(n, ch, 'law') && validFieldIfChanged(n, ch, 'public_health')
-        && validFieldIfChanged(n, ch, 'infection') && validFieldIfChanged(n, ch, 'hygiene')
-        && validFieldIfChanged(n, ch, 'anatomy') && validFieldIfChanged(n, ch, 'skin')
-        && validFieldIfChanged(n, ch, 'cosmetics') && validFieldIfChanged(n, ch, 'theory');
+        && validFieldIfChanged(n, ch, 'law', max) && validFieldIfChanged(n, ch, 'public_health', max)
+        && validFieldIfChanged(n, ch, 'infection', max) && validFieldIfChanged(n, ch, 'hygiene', max)
+        && validFieldIfChanged(n, ch, 'anatomy', max) && validFieldIfChanged(n, ch, 'skin', max)
+        && validFieldIfChanged(n, ch, 'cosmetics', max) && validFieldIfChanged(n, ch, 'theory', max);
     }
-    // 回別の最高点：14回のどれかがキーで、値はすべて 0〜55 の整数（値の一覧を1回で確かめる。評価回数を減らすため）
+    // 回別の最高点：14回のどれかがキーで、値はすべて 0〜55 の整数（値の一覧を1回で確かめる。評価回数を減らすため）。
+    // 上げる方向だけに限る検査は、評価回数の上限を超えるので入れていない（自己申告の値。SPEC §8.6）
     function validExamBestUpdate(n, o) {
       return n.keys().hasOnly(['41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54'])
         && n.values().hasOnly([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]);
     }
-    // 表示名：1〜30文字、制御文字を含まない
+    // 表示名：1〜30文字。制御文字と、見えない文字（ゼロ幅文字・文字の向きを変える文字）を含まない
     function validName(v) {
-      return v is string && v.size() >= 1 && v.size() <= 30 && v.matches('^[^\\x00-\\x1f\\x7f]+$');
+      return v is string && v.size() >= 1 && v.size() <= 30
+        && v.matches('^[^\\x00-\\x1f\\x7f\\x{061c}\\x{200b}-\\x{200f}\\x{202a}-\\x{202e}\\x{2060}-\\x{2069}\\x{feff}]+$');
     }
 
 
@@ -106,7 +112,7 @@ service cloud.firestore {
         && n.lastActiveAt == request.time
         && (n.displayName == o.displayName || validName(n.displayName))
         && validCount(n.totals, 1000000)
-        && (n.byField == o.byField || validByFieldUpdate(n.byField, o.byField))
+        && (n.byField == o.byField || validByFieldUpdate(n.byField, o.byField, n.totals.answered))
         && (n.examBest == o.examBest || validExamBestUpdate(n.examBest, o.examBest));
     }
     // progress / days は、同じ writeBatch で記録の送信（users/{uid}.syncAt を request.time にする更新）を
@@ -132,8 +138,9 @@ service cloud.firestore {
         && (d.nextReviewAt == null || d.nextReviewAt is timestamp);
     }
 
-    // users/{uid}/days/{YYYY-MM-DD}。sessions は最大50件。
-    // ルールでは配列を1件ずつ調べられないので、末尾（いま追加した1件）の中身を検査する
+    // users/{uid}/days/{YYYY-MM-DD}。sessions（その日のセットの結果）は、後ろに足すことだけができる。
+    // ルールでは配列を1件ずつ調べられないので、1回に足せるのを5件までにして、足した分をすべて検査する
+    // （前からある分は、足したときに検査済み）。1日100件まで（端末ごとに50件までなので、2台分）
     function validSession(s) {
       return s is map
         && hasExactly(s, ['mode', 'total', 'correct', 'endedAt'])
@@ -142,14 +149,21 @@ service cloud.firestore {
         && isNonNegInt(s.correct, 770) && s.correct <= s.total
         && s.endedAt is timestamp;
     }
+    function addedSessionOk(n, i, k) { return k <= i || validSession(n[n.size() - k + i]); }
+    function validSessionsAppend(n, o) {
+      let k = n.size() - o.size();
+      return n.size() <= 100 && k >= 0 && k <= 5
+        && (o.size() == 0 || n[0:o.size()] == o)
+        && addedSessionOk(n, 0, k) && addedSessionOk(n, 1, k) && addedSessionOk(n, 2, k)
+        && addedSessionOk(n, 3, k) && addedSessionOk(n, 4, k);
+    }
     function validDay(d) {
       return hasExactly(d, ['answered', 'correct', 'sessions'])
         && isNonNegInt(d.answered, 100000)
         && isNonNegInt(d.correct, 100000)
         && d.correct <= d.answered
         && d.sessions is list
-        && d.sessions.size() <= 50
-        && (d.sessions.size() == 0 || validSession(d.sessions[d.sessions.size() - 1]));
+        && validSessionsAppend(d.sessions, resource == null ? [] : resource.data.sessions);
     }
 
     // users/{uid}/assignments/{aid}（おすすめ復習。作るのは管理者だけ）
@@ -158,18 +172,20 @@ service cloud.firestore {
         && d.title is string && d.title.size() >= 1 && d.title.size() <= 50
         && d.questionIds is list
         && d.questionIds.size() >= 1 && d.questionIds.size() <= 55
-        && isValidQid(d.questionIds[0])
+        && d.questionIds.hasOnly(allQids())
+        && d.questionIds.toSet().size() == d.questionIds.size()
         && d.createdAt == request.time
         && d.doneAt == null;
     }
 
     // ---- 利用者の記録 -----------------------------------------------------
 
-    // 要復習マーク：ids は { 問題ID: true } の map。770件まで、値は true だけ。1回の更新で変えられるのは100件まで
+    // 要復習マーク：ids は { 問題ID: true } の map。キーは問題IDだけ（770件まで）、値は true だけ。1回の更新で変えられるのは100件まで
     function validReview(d) {
       return hasExactly(d, ['ids', 'updatedAt'])
         && d.ids is map
         && d.ids.size() <= 770
+        && d.ids.keys().hasOnly(allQids())
         && d.ids.values().hasOnly([true])
         && d.updatedAt == request.time
         && (resource == null || d.ids.diff(resource.data.ids).affectedKeys().size() <= 100);

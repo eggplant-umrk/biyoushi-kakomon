@@ -6,6 +6,10 @@ describe('cleanDisplayName', () => {
     expect(cleanDisplayName('a\u0000b\nc\td\u007f')).toBe('abcd');
     expect(cleanDisplayName('abc‮def')).toBe('abcdef');
   });
+  it('ゼロ幅文字などの見えない文字を取り除く（ルールで拒否される文字）', () => {
+    expect(cleanDisplayName('あ​い‌‍﻿⁠う؜‎⁦')).toBe('あいう');
+    expect(cleanDisplayName('​​')).toBe('');
+  });
   it('前後の空白を落とす', () => {
     expect(cleanDisplayName('  山田 花子　')).toBe('山田 花子');
   });

@@ -41,9 +41,39 @@ export function dailySeries(days: readonly DayRec[], now: number, n = SERIES_DAY
   return lastDates(now, n).map((date) => byDate.get(date) ?? { date, answered: 0, correct: 0 });
 }
 
-/** 一覧の並び順：最終学習日の新しい順 */
-export function sortUsers(users: readonly AdminUserData[]): AdminUserData[] {
-  return [...users].sort((a, b) => b.lastActiveAt - a.lastActiveAt || a.displayName.localeCompare(b.displayName, 'ja'));
+// ---- 更新回数が異常に多い利用者（SPEC §8.2）---------------------------------
+// 1人のログイン利用者が、無料枠の書き込みを使い切るほど送り続けていないかの目安。一覧で読んでいる users と days だけで判定し、
+// 読み取りは増やさない。表示名の変更・要復習マーク・メモの書き込みの回数は、記録に残らないので分からない（SPEC §8.6）
+
+/** 送信回数（syncSeq）が、解答数よりこれだけ多ければ目立たせる。アプリは10問ごとと、セットの終わりに送るので、ふつうは解答数より少ない */
+export const ALERT_EXTRA_SENDS = 200;
+/** 1日あたりの解答数がこれを超えたら目立たせる（全770問を1日に解いても届かない数） */
+export const ALERT_ANSWERS_PER_DAY = 1000;
+
+export type ActivityAlert = 'sends' | 'answers';
+
+/** 更新回数が異常に多い利用者の印。sends＝解答の伴わない送信が多い、answers＝1日の解答数が多すぎる */
+export function activityAlerts(u: AdminUserData, now: number): ActivityAlert[] {
+  const alerts: ActivityAlert[] = [];
+  if (u.syncSeq > u.answered + ALERT_EXTRA_SENDS) alerts.push('sends');
+  const since = u.createdAt > 0 ? u.createdAt : now;
+  const perDay = u.answered / Math.max(1, (now - since) / DAY_MS);
+  const maxDay = Math.max(0, ...u.days.map((d) => d.answered));
+  if (perDay > ALERT_ANSWERS_PER_DAY || maxDay > ALERT_ANSWERS_PER_DAY) alerts.push('answers');
+  return alerts;
+}
+
+/** 一覧の並び順：更新回数が異常に多い人を先に、あとは最終学習日の新しい順 */
+export function sortUsers(users: readonly AdminUserData[], now = Date.now()): AdminUserData[] {
+  const flagged = (u: AdminUserData) => (activityAlerts(u, now).length > 0 ? 1 : 0);
+  return [...users].sort(
+    (a, b) => flagged(b) - flagged(a) || b.lastActiveAt - a.lastActiveAt || a.displayName.localeCompare(b.displayName, 'ja'),
+  );
+}
+
+/** 管理画面で同じ表示名の人を見分けるための、uid の先頭6文字 */
+export function shortUid(uid: string): string {
+  return uid.slice(0, 6);
 }
 
 /** 「今日（11/13）」「昨日（11/12）」「3日前（11/10）」のような最終学習日の表示。0 を渡すと「—」（まだ解いていない人） */
@@ -103,7 +133,7 @@ const progressCache = new Map<string, Promise<ProgressRec[]>>();
 export function loadAdminUsers(): Promise<UsersCache> {
   usersCache ??= import('./cloud')
     .then((c) => c.adminLoadUsers())
-    .then((users) => ({ users: sortUsers(users), fetchedAt: Date.now() }))
+    .then((users) => ({ users: sortUsers(users, Date.now()), fetchedAt: Date.now() }))
     .catch((e: unknown) => {
       usersCache = null; // 失敗したら、次に開いたときにやり直す
       throw e;

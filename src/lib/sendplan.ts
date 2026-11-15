@@ -11,6 +11,11 @@ export const MAX_ANSWERS_PER_SEND = 55;
  * また1回の要求で評価できる式は1000個まで。日別の記録（最大2件）と users の更新を合わせて収まる数にする
  */
 export const MAX_DOCS_PER_SEND = 10;
+/**
+ * 1回の送信で、日別の記録（days）に足すセットの結果の件数の上限（日付ごと）。
+ * ルールは、足した分を1件ずつ検査するため、1回に足せる件数を5件までにしている（SPEC §14 #64）
+ */
+export const MAX_SESSIONS_PER_SEND = 5;
 
 /**
  * 未送信分（outbox）から、1回の送信で送る分を取り出す。
@@ -19,7 +24,8 @@ export const MAX_DOCS_PER_SEND = 10;
  * - 1問だけで上限を超える場合（オフラインで同じ問題を何十回も解いたなど）は、その問題を上限まで分けて送る。
  *   それ以外は問題を途中で分けない（Firestore の attempts が history の長さより少なくなるとルールで拒否されるため）
  * - correct は、その回に送る attempts を超えない（ルール：correct の増加 ≤ answered の増加）
- * - 日別の記録（days）は日付ごとに answered を MAX_ANSWERS_PER_SEND まで。sessions は全部送る
+ * - 日別の記録（days）は日付ごとに answered を MAX_ANSWERS_PER_SEND まで、sessions を MAX_SESSIONS_PER_SEND 件まで。
+ *   残りは次の送信に回す（送った件数だけ outbox から引く）
  */
 export function takeChunk(out: Outbox, limit = MAX_ANSWERS_PER_SEND): Outbox {
   const chunk: Outbox = { progress: {}, days: {} };
@@ -50,7 +56,7 @@ export function takeChunk(out: Outbox, limit = MAX_ANSWERS_PER_SEND): Outbox {
     chunk.days[date] = {
       answered,
       correct: Math.min(Math.max(d.correct, 0), answered),
-      sessions: [...d.sessions],
+      sessions: d.sessions.slice(0, MAX_SESSIONS_PER_SEND),
     };
   }
   return chunk;
