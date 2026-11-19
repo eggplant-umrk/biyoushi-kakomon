@@ -2598,3 +2598,38 @@ a.btn {
   border-color: var(--ng);
   color: var(--text);
 }
+
+/* 類題プリント（読む。SPEC §14 #69） */
+.print-entry {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 12px;
+}
+.print-entry-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.print-entry-title {
+  font-weight: 700;
+}
+.print-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.print-list .read-item {
+  height: auto;
+}
+.print-related ul {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
