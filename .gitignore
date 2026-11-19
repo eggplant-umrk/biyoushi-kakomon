@@ -36,3 +36,6 @@ textbook-src/
 
 # 解説の作業中のファイル（まとめる前のもの）
 data-src/explanations/parts/
+
+# 類題プリント（後輩の学校の先生が作ったもの）の写真。先生の著作物なので、コミットしない
+print-src/

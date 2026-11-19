@@ -66,6 +66,31 @@ test('閲覧モード：全770問の一覧、絞り込み、検索の強調、1�
   await expect(page.locator('.quiz-meta')).toContainText('第54回 問2');
 });
 
+test('類題プリント：一覧から問題を開き、答え・解説・注意・関連する過去問を読める（記録の対象にはしない）', async ({ page }) => {
+  await enterAsGuest(page);
+  await tabs(page).getByRole('button', { name: '読む' }).click();
+  await page.getByTestId('print-entry').click();
+  await expect(page).toHaveURL(/#\/read\?print=law-1$/);
+  await expect(page.getByTestId('print-item')).toHaveCount(20);
+
+  // 問題5：答えが2つになる問題には、注意を出す
+  await page.getByTestId('print-item').nth(4).click();
+  await expect(page.getByTestId('print-detail-title')).toHaveText('類題プリント 問題5');
+  await expect(page.getByTestId('print-caution')).toBeVisible();
+  await expect(page.locator('.choice.is-correct')).toHaveCount(2);
+  // 解くボタン・要復習マーク・メモはない
+  await expect(page.getByTestId('solve-this')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /要復習マーク/ })).toHaveCount(0);
+
+  // 次の問題へ。関連する過去問を開ける
+  await page.getByRole('button', { name: '次の問題' }).click();
+  await expect(page.getByTestId('print-detail-title')).toHaveText('類題プリント 問題6');
+  await expect(page.locator('.choice.is-correct')).toHaveCount(1);
+  await page.getByTestId('print-related').getByRole('button', { name: '第50回 問5' }).click();
+  await expect(page).toHaveURL(/#\/read\?q=50-05$/);
+  await expect(page.getByTestId('solve-this')).toBeVisible();
+});
+
 test('要復習マークとメモ：閲覧モードと解答画面の両方から。一覧に印が出て、絞り込みと「今日やること」に反映', async ({ page }) => {
   await enterAsGuest(page);
   await page.goto('./#/read?q=54-03');

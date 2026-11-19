@@ -24,6 +24,8 @@ import { usePersonal } from '../lib/personal';
 import { startQuestions } from '../lib/quickstart';
 import { navigate, useRouteParam } from '../lib/router';
 import { searchDocs, type BrowseItem, type SearchHit } from '../lib/searchIndex';
+import { PRINTS } from '../lib/prints';
+import { PrintDetail, PrintList } from './PrintScreens';
 import type { ExamMeta, Question } from '../lib/types';
 
 const FigureViewer = lazy(() => import('../components/FigureViewer').then((m) => ({ default: m.FigureViewer })));
@@ -43,6 +45,10 @@ const CONFIDENCE: [BrowseFilter['confidence'], string][] = [
  */
 export function ReadScreen() {
   const qid = useRouteParam('q');
+  const printId = useRouteParam('print');
+  const printQid = useRouteParam('pq');
+  if (printQid) return <PrintDetail key={printQid} questionId={printQid} />;
+  if (printId) return <PrintList printId={printId} />;
   return qid ? <ReadDetail key={qid} qid={qid} /> : <ReadList />;
 }
 
@@ -186,6 +192,22 @@ function ReadList() {
   return (
     <div className="screen read">
       <h1 className="screen-title">読む</h1>
+      {PRINTS.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          className="card card-action print-entry"
+          data-testid="print-entry"
+          onClick={() => navigate('/read', { query: { print: p.id } })}
+        >
+          <span className="print-entry-label">類題プリント</span>
+          <span className="print-entry-title">{p.title}</span>
+          <span className="small muted">{p.count}問・問題と解説を読む</span>
+          <span className="card-arrow" aria-hidden="true">
+            ›
+          </span>
+        </button>
+      ))}
       <div className="read-tools">
         <label className="search-box">
           <Icon name="search" size={20} />
