@@ -20,7 +20,7 @@
     "test:rules": "node scripts/setup/build-rules.ts --test && firebase emulators:exec --config firebase.emulator.json --project demo-kakomon --only firestore \"vitest run --config vitest.rules.config.ts\""
   },
   "dependencies": {
-    "firebase": "^13.2.0",
+    "firebase": "^13.4.0",
     "idb": "^8.0.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
@@ -34,9 +34,9 @@
     "@vitejs/plugin-react": "^6.3.0",
     "fake-indexeddb": "^6.2.8",
     "typescript": "^6.0.3",
-    "vite": "^8.3.7",
+    "vite": "^8.3.8",
     "vite-plugin-pwa": "^2.0.0",
-    "vitest": "^5.1.0",
+    "vitest": "^5.1.1",
     "workbox-window": "^7.4.1"
   },
   "overrides": {
